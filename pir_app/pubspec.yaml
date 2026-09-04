@@ -1,0 +1,29 @@
+name: pir_app
+description: PIR - Perigo de Incêndio Rural. Consulta rápida do risco de incêndio rural do IPMA.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  hive_flutter: ^1.1.0
+  provider: ^6.1.0
+  cupertino_icons: ^1.0.8
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/concelhos.json
+    - assets/logopirapp.png
+    - assets/concelhos_geo.json

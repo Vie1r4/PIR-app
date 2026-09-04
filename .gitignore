@@ -1,0 +1,10 @@
+﻿# Visual Studio / VS Code
+.vs/
+.vscode/
+
+# PowerShell temporary helper scripts
+update_icon*.ps1
+
+# Flutter build and cache (redundant safeguard for root)
+**/build/
+**/.dart_tool/
