@@ -12,6 +12,7 @@ import '../providers/acessibilidade_provider.dart';
 import '../providers/risco_provider.dart';
 import '../services/map_geometry_service.dart';
 import '../utils/risco_helpers.dart';
+import '../widgets/portugal_map_painter.dart';
 import '../widgets/risco_badge.dart';
 
 class MapScreen extends StatefulWidget {
@@ -294,6 +295,29 @@ class _MapScreenState extends State<MapScreen>
       return c.matchesSearch(normalizedQuery, queryIsNormalized: true);
     }).toList();
 
+    final mapShortcuts = <ShortcutActivator, VoidCallback>{
+      const SingleActivator(LogicalKeyboardKey.keyF, control: true): () {
+        _searchFocusNode.requestFocus();
+        if (_searchController.text.isNotEmpty) {
+          setState(() => _mostrandoDropdownPesquisa = true);
+        }
+      },
+      const SingleActivator(LogicalKeyboardKey.escape): () {
+        if (_mostrandoDropdownPesquisa) {
+          setState(() => _mostrandoDropdownPesquisa = false);
+          _searchFocusNode.unfocus();
+        } else if (_dicoSelecionado != null) {
+          setState(() => _dicoSelecionado = null);
+        }
+      },
+      const SingleActivator(LogicalKeyboardKey.equal): _zoomIn,
+      const SingleActivator(LogicalKeyboardKey.add): _zoomIn,
+      const SingleActivator(LogicalKeyboardKey.minus): _zoomOut,
+      const SingleActivator(LogicalKeyboardKey.numpadSubtract): _zoomOut,
+      const SingleActivator(LogicalKeyboardKey.digit0): _resetZoom,
+      const SingleActivator(LogicalKeyboardKey.numpad0): _resetZoom,
+    };
+
     return Scaffold(
       appBar: widget.showAppBar
           ? AppBar(
@@ -301,14 +325,18 @@ class _MapScreenState extends State<MapScreen>
               actions: [
                 IconButton(
                   icon: const Icon(Icons.center_focus_strong),
-                  tooltip: 'Centrar / Repor Zoom',
+                  tooltip: 'Centrar / Repor Zoom (0)',
                   onPressed: _resetZoom,
                 ),
               ],
             )
           : null,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
+      body: CallbackShortcuts(
+        bindings: mapShortcuts,
+        child: Focus(
+          autofocus: true,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
           final viewportSize = Size(constraints.maxWidth, constraints.maxHeight);
           _lastViewportSize = viewportSize;
 
@@ -368,7 +396,7 @@ class _MapScreenState extends State<MapScreen>
                                       MapGeometryService.canvasWidth,
                                       MapGeometryService.canvasHeight,
                                     ),
-                                    painter: _PortugalMapPainter(
+                                    painter: PortugalMapPainter(
                                       geometries: _geometries,
                                       dadosRisco: dadosRiscoDia,
                                       dicoSelecionado: _dicoSelecionado,
@@ -488,8 +516,10 @@ class _MapScreenState extends State<MapScreen>
           );
         },
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   /// Barra de pesquisa flutuante elegante no canto superior esquerdo
   Widget _buildSearchBar(bool isNarrow, [bool isGrandes = false]) {
@@ -519,7 +549,9 @@ class _MapScreenState extends State<MapScreen>
         focusNode: _searchFocusNode,
         style: const TextStyle(fontSize: 13),
         decoration: InputDecoration(
-          hintText: 'Pesquisar concelho ou distrito...',
+          hintText: isNarrow
+              ? 'Pesquisar concelho...'
+              : 'Pesquisar concelho ou distrito... (Ctrl+F)',
           hintStyle: TextStyle(
             fontSize: 12,
             color: cs.outline.withValues(alpha: 0.8),
@@ -552,7 +584,7 @@ class _MapScreenState extends State<MapScreen>
 
   /// Coluna vertical de seleção de dias flutuante no topo direito (estilo lista Apple)
   Widget _buildDiasVerticalColumn(
-    List<_DiaOpcao> diasDisponiveis,
+    List<DiaOpcao> diasDisponiveis,
     RiscoProvider provider,
     Size viewportSize,
   ) {
@@ -1051,21 +1083,21 @@ class _MapScreenState extends State<MapScreen>
           IconButton(
             padding: btnPadding,
             icon: Icon(Icons.add, size: iconSize),
-            tooltip: 'Aumentar Zoom',
+            tooltip: 'Aumentar Zoom (+)',
             onPressed: _zoomIn,
           ),
           const Divider(height: 1, thickness: 0.8),
           IconButton(
             padding: btnPadding,
             icon: Icon(Icons.remove, size: iconSize),
-            tooltip: 'Diminuir Zoom',
+            tooltip: 'Diminuir Zoom (-)',
             onPressed: _zoomOut,
           ),
           const Divider(height: 1, thickness: 0.8),
           IconButton(
             padding: btnPadding,
             icon: Icon(Icons.center_focus_strong, size: iconSize),
-            tooltip: 'Centrar Portugal / Repor Zoom',
+            tooltip: 'Centrar Portugal / Repor Zoom (0)',
             onPressed: _resetZoom,
           ),
         ],
@@ -1162,25 +1194,25 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
-  List<_DiaOpcao> _obterDiasDisponiveis(RiscoProvider provider) {
-    final list = <_DiaOpcao>[];
+  List<DiaOpcao> _obterDiasDisponiveis(RiscoProvider provider) {
+    final list = <DiaOpcao>[];
 
     if (provider.previsaoAlargada.isNotEmpty) {
       for (int i = 0; i < provider.previsaoAlargada.length; i++) {
         final dados = provider.previsaoAlargada[i];
         final rotulo = formatarRotuloDia(dados.dataPrev, i, incluirMes: false);
-        list.add(_DiaOpcao(index: i, rotulo: rotulo, dataPrev: dados.dataPrev));
+        list.add(DiaOpcao(index: i, rotulo: rotulo, dataPrev: dados.dataPrev));
       }
     } else {
       if (provider.riscoHoje != null) {
-        list.add(_DiaOpcao(
+        list.add(DiaOpcao(
           index: 0,
           rotulo: 'Hoje',
           dataPrev: provider.riscoHoje!.dataPrev,
         ));
       }
       if (provider.riscoAmanha != null) {
-        list.add(_DiaOpcao(
+        list.add(DiaOpcao(
           index: 1,
           rotulo: 'Amanhã',
           dataPrev: provider.riscoAmanha!.dataPrev,
@@ -1202,92 +1234,3 @@ class _MapScreenState extends State<MapScreen>
   }
 }
 
-class _DiaOpcao {
-  final int index;
-  final String rotulo;
-  final String dataPrev;
-
-  const _DiaOpcao({
-    required this.index,
-    required this.rotulo,
-    required this.dataPrev,
-  });
-}
-
-class _PortugalMapPainter extends CustomPainter {
-  final List<ConcelhoGeometry> geometries;
-  final DadosRisco? dadosRisco;
-  final String? dicoSelecionado;
-  final bool isDark;
-  final bool altoContraste;
-
-  final Paint _oceanPaint = Paint();
-  final Paint _fillPaint = Paint()..style = PaintingStyle.fill;
-  final Paint _strokePaint = Paint()..style = PaintingStyle.stroke;
-  final Paint _selectedStrokePaint = Paint()..style = PaintingStyle.stroke;
-
-  _PortugalMapPainter({
-    required this.geometries,
-    required this.dadosRisco,
-    required this.dicoSelecionado,
-    required this.isDark,
-    this.altoContraste = false,
-  }) {
-    _oceanPaint.color = isDark ? const Color(0xFF101318) : const Color(0xFFE5EAF0);
-
-    if (altoContraste) {
-      _strokePaint.strokeWidth = 2.8;
-      _strokePaint.color = Colors.black;
-      _selectedStrokePaint.strokeWidth = 5.0;
-    } else {
-      // Meio termo suave e elegante: divisão percetível entre concelhos sem linhas duras
-      _strokePaint.strokeWidth = 1.5;
-      _strokePaint.color = isDark
-          ? Colors.black.withValues(alpha: 0.45)
-          : const Color(0xFF1B2230).withValues(alpha: 0.35);
-      _selectedStrokePaint.strokeWidth = 4.0;
-    }
-
-    _selectedStrokePaint.color = isDark ? Colors.white : const Color(0xFF002F6C);
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, _oceanPaint);
-
-    ConcelhoGeometry? selectedGeometry;
-
-    for (final geo in geometries) {
-      final isSelected = geo.dico == dicoSelecionado;
-      if (isSelected) {
-        selectedGeometry = geo;
-        continue;
-      }
-
-      final rcm = dadosRisco?.getRisco(geo.dico)?.rcm ?? 0;
-      _fillPaint.color =
-          rcm > 0 ? corDoRiscoMapa(rcm) : const Color(0xFFDCDFE3);
-
-      canvas.drawPath(geo.path, _fillPaint);
-      canvas.drawPath(geo.path, _strokePaint);
-    }
-
-    if (selectedGeometry != null) {
-      final rcm = dadosRisco?.getRisco(selectedGeometry.dico)?.rcm ?? 0;
-      _fillPaint.color =
-          rcm > 0 ? corDoRiscoMapa(rcm) : const Color(0xFFDCDFE3);
-
-      canvas.drawPath(selectedGeometry.path, _fillPaint);
-      canvas.drawPath(selectedGeometry.path, _selectedStrokePaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _PortugalMapPainter oldDelegate) {
-    return oldDelegate.dadosRisco != dadosRisco ||
-        oldDelegate.dicoSelecionado != dicoSelecionado ||
-        oldDelegate.geometries != geometries ||
-        oldDelegate.isDark != isDark ||
-        oldDelegate.altoContraste != altoContraste;
-  }
-}

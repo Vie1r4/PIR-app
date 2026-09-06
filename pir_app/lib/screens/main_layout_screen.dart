@@ -71,6 +71,10 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
       const SingleActivator(LogicalKeyboardKey.digit2, alt: true): () => _mudarAba(1),
       const SingleActivator(LogicalKeyboardKey.digit3, alt: true): () => _mudarAba(2),
       const SingleActivator(LogicalKeyboardKey.digit4, alt: true): () => _mudarAba(3),
+      const SingleActivator(LogicalKeyboardKey.digit1, control: true): () => _mudarAba(0),
+      const SingleActivator(LogicalKeyboardKey.digit2, control: true): () => _mudarAba(1),
+      const SingleActivator(LogicalKeyboardKey.digit3, control: true): () => _mudarAba(2),
+      const SingleActivator(LogicalKeyboardKey.digit4, control: true): () => _mudarAba(3),
       const SingleActivator(LogicalKeyboardKey.escape): () {
         if (_indiceSelecionado != 0) _mudarAba(0);
       },

@@ -9,7 +9,7 @@ import '../providers/risco_provider.dart';
 import '../utils/risco_helpers.dart';
 import '../widgets/alerta_governo_card.dart';
 import '../widgets/modal_niveis_risco.dart';
-import '../widgets/modal_seletor_favoritos.dart';
+import '../widgets/modal_seletor_concelhos.dart';
 import '../widgets/risco_badge.dart';
 import '../widgets/risco_card.dart';
 import '../widgets/status_conexao_badge.dart';
@@ -185,7 +185,7 @@ class HomeScreen extends StatelessWidget {
             splashColor: Colors.transparent,
             onTap: () {
               HapticFeedback.lightImpact();
-              ModalSeletorFavoritos.exibir(
+              ModalSeletorConcelhos.exibir(
                 context,
                 onIrParaPesquisa: () => _navegarPara(context, 1),
               );

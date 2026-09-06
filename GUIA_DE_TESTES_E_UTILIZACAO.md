@@ -1,134 +1,105 @@
-# Manual do Utilizador & Roteiro de Testes — PIR App
+# Manual do Utilizador & Roteiro de Testes — PIR App (v1.1.0)
 
-Este documento foi preparado para te guiar passo a passo na utilização e validação da aplicação **PIR (Perigo de Incêndio Rural)** no teu computador.
+Este documento guia passo a passo na utilização e validação da aplicação **PIR (Perigo de Incêndio Rural - IPMA)** no ambiente de trabalho (Windows Desktop).
 
 ---
 
 ## 1. Como Iniciar a Aplicação
 
-Podes abrir a aplicação de duas formas:
+Podes abrir a aplicação de várias formas:
 
-1. **Atalho no Ambiente de Trabalho (Mais rápido):**
-   - Vai ao teu Ambiente de Trabalho.
-   - Dá duplo clique no ícone **`PIR - Incêndio Rural`**.
-   
-2. **Diretamente pelo ficheiro executável:**
-   - Pasta: `c:\Users\Utilizador\Desktop\Trabalhos\Pir-app\pir_app\build\windows\x64\runner\Release\`
-   - Ficheiro: `pir_app.exe`
+1. **Atalho no Ambiente de Trabalho ou Menu Iniciar:**
+   - Clica no atalho **`PIR - Incêndio Rural`**.
+2. **Executável Portátil / Build:**
+   - Caminho: `pir_app\build\windows\x64\runner\Release\pir_app.exe`
+3. **Instalador Oficial:**
+   - Executar `dist\PIR_App_v1.1.0_Setup.exe` (instalação automática limpa no Windows).
 
 ---
 
 ## 2. Visão Geral dos Ecrãs e Funcionalidades
 
-### 🏠 2.1. Ecrã Principal (Home)
-- **Título superior:** "PIR - Incêndio Rural".
-- **Botões no topo direito:**
-  - 🔍 **Lupa:** Abre a pesquisa de concelhos.
-  - ❤️ **Coração:** Abre a lista de favoritos.
-- **Caso não haja concelho selecionado:** É apresentado um botão azul/laranja com o texto *"Procurar Concelho"*.
-- **Quando selecionas um concelho:**
-  - Nome do concelho em tamanho grande e o respetivo distrito logo por baixo.
-  - Ícone de coração ao lado para marcar/desmarcar dos favoritos.
-  - **Cartão de Hoje:** Mostra o nível de perigo atual (ex: *Elevado*, *Muito Elevado*), o valor numérico (1 a 5), ícone ilustrativo e a data de hoje.
-  - **Cartão de Amanhã:** Mostra a previsão de risco para o dia seguinte.
-  - **Rodapé:** Indicação de quando os dados foram obtidos e o carimbo de data/hora oficial do IPMA.
+### 🏠 2.1. Ecrã Principal (Início / Dashboard)
+- **Cabeçalho Global:** Título, seletor rápido de concelho com modal de pesquisa entre os 278 concelhos de Portugal Continental, botão de favoritos e indicador de sincronização online/offline.
+- **Cartões de Destaque:** 
+  - **Hoje** e **Amanhã**: Nível de risco oficial (1 a 5), ícone climático, temperaturas esperadas e data correspondente.
+- **Carrossel de Previsão Estendida (até 9 Dias):** Cartões individuais com a evolução meteorológica e índice FWI calculados pelo IPMA.
+- **Aviso Oficial da Proteção Civil:** Faixa de recomendação preventiva ajustada dinamicamente ao grau de perigo.
+
+### 🗺️ 2.2. Mapa Vetorial Interativo de Portugal Continental
+- **Renderização Cartográfica Offline:** Todos os 278 concelhos desenhados com vetores e coloridos segundo o nível de perigo do dia selecionado.
+- **Pesquisa Integrada:** Caixa de pesquisa flutuante com autocompletar e centralização automática no concelho pretendido.
+- **Interatividade Total:**
+  - Deslocar (Pan) clicando e arrastando com o rato.
+  - Zoom fluído (botões `+` e `-` na interface ou roda do rato).
+  - Reposicionamento com botão `0` (centrar Portugal).
+  - Seleção de dias: Barra vertical para alternar instantaneamente a visualização entre Hoje, Amanhã e os restantes dias disponíveis.
+
+### ⭐ 2.3. Gestão de Favoritos
+- Acesso rápido a concelhos previamente guardados.
+- Exibição de cartões detalhados com risco e temperatura.
+- Gestão direta (adicionar/remover) com sincronização em tempo real com o Dashboard.
+
+### ⚙️ 2.4. Definições & Acessibilidade
+- **Tamanho do Texto:** 4 patamares calibrados (`pequeno`, `normal`, `grande`, `gigante`).
+- **Tema Visual:** Claro (Light), Escuro (Dark) ou Automático (conforme o sistema operativo).
+- **Reposição Rápida:** Botão para repor predefinições acessíveis.
 
 ---
 
-### 🔍 2.2. Ecrã de Pesquisa (Search)
-- Escreve no campo de texto para filtrar instantaneamente entre os **278 concelhos** de Portugal Continental.
-- A pesquisa procura tanto pelo **nome do concelho** como pelo **distrito**.
-- **Não precisas de te preocupar com acentos nem maiúsculas:**
-  - `braganca` encontra `Bragança`.
-  - `evora` encontra `Évora`.
-  - `faro` lista os concelhos do distrito de Faro.
-- Em cada linha vês o nome, distrito, o círculo colorido com o nível de risco de hoje e o botão de coração para favoritar diretamente.
-- Clicar num concelho seleciona-o e volta automaticamente ao ecrã inicial.
+## 3. ⌨️ Atalhos de Teclado no Windows
+
+| Atalho | Ação |
+| :--- | :--- |
+| `Ctrl + F` | Focar instantaneamente a barra de pesquisa de concelhos |
+| `Esc` | Fechar dropdowns de pesquisa, modais ou desselecionar o concelho |
+| `+` ou `=` | Aumentar zoom no mapa cartográfico |
+| `-` | Diminuir zoom no mapa cartográfico |
+| `0` | Centrar Portugal Continental e repor escala inicial |
+| `Ctrl + 1` | Navegar para o ecrã de **Início** |
+| `Ctrl + 2` | Navegar para o **Mapa & Pesquisa** |
+| `Ctrl + 3` | Navegar para os **Favoritos** |
+| `Ctrl + 4` | Navegar para as **Definições** |
+| `F5` / `Ctrl + R` | Forçar sincronização imediata com os servidores do IPMA |
 
 ---
 
-### ❤️ 2.3. Ecrã de Favoritos
-- Apresenta a lista de concelhos que guardaste como favoritos.
-- Se a lista estiver vazia, apresenta uma mensagem informativa.
-- Clicar num concelho favorito leva-te ao ecrã inicial focado nesse concelho.
-- Podes remover dos favoritos carregando no coração vermelho ou arrastando o item para o lado (swipe / dismiss).
+## 4. Roteiro de Testes Passo a Passo
+
+Segue esta lista de verificações práticas para comprovar o funcionamento da versão 1.1.0:
+
+### ✅ Teste 1: Arranque e Identidade Visual
+- [ ] Executa a aplicação.
+- [ ] **Resultado Esperado:** A janela desktop abre em formato moderno (1180x780 px) com barra de navegação lateral (`NavigationRail`). O ícone na barra de tarefas e no topo da janela apresenta o logótipo oficial do PIR (não o ícone padrão do Flutter).
+
+### ✅ Teste 2: Seletor Global de Concelhos
+- [ ] No topo da página inicial, clica no nome do concelho atual.
+- [ ] **Resultado Esperado:** Abre o diálogo modal com os 278 concelhos. Ao pesquisar por `agueda`, `braga` ou `coimbra`, a filtragem é instantânea e tolerante a acentos. Selecionar um concelho atualiza imediatamente todos os dados da página inicial.
+
+### ✅ Teste 3: Navegação e Interação no Mapa
+- [ ] Clica na aba **Mapa** (ou pressiona `Ctrl + 2`).
+- [ ] Clica e arrasta no mapa para verificar o movimento suave de câmara.
+- [ ] Pressiona `+` e `-` para testar o zoom via teclado, e `0` para recentrar.
+- [ ] Clica em concelhos diferentes no mapa para confirmar o cartão flutuante com dados de risco.
+
+### ✅ Teste 4: Acessibilidade e Tamanhos de Letra
+- [ ] Vai ao ecrã de **Definições** (ou pressiona `Ctrl + 4`).
+- [ ] Alterna entre os tamanhos de letra (`pequeno`, `normal`, `grande`, `gigante`).
+- [ ] **Resultado Esperado:** Toda a interface adapta as fontes e espaçamentos sem sobreposição nem quebra de layout.
+
+### ✅ Teste 5: Modo Offline & Tolerância de Rede
+- [ ] Desliga o Wi-Fi ou a ligação à internet do computador.
+- [ ] Fecha e reabre a aplicação.
+- [ ] **Resultado Esperado:** A aplicação carrega os dados armazenados em cache local (Hive NoSQL) com badge indicativo de estado offline e sem mensagens de falha impeditivas.
 
 ---
 
-## 3. Roteiro de Testes Passo a Passo
+## 5. Escala Oficial de Risco do IPMA
 
-Segue esta lista de verificações práticas para comprovar o bom funcionamento de cada parte da aplicação:
-
-### ✅ Teste 1: Abertura e Dimensão da Janela
-- [ ] Clica no atalho do Ambiente de Trabalho.
-- [ ] **O que deves observar:** A aplicação abre numa janela compacta com proporção de telemóvel (420 x 700 px) e título "PIR - Perigo de Incêndio Rural".
-
----
-
-### ✅ Teste 2: Primeira Seleção de Concelho
-- [ ] No ecrã inicial, clica no botão **"Procurar Concelho"** (ou na lupa no topo).
-- [ ] Escreve as primeiras letras do teu concelho (por exemplo, `Águeda` ou `Coimbra`).
-- [ ] Clica no concelho correspondente.
-- [ ] **O que deves observar:** O ecrã volta ao início e surgem os dois cartões: **Hoje** e **Amanhã**, pintados com a cor correspondente ao perigo de incêndio desse local.
-
----
-
-### ✅ Teste 3: Teste de Acentos na Pesquisa
-- [ ] Abre novamente a pesquisa pela lupa.
-- [ ] Experimenta escrever sem acentos: `santarem`.
-- [ ] **O que deves observar:** Deves ver aparecer `Santarém` sem qualquer dificuldade.
-- [ ] Experimenta pesquisar por um distrito (ex: `Leiria` ou `Viseu`).
-- [ ] **O que deves observar:** São listados todos os concelhos pertencentes a esse distrito.
-
----
-
-### ✅ Teste 4: Adicionar e Consultar Favoritos
-- [ ] No ecrã principal com um concelho aberto, clica no ícone de coração no canto superior direito do cabeçalho.
-- [ ] O ícone deve ficar preenchido a vermelho.
-- [ ] Clica no ícone de favoritos na barra de topo (canto superior direito).
-- [ ] **O que deves observar:** O concelho que marcaste aparece na lista de favoritos com o respetivo nível de risco.
-
----
-
-### ✅ Teste 5: Persistência entre Reinícios (Memória da App)
-- [ ] Fecha a janela da aplicação.
-- [ ] Volta a abrir a aplicação pelo atalho do Ambiente de Trabalho.
-- [ ] **O que deves observar:** A aplicação não pede para selecionar concelho novamente; ela lembra-se do último concelho principal que tinhas aberto e dos teus favoritos guardados.
-
----
-
-### ✅ Teste 6: Teste do Modo Offline (Sem Internet)
-- [ ] Desliga a tua ligação à internet (podes desligar o Wi-Fi ou ativar o Modo de Voo temporariamente).
-- [ ] Fecha e volta a abrir a aplicação.
-- [ ] **O que deves observar:**
-  - A aplicação abre sem bloquear nem dar ecrã branco.
-  - Apresenta os últimos dados de risco que tinha descarregado (vindos da cache Hive).
-  - Surge uma barra de aviso suave no topo a indicar que não foi possível atualizar os dados e que está a mostrar a última informação disponível.
-- [ ] Volta a ligar a internet e puxa a lista para baixo para atualizar.
-
----
-
-## 4. Escala Oficial de Risco do IPMA
-
-A aplicação utiliza as seguintes cores e classificações definidas para o RCM (Risco Conjuntural e Meteorológico):
-
-| Valor | Classificação | Cor Visual |
-| :---: | :--- | :--- |
-| **1** | **Reduzido** | 🟢 Verde (`#4CAF50`) |
-| **2** | **Moderado** | 🟡 Amarelo (`#FFC107`) |
-| **3** | **Elevado** | 🟠 Laranja (`#FF9800`) |
-| **4** | **Muito Elevado** | 🔴 Vermelho (`#F44336`) |
-| **5** | **Máximo** | 🟣 Roxo escuro (`#9C27B0`) |
-
----
-
-## 5. Perguntas Frequentes & Resolução de Dúvidas
-
-**Q: Porque é que os Açores e a Madeira não estão na lista de concelhos?**  
-*R:* O índice RCM (Perigo de Incêndio Rural) emitido pelo IPMA nestes ficheiros específicos (`rcm-d0.json` e `rcm-d1.json`) abrange apenas Portugal Continental. Os arquipélagos possuem sistemas de vigilância e relatórios meteorológicos diferenciados.
-
-**Q: A que horas o IPMA costuma atualizar a previsão para o dia seguinte?**  
-*R:* O IPMA normalmente atualiza os ficheiros durante a manhã e ao início da tarde. A app indica sempre no rodapé o carimbo exato da data e hora emitido pelo IPMA (`fileDate`).
-
-**Q: Posso copiar a pasta da app para outro computador?**  
-*R:* Sim! A pasta `pir_app\build\windows\x64\runner\Release\` contém tudo o que é necessário para correr a aplicação em qualquer computador com Windows 10/11 sem necessitar de instalar nada adicional.
+| Valor | Classificação | Cor Visual | Ação Recomendada |
+| :---: | :--- | :---: | :--- |
+| **1** | **Reduzido** | 🟢 Verde (`#4CAF50`) | Condições normais de segurança |
+| **2** | **Moderado** | 🟡 Amarelo (`#FFC107`) | Atenção a trabalhos rurais com maquinaria |
+| **3** | **Elevado** | 🟠 Laranja (`#FF9800`) | Cuidados redobrados, restrições habituais |
+| **4** | **Muito Elevado** | 🔴 Vermelho (`#F44336`) | Risco severo, fortes restrições |
+| **5** | **Máximo** | 🟣 Roxo escuro (`#9C27B0`) | Proibições legais estritas em meio florestal |

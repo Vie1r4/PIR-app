@@ -1,4 +1,4 @@
-﻿# Visual Studio / VS Code
+# Visual Studio / VS Code
 .vs/
 .vscode/
 
@@ -8,3 +8,4 @@ update_icon*.ps1
 # Flutter build and cache (redundant safeguard for root)
 **/build/
 **/.dart_tool/
+**/dist/
