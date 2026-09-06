@@ -22,39 +22,77 @@ class ConcelhoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: rcm != null
-          ? RiscoBadge(rcm: rcm!, size: 36)
-          : Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.location_on_outlined,
-                color: Theme.of(context).colorScheme.outline,
-                size: 20,
-              ),
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      child: Card(
+        margin: EdgeInsets.zero,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(
+            color: cs.outlineVariant.withValues(alpha: isDark ? 0.22 : 0.35),
+            width: 0.8,
+          ),
+        ),
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          leading: rcm != null
+              ? RiscoBadge(rcm: rcm!, size: 38)
+              : Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.location_on_outlined,
+                    color: cs.outline,
+                    size: 20,
+                  ),
+                ),
+          title: Text(
+            concelho.nome,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              letterSpacing: -0.2,
             ),
-      title: Text(
-        concelho.nome,
-        style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            concelho.distrito,
+            style: TextStyle(
+              fontSize: 13,
+              letterSpacing: 0.1,
+              color: cs.outline,
+            ),
+          ),
+          trailing: onFavoriteToggle != null
+              ? IconButton(
+                  tooltip: isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos',
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border_rounded,
+                    color: isFavorite
+                        ? const Color(0xFFFF453A)
+                        : cs.outline,
+                    size: 22,
+                  ),
+                  onPressed: onFavoriteToggle,
+                )
+              : Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: isDark ? Colors.white24 : Colors.black26,
+                ),
+          onTap: onTap,
+        ),
       ),
-      subtitle: Text(concelho.distrito),
-      trailing: onFavoriteToggle != null
-          ? IconButton(
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite
-                    ? Colors.red
-                    : Theme.of(context).colorScheme.outline,
-              ),
-              onPressed: onFavoriteToggle,
-            )
-          : null,
-      onTap: onTap,
     );
   }
 }

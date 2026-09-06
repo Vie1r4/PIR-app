@@ -37,5 +37,12 @@ void main() {
     test('Non-matching query', () {
       expect(agueda.matchesSearch('Lisboa'), isFalse);
     });
+
+    test('Pre-normalized query search', () {
+      final normalizedQuery = Concelho.normalize('águeda');
+      expect(normalizedQuery, equals('agueda'));
+      expect(agueda.matchesSearch(normalizedQuery, queryIsNormalized: true), isTrue);
+      expect(evora.matchesSearch(normalizedQuery, queryIsNormalized: true), isFalse);
+    });
   });
 }

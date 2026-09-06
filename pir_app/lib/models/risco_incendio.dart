@@ -1,3 +1,5 @@
+import '../utils/risco_helpers.dart';
+
 /// Nível de risco de incêndio rural
 enum NivelRisco {
   reduzido(1, 'Reduzido'),
@@ -135,20 +137,6 @@ class RiscoPrevisaoDia {
     required this.risco,
   });
 
-  String get rotuloDia {
-    if (diaIndex == 0) return 'Hoje';
-    if (diaIndex == 1) return 'Amanhã';
-    try {
-      final dt = DateTime.parse(dataPrev);
-      const weekdays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-      const months = [
-        'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-        'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
-      ];
-      return '${weekdays[dt.weekday - 1]}, ${dt.day} ${months[dt.month - 1]}';
-    } catch (_) {
-      return dataPrev;
-    }
-  }
+  String get rotuloDia => formatarRotuloDia(dataPrev, diaIndex);
 }
 

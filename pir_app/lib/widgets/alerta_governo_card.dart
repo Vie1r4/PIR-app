@@ -3,8 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Cartão oficial de aviso de Situação de Alerta (Proteção Civil / IPMA)
-class AlertaGovernoCard extends StatelessWidget {
+class AlertaGovernoCard extends StatefulWidget {
   const AlertaGovernoCard({super.key});
+
+  @override
+  State<AlertaGovernoCard> createState() => _AlertaGovernoCardState();
+}
+
+class _AlertaGovernoCardState extends State<AlertaGovernoCard> {
+  late final TapGestureRecognizer _gestureRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _gestureRecognizer = TapGestureRecognizer()..onTap = _abrirProCiv;
+  }
+
+  @override
+  void dispose() {
+    _gestureRecognizer.dispose();
+    super.dispose();
+  }
 
   Future<void> _abrirProCiv() async {
     final uri = Uri.parse('https://prociv.gov.pt/pt/home/');
@@ -17,50 +36,59 @@ class AlertaGovernoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final amberCor = isDark ? const Color(0xFFFFB340) : const Color(0xFFD97706);
+    final bgCor = isDark
+        ? const Color(0xFF18191E)
+        : const Color(0xFFFFFBEB);
+    final borderCor = amberCor.withValues(alpha: isDark ? 0.30 : 0.40);
+    final textCor = isDark ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF451A03);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF7E6),
-        borderRadius: BorderRadius.circular(12),
+        color: bgCor,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFF9800).withValues(alpha: 0.6),
-          width: 1.5,
+          color: borderCor,
+          width: 0.8,
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 1, right: 10),
+          Padding(
+            padding: const EdgeInsets.only(top: 2, right: 12),
             child: Icon(
               Icons.warning_amber_rounded,
-              color: Color(0xFFD32F2F),
+              color: amberCor,
               size: 20,
             ),
           ),
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: Color(0xFF4A3B2C),
-                  height: 1.35,
+                  color: textCor,
+                  height: 1.4,
+                  letterSpacing: 0.1,
                 ),
                 children: [
                   const TextSpan(text: 'Em caso de '),
                   TextSpan(
                     text: 'Situação de Alerta',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
                       decoration: TextDecoration.underline,
-                      color: Color(0xFFC62828),
+                      color: amberCor,
                     ),
-                    recognizer: TapGestureRecognizer()..onTap = _abrirProCiv,
+                    recognizer: _gestureRecognizer,
                   ),
                   const TextSpan(
                     text:
-                        ', decretada pelo governo, as condicionantes associadas à mesma sobrepõem-se às definidas pelas classes de Perigo de Incêndio Rural (PIR).',
+                        ' decretada pela Proteção Civil / Governo, as condicionantes dessa situação sobrepõem-se às classes de Perigo de Incêndio Rural (PIR).',
                   ),
                 ],
               ),

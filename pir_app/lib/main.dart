@@ -3,7 +3,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'app.dart';
+import 'providers/acessibilidade_provider.dart';
 import 'providers/risco_provider.dart';
+import 'providers/tema_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,12 +13,18 @@ void main() async {
   // Initialize Hive for local storage
   await Hive.initFlutter();
 
-  // Create and initialize the provider
+  // Load persisted theme and accessibility preferences before rendering
+  final temaProvider = await TemaProvider.carregar();
+  final acessibilidadeProvider = await AcessibilidadeProvider.carregar();
   final riscoProvider = RiscoProvider();
 
   runApp(
-    ChangeNotifierProvider.value(
-      value: riscoProvider,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: temaProvider),
+        ChangeNotifierProvider.value(value: acessibilidadeProvider),
+        ChangeNotifierProvider.value(value: riscoProvider),
+      ],
       child: const PirApp(),
     ),
   );

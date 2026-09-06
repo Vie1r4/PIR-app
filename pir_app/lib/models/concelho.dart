@@ -3,17 +3,30 @@ class Concelho {
   final String nome;
   final String distrito;
 
+  final String? _nomeNormalizado;
+  final String? _distritoNormalizado;
+
   const Concelho({
     required this.dico,
     required this.nome,
     required this.distrito,
-  });
+    String? nomeNormalizado,
+    String? distritoNormalizado,
+  })  : _nomeNormalizado = nomeNormalizado,
+        _distritoNormalizado = distritoNormalizado;
+
+  String get nomeNormalizado => _nomeNormalizado ?? normalize(nome);
+  String get distritoNormalizado => _distritoNormalizado ?? normalize(distrito);
 
   factory Concelho.fromJson(Map<String, dynamic> json) {
+    final nome = json['nome'] as String;
+    final distrito = json['distrito'] as String;
     return Concelho(
       dico: json['dico'] as String,
-      nome: json['nome'] as String,
-      distrito: json['distrito'] as String,
+      nome: nome,
+      distrito: distrito,
+      nomeNormalizado: normalize(nome),
+      distritoNormalizado: normalize(distrito),
     );
   }
 
@@ -23,23 +36,29 @@ class Concelho {
         .toList();
   }
 
-  /// Check if this concelho matches a search query (case-insensitive, accent-tolerant)
-  bool matchesSearch(String query) {
-    final q = _normalize(query);
-    return _normalize(nome).contains(q) || _normalize(distrito).contains(q);
-  }
+  static final _regexA = RegExp(r'[àáâãäå]');
+  static final _regexE = RegExp(r'[èéêë]');
+  static final _regexI = RegExp(r'[ìíîï]');
+  static final _regexO = RegExp(r'[òóôõö]');
+  static final _regexU = RegExp(r'[ùúûü]');
 
-  /// Simple accent normalization for search
-  static String _normalize(String input) {
+  /// Accent and case normalization for search
+  static String normalize(String input) {
     return input
         .toLowerCase()
-        .replaceAll(RegExp(r'[àáâãäå]'), 'a')
-        .replaceAll(RegExp(r'[èéêë]'), 'e')
-        .replaceAll(RegExp(r'[ìíîï]'), 'i')
-        .replaceAll(RegExp(r'[òóôõö]'), 'o')
-        .replaceAll(RegExp(r'[ùúûü]'), 'u')
+        .replaceAll(_regexA, 'a')
+        .replaceAll(_regexE, 'e')
+        .replaceAll(_regexI, 'i')
+        .replaceAll(_regexO, 'o')
+        .replaceAll(_regexU, 'u')
         .replaceAll('ç', 'c')
         .replaceAll('ñ', 'n');
+  }
+
+  /// Check if this concelho matches a search query (case-insensitive, accent-tolerant)
+  bool matchesSearch(String query, {bool queryIsNormalized = false}) {
+    final q = queryIsNormalized ? query : normalize(query);
+    return nomeNormalizado.contains(q) || distritoNormalizado.contains(q);
   }
 
   @override

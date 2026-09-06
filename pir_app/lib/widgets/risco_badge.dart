@@ -15,30 +15,38 @@ class RiscoBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final cor = corDoRiscoContextual(rcm, brightness);
+    final corTexto = corDoRiscoTexto(rcm);
+    final corTextoEfetiva = (rcm == 2 && brightness == Brightness.dark)
+        ? const Color(0xFF1E1B18)
+        : corTexto;
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: corDoRisco(rcm),
+        color: cor,
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: corDoRisco(rcm).withValues(alpha: 0.4),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.15)
+              : Colors.black.withValues(alpha: 0.08),
+          width: 1,
+        ),
       ),
       child: Center(
         child: Text(
           '$rcm',
           style: TextStyle(
-            color: corDoRiscoTexto(rcm),
-            fontWeight: FontWeight.bold,
-            fontSize: size * 0.45,
+            color: corTextoEfetiva,
+            fontWeight: FontWeight.w700,
+            fontSize: size * 0.44,
+            letterSpacing: -0.5,
           ),
         ),
       ),
     );
   }
 }
+
