@@ -28,11 +28,23 @@
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
+  <meta name="theme-color" content="#0D0E11" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F4F5F8" media="(prefers-color-scheme: light)">
 
   <title>PIR – Perigo de Incêndio Rural</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body {
+      background-color: #0D0E11;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
 </head>
-<body>
+<body style="background-color: #0D0E11;">
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

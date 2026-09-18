@@ -235,21 +235,22 @@ class RiscoProvider extends ChangeNotifier {
         await _cacheService.salvarDadosRisco('rcm_d1', _riscoAmanha!.toJson());
         await _cacheService.salvarUltimaAtualizacao('rcm_d0');
         _erro = null;
-      } else if (_riscoHoje == null) {
-        _isOnline = false;
-        if (!silencioso) {
-          _erro =
-              'Não foi possível atualizar os dados. A mostrar última informação disponível.';
-        }
       } else {
         _isOnline = false;
+        // Mantém a data original do cache
+        _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
+        if (!silencioso && _riscoHoje == null) {
+          _erro =
+              'Sem ligação à internet. Não existem dados em cache.';
+        }
       }
     } catch (e) {
       _isOnline = false;
+      _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
       debugPrint('Erro ao carregar dados: $e');
-      if (!silencioso) {
+      if (!silencioso && _riscoHoje == null) {
         _erro =
-            'Não foi possível atualizar os dados. A mostrar última informação disponível.';
+            'Sem ligação à internet. A aguardar reconexão.';
       }
     } finally {
       _isLoading = false;

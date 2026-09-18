@@ -54,6 +54,8 @@ class _MapScreenState extends State<MapScreen>
   String _searchQuery = '';
   int? _filtroNivelRisco; // null = todos, 1 a 5 = filtrar por nível de risco
   bool _mostrandoDropdownPesquisa = false;
+  bool _pesquisaExpandida = false;
+  bool _diasExpandido = false;
 
   @override
   void initState() {
@@ -61,7 +63,10 @@ class _MapScreenState extends State<MapScreen>
     _dicoSelecionado = widget.initialDico;
     _searchFocusNode.addListener(() {
       if (_searchFocusNode.hasFocus) {
-        setState(() => _mostrandoDropdownPesquisa = true);
+        setState(() {
+          _pesquisaExpandida = true;
+          _mostrandoDropdownPesquisa = true;
+        });
       }
     });
     _carregarMapa();
@@ -173,7 +178,7 @@ class _MapScreenState extends State<MapScreen>
     _animController?.dispose();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 280),
     );
 
     _matrixAnimation = Matrix4Tween(
@@ -240,11 +245,16 @@ class _MapScreenState extends State<MapScreen>
   }
 
   void _aoTocarNoMapa(Offset scenePoint) {
-    // Se o dropdown de pesquisa estiver aberto, tocar fora fecha-o
-    if (_mostrandoDropdownPesquisa) {
-      setState(() => _mostrandoDropdownPesquisa = false);
+    // Se o dropdown de pesquisa ou barra de pesquisa estiverem abertos, tocar fora fecha-os
+    if (_mostrandoDropdownPesquisa || _pesquisaExpandida) {
+      setState(() {
+        _mostrandoDropdownPesquisa = false;
+        _pesquisaExpandida = false;
+      });
       _searchFocusNode.unfocus();
-      return;
+    }
+    if (_diasExpandido) {
+      setState(() => _diasExpandido = false);
     }
 
     if (_geometries.isEmpty) return;
@@ -299,14 +309,20 @@ class _MapScreenState extends State<MapScreen>
     final mapShortcuts = <ShortcutActivator, VoidCallback>{
       const SingleActivator(LogicalKeyboardKey.keyF, control: true): () {
         _searchFocusNode.requestFocus();
-        if (_searchController.text.isNotEmpty) {
-          setState(() => _mostrandoDropdownPesquisa = true);
-        }
+        setState(() {
+          _pesquisaExpandida = true;
+          _mostrandoDropdownPesquisa = true;
+        });
       },
       const SingleActivator(LogicalKeyboardKey.escape): () {
-        if (_mostrandoDropdownPesquisa) {
-          setState(() => _mostrandoDropdownPesquisa = false);
+        if (_mostrandoDropdownPesquisa || _pesquisaExpandida) {
+          setState(() {
+            _mostrandoDropdownPesquisa = false;
+            _pesquisaExpandida = false;
+          });
           _searchFocusNode.unfocus();
+        } else if (_diasExpandido) {
+          setState(() => _diasExpandido = false);
         } else if (_dicoSelecionado != null) {
           setState(() => _dicoSelecionado = null);
         }
@@ -357,7 +373,7 @@ class _MapScreenState extends State<MapScreen>
 
           return Stack(
             children: [
-              // 1. O Mapa Interativo de Portugal (Ocupa o ecrã inteiro)
+              // 1. O Mapa Interativo de Portugal (Ocupa o ecrã inteiro com RepaintBoundary para 60/120fps fluidos)
               Positioned.fill(
                 child: Container(
                   color: Theme.of(context).brightness == Brightness.dark
@@ -367,9 +383,15 @@ class _MapScreenState extends State<MapScreen>
                       ? const Center(child: CircularProgressIndicator())
                       : Listener(
                           onPointerDown: (_) {
-                            if (_mostrandoDropdownPesquisa) {
-                              setState(() => _mostrandoDropdownPesquisa = false);
+                            if (_mostrandoDropdownPesquisa || _pesquisaExpandida) {
+                              setState(() {
+                                _mostrandoDropdownPesquisa = false;
+                                _pesquisaExpandida = false;
+                              });
                               _searchFocusNode.unfocus();
+                            }
+                            if (_diasExpandido) {
+                              setState(() => _diasExpandido = false);
                             }
                           },
                           onPointerSignal: _onPointerSignal,
@@ -378,7 +400,8 @@ class _MapScreenState extends State<MapScreen>
                             panEnabled: true,
                             scaleEnabled: true,
                             constrained: false,
-                            boundaryMargin: const EdgeInsets.all(double.infinity),
+                            clipBehavior: Clip.none,
+                            boundaryMargin: const EdgeInsets.all(400),
                             minScale: 0.20,
                             maxScale: 6.0,
                             child: MouseRegion(
@@ -387,23 +410,25 @@ class _MapScreenState extends State<MapScreen>
                                 behavior: HitTestBehavior.opaque,
                                 onTapUp: (details) =>
                                     _aoTocarNoMapa(details.localPosition),
-                                child: SizedBox(
-                                  width: MapGeometryService.canvasWidth,
-                                  height: MapGeometryService.canvasHeight,
-                                  child: CustomPaint(
-                                    isComplex: true,
-                                    willChange: false,
-                                    size: const Size(
-                                      MapGeometryService.canvasWidth,
-                                      MapGeometryService.canvasHeight,
-                                    ),
-                                    painter: PortugalMapPainter(
-                                      geometries: _geometries,
-                                      dadosRisco: dadosRiscoDia,
-                                      dicoSelecionado: _dicoSelecionado,
-                                      isDark: Theme.of(context).brightness ==
-                                          Brightness.dark,
-                                      altoContraste: accProvider.altoContraste,
+                                child: RepaintBoundary(
+                                  child: SizedBox(
+                                    width: MapGeometryService.canvasWidth,
+                                    height: MapGeometryService.canvasHeight,
+                                    child: CustomPaint(
+                                      isComplex: true,
+                                      willChange: false,
+                                      size: const Size(
+                                        MapGeometryService.canvasWidth,
+                                        MapGeometryService.canvasHeight,
+                                      ),
+                                      painter: PortugalMapPainter(
+                                        geometries: _geometries,
+                                        dadosRisco: dadosRiscoDia,
+                                        dicoSelecionado: _dicoSelecionado,
+                                        isDark: Theme.of(context).brightness ==
+                                            Brightness.dark,
+                                        altoContraste: accProvider.altoContraste,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -414,16 +439,16 @@ class _MapScreenState extends State<MapScreen>
                 ),
               ),
 
-              // 2. Barra de Pesquisa Flutuante no Topo Esquerdo
+              // 2. Barra de Pesquisa Flutuante no Topo Esquerdo (Minimizável / Expansível)
               Positioned(
                 left: 14,
                 top: effectiveTop,
-                right: isNarrow ? 14 : null,
+                right: (isNarrow && _pesquisaExpandida) ? 14 : null,
                 child: _buildSearchBar(isNarrow, accProvider.elementosGrandes),
               ),
 
               // 3. Dropdown Flutuante de Resultados de Pesquisa (quando ativo)
-              if (_mostrandoDropdownPesquisa)
+              if (_mostrandoDropdownPesquisa && _pesquisaExpandida)
                 Positioned(
                   left: 14,
                   right: isNarrow ? 14 : null,
@@ -436,11 +461,11 @@ class _MapScreenState extends State<MapScreen>
                   ),
                 ),
 
-              // 4. Seletor de Dias em Coluna Vertical no Topo Direito
-              if (diasDisponiveis.isNotEmpty)
+              // 4. Seletor de Dias Flutuante no Topo Direito (Com modo recolhido/expandido)
+              if (diasDisponiveis.isNotEmpty && !(isNarrow && _pesquisaExpandida))
                 Positioned(
                   right: 14,
-                  top: isNarrow ? effectiveTop + (accProvider.elementosGrandes ? 58 : 52) : effectiveTop,
+                  top: effectiveTop,
                   child: _buildDiasVerticalColumn(
                     diasDisponiveis,
                     provider,
@@ -482,11 +507,67 @@ class _MapScreenState extends State<MapScreen>
 );
 }
 
-  /// Barra de pesquisa flutuante elegante no canto superior esquerdo
+  /// Barra de pesquisa flutuante elegante com suporte a minimizar e fechar
   Widget _buildSearchBar(bool isNarrow, [bool isGrandes = false]) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Se estiver em ecrã estreito e não estiver expandida
+    if (isNarrow && !_pesquisaExpandida && _searchQuery.isEmpty && !_searchFocusNode.hasFocus) {
+      return Container(
+        height: isGrandes ? 44 : 38,
+        decoration: BoxDecoration(
+          color: cs.surface.withValues(alpha: isDark ? 0.92 : 0.97),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark ? const Color(0x28FFFFFF) : const Color(0x18000000),
+            width: 0.8,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() {
+                _pesquisaExpandida = true;
+                _mostrandoDropdownPesquisa = true;
+                _diasExpandido = false; // Recolhe a aba de dias ao pesquisar
+              });
+              _searchFocusNode.requestFocus();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(CupertinoIcons.search, size: 16, color: cs.primary),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Pesquisar...',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: cs.outline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Barra de pesquisa aberta / expandida
     return Container(
       width: isNarrow ? null : 310,
       height: isGrandes ? 48 : 42,
@@ -507,48 +588,74 @@ class _MapScreenState extends State<MapScreen>
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: TextField(
-          controller: _searchController,
-          focusNode: _searchFocusNode,
-          style: const TextStyle(fontSize: 13),
-          decoration: InputDecoration(
-            filled: false,
-            fillColor: Colors.transparent,
-            hintText: isNarrow
-                ? 'Pesquisar concelho...'
-                : 'Pesquisar concelho ou distrito... (Ctrl+F)',
-            hintStyle: TextStyle(
-              fontSize: 12,
-              color: cs.outline.withValues(alpha: 0.8),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                focusNode: _searchFocusNode,
+                style: const TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  filled: false,
+                  fillColor: Colors.transparent,
+                  hintText: isNarrow
+                      ? 'Pesquisar concelho ou distrito...'
+                      : 'Pesquisar concelho ou distrito... (Ctrl+F)',
+                  hintStyle: TextStyle(
+                    fontSize: 12,
+                    color: cs.outline.withValues(alpha: 0.8),
+                  ),
+                  prefixIcon: const Icon(CupertinoIcons.search, size: 18),
+                  prefixIconConstraints: const BoxConstraints(minWidth: 36),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(CupertinoIcons.xmark_circle_fill, size: 16),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onChanged: (val) {
+                  setState(() {
+                    _searchQuery = val;
+                    _mostrandoDropdownPesquisa = true;
+                    _pesquisaExpandida = true;
+                  });
+                },
+              ),
             ),
-            prefixIcon: const Icon(CupertinoIcons.search, size: 19),
-            prefixIconConstraints: const BoxConstraints(minWidth: 36),
-            suffixIcon: _searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(CupertinoIcons.xmark_circle_fill, size: 16),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() => _searchQuery = '');
-                    },
-                  )
-                : null,
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 10),
-          ),
-          onChanged: (val) {
-            setState(() {
-              _searchQuery = val;
-              _mostrandoDropdownPesquisa = true;
-            });
-          },
+            // Botão explícito de minimizar/fechar pesquisa
+            IconButton(
+              tooltip: 'Fechar pesquisa',
+              icon: Icon(
+                CupertinoIcons.chevron_up,
+                size: 17,
+                color: cs.outline,
+              ),
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                _searchController.clear();
+                _searchFocusNode.unfocus();
+                setState(() {
+                  _searchQuery = '';
+                  _mostrandoDropdownPesquisa = false;
+                  _pesquisaExpandida = false;
+                });
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// Coluna vertical de seleção de dias flutuante no topo direito (estilo lista Apple)
+  /// Seletor de dias flutuante no topo direito com suporte a recolher e expandir
   Widget _buildDiasVerticalColumn(
     List<DiaOpcao> diasDisponiveis,
     RiscoProvider provider,
@@ -556,9 +663,101 @@ class _MapScreenState extends State<MapScreen>
   ) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isNarrow = viewportSize.width < 680;
     final concelhoRef = _dicoSelecionado != null
         ? _geometries.where((g) => g.dico == _dicoSelecionado).firstOrNull
         : null;
+
+    final diaSelecionado = _diaSelecionadoIndex < diasDisponiveis.length
+        ? diasDisponiveis[_diaSelecionadoIndex]
+        : diasDisponiveis.firstOrNull;
+
+    // Se estiver recolhido (em ecrã estreito ou se fechado pelo utilizador)
+    if (!_diasExpandido && isNarrow) {
+      final dadosDoDia = _obterDadosDoDia(provider, _diaSelecionadoIndex);
+      final dicoRef = concelhoRef?.dico ?? provider.concelhoPrincipal?.dico;
+      final rcm = dicoRef != null ? dadosDoDia?.getRisco(dicoRef)?.rcm : null;
+
+      return Container(
+        height: 38,
+        decoration: BoxDecoration(
+          color: cs.surface.withValues(alpha: isDark ? 0.92 : 0.97),
+          borderRadius: BorderRadius.circular(19),
+          border: Border.all(
+            color: isDark ? const Color(0x22FFFFFF) : const Color(0x16000000),
+            width: 0.8,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(19),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() {
+                _diasExpandido = true;
+                _pesquisaExpandida = false;
+                _mostrandoDropdownPesquisa = false;
+              });
+              _searchFocusNode.unfocus();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.calendar,
+                    size: 14,
+                    color: isDark ? kBrandDark : kBrand,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    diaSelecionado?.rotulo ?? 'Hoje',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
+                  ),
+                  if (rcm != null && rcm > 0) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: corDoRiscoContextual(rcm, Theme.of(context).brightness),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        '$rcm',
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                          color: corDoRiscoTexto(rcm),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(width: 4),
+                  Icon(
+                    CupertinoIcons.chevron_down,
+                    size: 12,
+                    color: cs.outline,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     // Altura máxima para não sobrepor aos botões de zoom ou à base em janelas compactas
     final maxHeight = (viewportSize.height - 120).clamp(160.0, 480.0);
@@ -587,27 +786,47 @@ class _MapScreenState extends State<MapScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Cabeçalho da coluna
+            // Cabeçalho da coluna com botão de recolher
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               color: isDark
                   ? Colors.white.withValues(alpha: 0.04)
                   : Colors.black.withValues(alpha: 0.03),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    CupertinoIcons.calendar,
-                    size: 13,
-                    color: isDark ? kBrandDark : kBrand,
+                  Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.calendar,
+                        size: 13,
+                        color: isDark ? kBrandDark : kBrand,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        'DIAS (${diasDisponiveis.length})',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: cs.outline,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'DIAS (${diasDisponiveis.length})',
-                    style: TextStyle(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
-                      color: cs.outline,
+                  InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _diasExpandido = false);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(
+                        isNarrow ? CupertinoIcons.chevron_up : CupertinoIcons.xmark,
+                        size: 14,
+                        color: cs.outline,
+                      ),
                     ),
                   ),
                 ],
@@ -648,7 +867,12 @@ class _MapScreenState extends State<MapScreen>
                     child: InkWell(
                       onTap: () {
                         HapticFeedback.selectionClick();
-                        setState(() => _diaSelecionadoIndex = index);
+                        setState(() {
+                          _diaSelecionadoIndex = index;
+                          if (isNarrow) {
+                            _diasExpandido = false; // Recolhe no telemóvel ao selecionar
+                          }
+                        });
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -684,7 +908,7 @@ class _MapScreenState extends State<MapScreen>
                               ),
                             ),
 
-                            // Badge com cor de risco do concelho (se disponível) ou chevron
+                            // Badge com cor de risco do concelho (se disponível) ou check
                             if (rcm != null && rcm > 0)
                               Container(
                                 padding: const EdgeInsets.symmetric(

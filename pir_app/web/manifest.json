@@ -1,0 +1,37 @@
+{
+  "name": "PIR – Perigo de Incêndio Rural",
+  "short_name": "PIR Incêndio",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0D0E11",
+  "theme_color": "#FF6B35",
+  "description": "Consulta rápida do perigo e risco de incêndio rural do IPMA em Portugal Continental.",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/Icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/Icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -17,29 +17,49 @@ class IpmaScraperService {
   IpmaScraperService({http.Client? client}) : _client = client ?? http.Client();
 
   /// Descarrega a página do IPMA e extrai a lista de previsões (até 9 dias).
-  /// Retorna uma lista vazia se falhar, sem interromper a execução da aplicação.
+  /// Na Web, utiliza proxies CORS transparentes de fallback para contornar
+  /// a ausência de cabeçalhos CORS no servidor do IPMA.
   Future<List<DadosRisco>> fetchPrevisao9Dias() async {
-    try {
-      final response = await _client.get(
-        Uri.parse(pageUrl),
-        headers: {
-          'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
-        },
-      ).timeout(const Duration(seconds: 20));
+    final urlsParaTentar = <String>[];
 
-      if (response.statusCode == 200) {
-        return parseHtml(response.body);
-      } else {
-        debugPrint('IpmaScraperService: Falha HTTP ${response.statusCode}');
-        return [];
-      }
-    } catch (e) {
-      debugPrint('IpmaScraperService: Erro ao obter página do IPMA: $e');
-      return [];
+    if (!kIsWeb) {
+      urlsParaTentar.add(pageUrl);
     }
+
+    // Proxies CORS para Web ou fallback resiliente
+    urlsParaTentar.addAll([
+      'https://api.allorigins.win/raw?url=${Uri.encodeComponent(pageUrl)}',
+      'https://corsproxy.io/?${Uri.encodeComponent(pageUrl)}',
+      'https://api.codetabs.com/v1/proxy?quest=${Uri.encodeComponent(pageUrl)}',
+    ]);
+
+    if (kIsWeb) {
+      // Também adiciona o direto no final caso o browser suporte ou ambiente permita
+      urlsParaTentar.add(pageUrl);
+    }
+
+    for (final url in urlsParaTentar) {
+      try {
+        final response = await _client.get(
+          Uri.parse(url),
+          headers: {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          },
+        ).timeout(const Duration(seconds: 12));
+
+        if (response.statusCode == 200 && response.body.isNotEmpty) {
+          final resultados = parseHtml(response.body);
+          if (resultados.isNotEmpty) {
+            return resultados;
+          }
+        }
+      } catch (e) {
+        debugPrint('IpmaScraperService: Falha na URL $url: $e');
+        continue;
+      }
+    }
+
+    return [];
   }
 
   /// Extrai os blocos de dados `rcmF[0]` ... `rcmF[8]` a partir do código HTML.

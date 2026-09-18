@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
-import '../models/risco_incendio.dart';
 import '../providers/acessibilidade_provider.dart';
 import '../providers/risco_provider.dart';
+import '../models/risco_incendio.dart';
 import '../utils/risco_helpers.dart';
 import '../widgets/alerta_governo_card.dart';
 import '../widgets/modal_niveis_risco.dart';
@@ -113,44 +113,43 @@ class HomeScreen extends StatelessWidget {
                           if (concelho == null) ...[
                             _buildZeroState(context, provider),
                           ] else if (isWide) ...[
-                            // Layout em 2 colunas para ecrãs alargados / maximizados
+                            // Layout em 2 colunas para ecrãs alargados / Desktop
                             _buildConcelhoHeader(context, provider, concelho),
                             const SizedBox(height: 18),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Coluna Esquerda: Cartão Hoje + Regras & Níveis + Aviso Alerta
+                                // Coluna Esquerda: Cartão Hoje + Regras + Alerta
                                 Expanded(
                                   flex: 5,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
                                       _buildHeroHoje(context, provider, concelho),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: 14),
                                       _buildBotaoExplicacaoRegras(context, provider, concelho),
                                       const SizedBox(height: 14),
                                       const AlertaGovernoCard(),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 20),
-                                // Coluna Direita: Previsão Próximos Dias Integrada
+                                const SizedBox(width: 18),
+                                // Coluna Direita: Previsão Alargada de múltiplos dias
                                 Expanded(
                                   flex: 6,
-                                  child: _buildPrevisaoIntegrada(context, provider, concelho),
+                                  child: _buildPrevisaoAlargada(context, provider, concelho),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 24),
                           ] else ...[
-                            // Layout em 1 coluna vertical otimizado para janelas normais / compactas
+                            // Layout limpo vertical em 1 coluna (iPhone / Telemóvel)
                             _buildConcelhoHeader(context, provider, concelho),
                             const SizedBox(height: 14),
                             _buildHeroHoje(context, provider, concelho),
-                            const SizedBox(height: 10),
-                            _buildBotaoExplicacaoRegras(context, provider, concelho),
                             const SizedBox(height: 14),
-                            _buildPrevisaoIntegrada(context, provider, concelho),
+                            _buildPrevisaoAlargada(context, provider, concelho),
+                            const SizedBox(height: 14),
+                            _buildBotaoExplicacaoRegras(context, provider, concelho),
                             const SizedBox(height: 14),
                             const AlertaGovernoCard(),
                             const SizedBox(height: 20),
@@ -384,6 +383,160 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Bloco de previsão alargada para os próximos dias (estilo Apple Weather limpo e sem poluição visual)
+  Widget _buildPrevisaoAlargada(
+    BuildContext context,
+    RiscoProvider provider,
+    dynamic concelho,
+  ) {
+    final todosDias = provider.getPrevisaoDias(concelho.dico);
+    // Dias a partir de amanhã (diaIndex >= 1)
+    final diasFuturos = todosDias.length > 1
+        ? todosDias.sublist(1)
+        : <RiscoPrevisaoDia>[];
+
+    if (diasFuturos.isEmpty) {
+      final riscoAmanha = provider.getRiscoAmanha(concelho.dico);
+      if (riscoAmanha == null) {
+        return const SizedBox.shrink();
+      }
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : cs.surfaceContainerHighest.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: cs.outlineVariant.withValues(alpha: isDark ? 0.22 : 0.35),
+          width: 0.8,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Cabeçalho da secção
+          Row(
+            children: [
+              Icon(
+                CupertinoIcons.calendar,
+                size: 15,
+                color: isDark ? kBrandDark : kBrand,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'PREVISÃO PRÓXIMOS DIAS (${diasFuturos.length} DIAS)',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.8,
+                  color: isDark ? Colors.white60 : Colors.black54,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Lista de dias com divisores subtis
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: diasFuturos.length,
+            separatorBuilder: (_, __) => Divider(
+              height: 1,
+              thickness: 0.6,
+              color: cs.outlineVariant.withValues(alpha: isDark ? 0.15 : 0.22),
+            ),
+            itemBuilder: (context, index) {
+              final item = diasFuturos[index];
+              final cor = corDoRiscoContextual(
+                item.risco.rcm,
+                Theme.of(context).brightness,
+              );
+              final corTexto = isDark
+                  ? cor
+                  : corDoRiscoTextoEmFundoClaro(item.risco.rcm);
+              final isAmanha = item.diaIndex == 1;
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 2),
+                child: Row(
+                  children: [
+                    // Coluna do Dia (ex: Amanhã, Sex, 19 Set)
+                    SizedBox(
+                      width: 96,
+                      child: Text(
+                        item.rotuloDia,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: isAmanha ? FontWeight.bold : FontWeight.w500,
+                          letterSpacing: -0.1,
+                          color: isAmanha
+                              ? (isDark ? Colors.white : Colors.black87)
+                              : (isDark ? Colors.white70 : Colors.black54),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Badge discreto com o nível de perigo
+                    RiscoBadge(
+                      rcm: item.risco.rcm,
+                      size: 26,
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Nome do Risco
+                    Expanded(
+                      child: Text(
+                        textoDoRisco(item.risco.rcm),
+                        style: TextStyle(
+                          color: corTexto,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          letterSpacing: -0.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+
+                    // Temperaturas Mín / Máx
+                    if (item.risco.tMin != null && item.risco.tMax != null)
+                      Text(
+                        '${item.risco.tMin!.round()}° / ${item.risco.tMax!.round()}°C',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.1,
+                          color: isDark ? Colors.white70 : Colors.black87,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      )
+                    else
+                      Text(
+                        '—',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: cs.outline.withValues(alpha: 0.5),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Botão elegante estilo Apple para consultar a explicação de todos os níveis de risco e suas regras
   Widget _buildBotaoExplicacaoRegras(
     BuildContext context,
@@ -469,249 +622,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// Barra de horizonte de tendência diária compacta (estilo Apple Weather)
-  Widget _buildTrendHorizon(BuildContext context, List<RiscoPrevisaoDia> dias) {
-    if (dias.isEmpty) return const SizedBox.shrink();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cs = Theme.of(context).colorScheme;
 
-    return Container(
-      margin: const EdgeInsets.only(top: 10, bottom: 12),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.03)
-            : cs.surfaceContainerHighest.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: cs.outlineVariant.withValues(alpha: isDark ? 0.15 : 0.25),
-          width: 0.6,
-        ),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final itemWidth = (constraints.maxWidth / dias.length).clamp(46.0, 70.0);
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: dias.map((dia) {
-                final cor = corDoRiscoContextual(dia.risco.rcm, Theme.of(context).brightness);
-                final corTexto = isDark ? cor : corDoRiscoTextoEmFundoClaro(dia.risco.rcm);
-                final isHoje = dia.diaIndex == 0;
-                final diaLabel = isHoje
-                    ? 'Hoje'
-                    : (dia.diaIndex == 1
-                        ? 'Amanhã'
-                        : dia.rotuloDia.split(',').first.trim().split(' ').first);
-
-                return SizedBox(
-                  width: itemWidth,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        diaLabel,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isHoje ? FontWeight.bold : FontWeight.w500,
-                          color: isHoje
-                              ? (isDark ? Colors.white : Colors.black)
-                              : cs.outline,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          color: cor.withValues(alpha: isDark ? 0.25 : 0.18),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: cor.withValues(alpha: 0.7), width: 1),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          '${dia.risco.rcm}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: corTexto,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      if (dia.risco.tMax != null)
-                        Text(
-                          '${dia.risco.tMax!.round()}°',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white70 : Colors.black87,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// Lista de previsão diária integrada (Amanhã + próximos dias num único bloco elegante)
-  Widget _buildPrevisaoIntegrada(
-    BuildContext context,
-    RiscoProvider provider,
-    dynamic concelho,
-  ) {
-    final todosDias = provider.getPrevisaoDias(concelho.dico);
-    // Dias a partir de amanhã (diaIndex >= 1)
-    final diasFuturos = todosDias.length > 1
-        ? todosDias.sublist(1)
-        : <RiscoPrevisaoDia>[];
-
-    if (diasFuturos.isEmpty) return const SizedBox.shrink();
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cs = Theme.of(context).colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: cs.outlineVariant.withValues(alpha: isDark ? 0.28 : 0.35),
-          width: 0.8,
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Cabeçalho da secção
-          Row(
-            children: [
-              Icon(
-                CupertinoIcons.calendar,
-                size: 16,
-                color: isDark ? kBrandDark : kBrand,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'TENDÊNCIA & PREVISÃO (${diasFuturos.length} DIAS)',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.0,
-                  color: isDark ? Colors.white60 : Colors.black45,
-                ),
-              ),
-            ],
-          ),
-          // Micro horizonte de tendência visual
-          _buildTrendHorizon(context, todosDias),
-          const SizedBox(height: 6),
-
-          // Lista de dias com hairline dividers
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: diasFuturos.length,
-            separatorBuilder: (_, __) => Divider(
-              height: 1,
-              thickness: 0.8,
-              indent: 4,
-              endIndent: 4,
-              color: cs.outlineVariant.withValues(alpha: isDark ? 0.20 : 0.25),
-            ),
-            itemBuilder: (context, index) {
-              final item = diasFuturos[index];
-              final cor = corDoRiscoContextual(
-                item.risco.rcm,
-                Theme.of(context).brightness,
-              );
-              final corTexto = isDark
-                  ? cor
-                  : corDoRiscoTextoEmFundoClaro(item.risco.rcm);
-              final isAmanha = item.diaIndex == 1;
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-                child: Row(
-                  children: [
-                    // Coluna do Dia
-                    SizedBox(
-                      width: 95,
-                      child: Text(
-                        item.rotuloDia,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: isAmanha ? FontWeight.bold : FontWeight.w500,
-                          letterSpacing: 0.1,
-                          color: isAmanha
-                              ? (isDark ? Colors.white : Colors.black87)
-                              : (isDark ? Colors.white70 : Colors.black54),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-
-                    // Badge com número de risco
-                    RiscoBadge(
-                      rcm: item.risco.rcm,
-                      size: 30,
-                    ),
-                    const SizedBox(width: 12),
-
-                    // Nome do Risco
-                    Expanded(
-                      child: Text(
-                        textoDoRisco(item.risco.rcm),
-                        style: TextStyle(
-                          color: corTexto,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          letterSpacing: -0.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-
-                    // Temperaturas Mín / Máx
-                    if (item.risco.tMin != null && item.risco.tMax != null)
-                      Text(
-                        '${item.risco.tMin!.round()}° / ${item.risco.tMax!.round()}°C',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.1,
-                          color: isDark ? Colors.white70 : Colors.black87,
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                        ),
-                      )
-                    else
-                      Text(
-                        '—',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: cs.outline.withValues(alpha: 0.5),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
   /// Ecrã de Boas-Vindas quando não há concelho selecionado
   Widget _buildZeroState(BuildContext context, RiscoProvider provider) {

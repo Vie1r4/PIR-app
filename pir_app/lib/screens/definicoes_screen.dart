@@ -79,7 +79,7 @@ class DefinicoesScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Versão 1.0.0 · Portugal Continental',
+                        'Versão 1.1.0 · Portugal Continental',
                         style: TextStyle(
                           color: cs.outline,
                           fontSize: 12,
@@ -829,6 +829,13 @@ class _InfoCard extends StatelessWidget {
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           _ItemLinhaClicavel(
+            icone: CupertinoIcons.calendar,
+            titulo: 'Previsão Alargada',
+            subtitulo: 'Modelo RCM até 9 dias (IPMA & Proteção Civil)',
+            onTap: () => _abrirUrl('https://www.ipma.pt/pt/ambiente/risco.incendio/'),
+          ),
+          Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
+          _ItemLinhaClicavel(
             icone: CupertinoIcons.shield,
             titulo: 'Proteção Civil & ICNF',
             subtitulo: 'Legislação Decreto-Lei n.º 82/2021',
@@ -842,10 +849,10 @@ class _InfoCard extends StatelessWidget {
             onTap: () => _mostrarDialogoPrivacidade(context),
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
-          _ItemLinha(
+          const _ItemLinha(
             icone: CupertinoIcons.info_circle,
             titulo: 'Natureza da App',
-            valor: 'App independente não oficial',
+            valor: 'Consulta cívica não oficial',
           ),
         ],
       ),

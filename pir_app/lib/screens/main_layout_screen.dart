@@ -250,6 +250,9 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
     int numFavoritos,
     AcessibilidadeProvider accProvider,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeColor = isDark ? kBrandDark : kBrand;
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -288,31 +291,46 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
                 ),
               ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _indiceSelecionado.clamp(0, 3),
-        onDestinationSelected: _mudarAba,
-        destinations: [
-          const NavigationDestination(
-            icon: Icon(CupertinoIcons.house),
-            selectedIcon: Icon(CupertinoIcons.house_fill),
-            label: 'Início',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: (isDark ? kDarkCard : kLightCard).withValues(alpha: 0.94),
+          border: Border(
+            top: BorderSide(
+              color: isDark ? const Color(0x22FFFFFF) : const Color(0x15000000),
+              width: 0.6,
+            ),
           ),
-          const NavigationDestination(
-            icon: Icon(CupertinoIcons.map),
-            selectedIcon: Icon(CupertinoIcons.map_fill),
-            label: 'Mapa & Pesquisa',
-          ),
-          const NavigationDestination(
-            icon: Icon(CupertinoIcons.heart),
-            selectedIcon: Icon(CupertinoIcons.heart_fill),
-            label: 'Favoritos',
-          ),
-          const NavigationDestination(
-            icon: Icon(CupertinoIcons.gear_alt),
-            selectedIcon: Icon(CupertinoIcons.gear_alt_fill),
-            label: 'Definições',
-          ),
-        ],
+        ),
+        child: CupertinoTabBar(
+          currentIndex: _indiceSelecionado.clamp(0, 3),
+          onTap: _mudarAba,
+          activeColor: activeColor,
+          inactiveColor: isDark ? const Color(0x88FFFFFF) : const Color(0x77000000),
+          backgroundColor: Colors.transparent,
+          iconSize: 22,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.house),
+              activeIcon: Icon(CupertinoIcons.house_fill),
+              label: 'Início',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.map),
+              activeIcon: Icon(CupertinoIcons.map_fill),
+              label: 'Mapa',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.heart),
+              activeIcon: Icon(CupertinoIcons.heart_fill),
+              label: 'Favoritos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.gear_alt),
+              activeIcon: Icon(CupertinoIcons.gear_alt_fill),
+              label: 'Definições',
+            ),
+          ],
+        ),
       ),
     );
   }
