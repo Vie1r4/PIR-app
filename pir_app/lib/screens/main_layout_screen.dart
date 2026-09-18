@@ -291,49 +291,215 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
                 ),
               ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: (isDark ? kDarkCard : kLightCard).withValues(alpha: 0.94),
-          border: Border(
-            top: BorderSide(
-              color: isDark ? const Color(0x22FFFFFF) : const Color(0x15000000),
-              width: 0.6,
-            ),
+      bottomNavigationBar: _MobileBottomBar(
+        selectedIndex: _indiceSelecionado.clamp(0, 3),
+        onTabSelected: _mudarAba,
+        numFavoritos: numFavoritos,
+        isDark: isDark,
+        activeColor: activeColor,
+        isGrandes: accProvider.elementosGrandes,
+      ),
+    );
+  }
+}
+
+// ── Barra de Navegação Inferior Móvel/iOS Moderna e Ergonómica ───────────────
+
+class _MobileBottomBar extends StatelessWidget {
+  final int selectedIndex;
+  final ValueChanged<int> onTabSelected;
+  final int numFavoritos;
+  final bool isDark;
+  final Color activeColor;
+  final bool isGrandes;
+
+  const _MobileBottomBar({
+    required this.selectedIndex,
+    required this.onTabSelected,
+    required this.numFavoritos,
+    required this.isDark,
+    required this.activeColor,
+    required this.isGrandes,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor = (isDark ? kDarkCard : kLightCard).withValues(alpha: 0.96);
+    final borderColor = isDark ? const Color(0x20FFFFFF) : const Color(0x18000000);
+    final inactiveColor = isDark ? const Color(0x99FFFFFF) : const Color(0x88000000);
+
+    final items = [
+      const _NavItemData(
+        icon: CupertinoIcons.house,
+        selectedIcon: CupertinoIcons.house_fill,
+        label: 'Início',
+      ),
+      const _NavItemData(
+        icon: CupertinoIcons.map,
+        selectedIcon: CupertinoIcons.map_fill,
+        label: 'Mapa',
+      ),
+      _NavItemData(
+        icon: CupertinoIcons.heart,
+        selectedIcon: CupertinoIcons.heart_fill,
+        label: 'Favoritos',
+        badgeCount: numFavoritos,
+      ),
+      const _NavItemData(
+        icon: CupertinoIcons.gear_alt,
+        selectedIcon: CupertinoIcons.gear_alt_fill,
+        label: 'Definições',
+      ),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border(
+          top: BorderSide(color: borderColor, width: 0.7),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Container(
+          height: isGrandes ? 68 : 60,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(items.length, (index) {
+              final item = items[index];
+              final isSelected = selectedIndex == index;
+
+              return Expanded(
+                child: _MobileTabItem(
+                  item: item,
+                  isSelected: isSelected,
+                  activeColor: activeColor,
+                  inactiveColor: inactiveColor,
+                  isGrandes: isGrandes,
+                  onTap: () => onTabSelected(index),
+                ),
+              );
+            }),
           ),
         ),
-        child: CupertinoTabBar(
-          currentIndex: _indiceSelecionado.clamp(0, 3),
-          onTap: _mudarAba,
-          activeColor: activeColor,
-          inactiveColor: isDark ? const Color(0x88FFFFFF) : const Color(0x77000000),
-          backgroundColor: Colors.transparent,
-          iconSize: 22,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.house),
-              activeIcon: Icon(CupertinoIcons.house_fill),
-              label: 'Início',
+      ),
+    );
+  }
+}
+
+class _MobileTabItem extends StatelessWidget {
+  final _NavItemData item;
+  final bool isSelected;
+  final Color activeColor;
+  final Color inactiveColor;
+  final bool isGrandes;
+  final VoidCallback onTap;
+
+  const _MobileTabItem({
+    required this.item,
+    required this.isSelected,
+    required this.activeColor,
+    required this.inactiveColor,
+    required this.isGrandes,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final iconSize = isGrandes ? 25.0 : 23.0;
+    final fontSize = isGrandes ? 12.5 : 11.5;
+
+    return InkWell(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(14),
+      splashColor: activeColor.withValues(alpha: 0.12),
+      highlightColor: activeColor.withValues(alpha: 0.08),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor.withValues(alpha: 0.12) : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  isSelected ? item.selectedIcon : item.icon,
+                  size: iconSize,
+                  color: isSelected ? activeColor : inactiveColor,
+                ),
+                if (item.badgeCount != null && item.badgeCount! > 0)
+                  Positioned(
+                    right: -7,
+                    top: -3,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                      decoration: BoxDecoration(
+                        color: activeColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${item.badgeCount}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.map),
-              activeIcon: Icon(CupertinoIcons.map_fill),
-              label: 'Mapa',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.heart),
-              activeIcon: Icon(CupertinoIcons.heart_fill),
-              label: 'Favoritos',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.gear_alt),
-              activeIcon: Icon(CupertinoIcons.gear_alt_fill),
-              label: 'Definições',
+            const SizedBox(height: 3),
+            Text(
+              item.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? activeColor : inactiveColor,
+                letterSpacing: -0.1,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
+
+class _NavItemData {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final int? badgeCount;
+
+  const _NavItemData({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    this.badgeCount,
+  });
 }
 
 class _SidebarDestinationButton extends StatefulWidget {

@@ -400,8 +400,10 @@ class _MapScreenState extends State<MapScreen>
                             panEnabled: true,
                             scaleEnabled: true,
                             constrained: false,
-                            clipBehavior: Clip.none,
-                            boundaryMargin: const EdgeInsets.all(400),
+                            clipBehavior: Clip.hardEdge,
+                            trackpadScrollCausesScale: true,
+                            interactionEndFrictionCoefficient: 0.0000135,
+                            boundaryMargin: const EdgeInsets.all(300),
                             minScale: 0.20,
                             maxScale: 6.0,
                             child: MouseRegion(

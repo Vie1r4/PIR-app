@@ -96,6 +96,16 @@ class DadosRisco {
   /// Get risk data for a specific concelho by DICO code
   RiscoLocal? getRisco(String dico) => locais[dico];
 
+  /// Carimbo temporal oficial de geração do ficheiro pelo IPMA
+  DateTime? get dataAtualizacaoOficial {
+    try {
+      if (fileDate.isNotEmpty) {
+        return DateTime.tryParse(fileDate.replaceAll(' ', 'T'));
+      }
+    } catch (_) {}
+    return null;
+  }
+
   factory DadosRisco.fromJson(Map<String, dynamic> json) {
     final localMap = json['local'] as Map<String, dynamic>;
     final locais = <String, RiscoLocal>{};

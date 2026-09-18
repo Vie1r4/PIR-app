@@ -16,12 +16,14 @@ class HttpHeadersConfig {
   static const Map<String, String> defaultHeaders = {
     'User-Agent': userAgent,
     'Accept': 'application/json, text/plain, */*',
+    'Accept-Encoding': 'gzip, deflate, br',
   };
 
   static const Map<String, String> scraperHeaders = {
     'User-Agent': userAgent,
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
   };
 
   HttpHeadersConfig._();
