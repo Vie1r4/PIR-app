@@ -75,7 +75,7 @@ class HomeScreen extends StatelessWidget {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => provider.carregarDados(),
+                  onPressed: () => provider.carregarDados(forcar: true),
                   child: const Text('Tentar novamente'),
                 ),
               ],
@@ -94,7 +94,7 @@ class HomeScreen extends StatelessWidget {
           // Conteúdo Principal
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => provider.carregarDados(),
+              onRefresh: () => provider.carregarDados(forcar: true),
               child: Align(
                 alignment: Alignment.topCenter,
                 child: ConstrainedBox(

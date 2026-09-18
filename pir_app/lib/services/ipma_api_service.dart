@@ -24,7 +24,10 @@ class IpmaApiService {
   Future<DadosRisco> _fetchRisco(String url) async {
     try {
       final response = await _client
-          .get(Uri.parse(url))
+          .get(
+            Uri.parse(url),
+            headers: HttpHeadersConfig.defaultHeaders,
+          )
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {

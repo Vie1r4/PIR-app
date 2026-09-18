@@ -8,6 +8,25 @@ class ApiUrls {
   ApiUrls._();
 }
 
+/// Configuração de cabeçalhos HTTP com User-Agent responsável
+class HttpHeadersConfig {
+  static const String userAgent =
+      'PIR-App/1.1.0 (+https://github.com/Vie1r4/PIR-app; shovieira@gmail.com)';
+
+  static const Map<String, String> defaultHeaders = {
+    'User-Agent': userAgent,
+    'Accept': 'application/json, text/plain, */*',
+  };
+
+  static const Map<String, String> scraperHeaders = {
+    'User-Agent': userAgent,
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
+  };
+
+  HttpHeadersConfig._();
+}
+
 /// Strings da aplicação em Português
 class AppStrings {
   static const String appTitle = 'PIR - Incêndio Rural';

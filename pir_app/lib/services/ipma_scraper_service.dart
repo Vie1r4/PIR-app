@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/risco_incendio.dart';
+import '../utils/constants.dart';
 
 /// Serviço isolado responsável por extrair a previsão alargada de 9 dias
 /// a partir da página HTML do IPMA (web scraping).
@@ -42,9 +43,7 @@ class IpmaScraperService {
       try {
         final response = await _client.get(
           Uri.parse(url),
-          headers: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          },
+          headers: HttpHeadersConfig.scraperHeaders,
         ).timeout(const Duration(seconds: 12));
 
         if (response.statusCode == 200 && response.body.isNotEmpty) {

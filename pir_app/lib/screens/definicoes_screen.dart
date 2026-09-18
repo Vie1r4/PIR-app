@@ -703,8 +703,8 @@ class _DadosCard extends StatelessWidget {
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           const _ItemLinha(
             icone: CupertinoIcons.arrow_2_circlepath,
-            titulo: 'Sincronização Automática',
-            valor: 'Ativa (a cada 30m / ao abrir)',
+            titulo: 'Política de Cache & TTL',
+            valor: '2 horas (Eco-Sync IPMA)',
             corValor: Color(0xFF34C759),
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
@@ -715,7 +715,7 @@ class _DadosCard extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: provider.isLoading
                     ? null
-                    : () => provider.carregarDados(),
+                    : () => provider.carregarDados(forcar: true),
                 icon: provider.isLoading
                     ? const SizedBox(
                         width: 16,
@@ -724,7 +724,7 @@ class _DadosCard extends StatelessWidget {
                       )
                     : const Icon(CupertinoIcons.arrow_clockwise, size: 18),
                 label: Text(
-                    provider.isLoading ? 'A sincronizar…' : 'Sincronizar Agora'),
+                    provider.isLoading ? 'A sincronizar…' : 'Sincronizar Agora (Forçar)'),
               ),
             ),
           ),
@@ -785,7 +785,7 @@ class _EmergenciaLegalCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Esta aplicação é uma ferramenta de consulta informativa baseada em dados públicos. Em caso de emergência ou avistamento de fumo/fogo, contacte de imediato as autoridades (112 ou Bombeiros) e siga sempre as orientações da Proteção Civil (ANEPC) e ICNF.',
+            'Esta aplicação é uma ferramenta de consulta informativa baseada em dados abertos públicos (Lei n.º 68/2021). Em caso de emergência ou avistamento de fumo/fogo, contacte de imediato o 112 e siga sempre as orientações oficiais da ANEPC (Proteção Civil) e do ICNF.',
             style: TextStyle(
               fontSize: 12.5,
               height: 1.35,
@@ -836,6 +836,13 @@ class _InfoCard extends StatelessWidget {
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           _ItemLinhaClicavel(
+            icone: CupertinoIcons.doc_text_search,
+            titulo: 'Enquadramento Legal & Dados Abertos',
+            subtitulo: 'Lei n.º 68/2021 · Diretiva (UE) 2019/1024',
+            onTap: () => _mostrarDialogoAvisoLegal(context),
+          ),
+          Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
+          _ItemLinhaClicavel(
             icone: CupertinoIcons.shield,
             titulo: 'Proteção Civil & ICNF',
             subtitulo: 'Legislação Decreto-Lei n.º 82/2021',
@@ -852,7 +859,60 @@ class _InfoCard extends StatelessWidget {
           const _ItemLinha(
             icone: CupertinoIcons.info_circle,
             titulo: 'Natureza da App',
-            valor: 'Consulta cívica não oficial',
+            valor: 'Iniciativa cívica independente',
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _mostrarDialogoAvisoLegal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(CupertinoIcons.doc_text_search, size: 22),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Aviso Legal & Dados Abertos',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Enquadramento Legal da Informação:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              SizedBox(height: 6),
+              Text(
+                '1. Princípio de Dados Abertos (Open Data):\n'
+                'Esta aplicação reutiliza dados públicos meteorológicos e de perigo de incêndio rural disponibilizados pelo Instituto Português do Mar e da Atmosfera (IPMA, I.P.), ao abrigo da Lei n.º 68/2021, de 24 de agosto, que transpõe a Diretiva (UE) 2019/1024 relativa a dados abertos e à reutilização de informação do setor público.\n\n'
+                '2. Isenção de Responsabilidade Operacional:\n'
+                'O PIR-App é uma plataforma de agregação e visualização cívica independente. A informação aqui apresentada não substitui, em circunstância alguma, as comunicações, avisos à população ou ordens operacionais emanadas pela Autoridade Nacional de Emergência e Proteção Civil (ANEPC), pelo Instituto da Conservação da Natureza e das Florestas (ICNF) ou pelas Forças de Segurança.\n\n'
+                '3. Atribuição de Fontes:\n'
+                '• Perigo de Incêndio Rural (RCM): IPMA, I.P.\n'
+                '• Limites Administrativos (CAOP): Direção-Geral do Território (DGT)\n\n'
+                '4. Contactos de Emergência:\n'
+                '• Número Europeu de Emergência: 112\n'
+                '• Linha SOS Ambiente e Território (GNR): 808 200 520\n'
+                '• Informações ICNF: 808 200 500',
+                style: TextStyle(fontSize: 12.5, height: 1.4),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Compreendi'),
           ),
         ],
       ),

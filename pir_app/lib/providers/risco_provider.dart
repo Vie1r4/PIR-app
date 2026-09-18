@@ -36,6 +36,9 @@ class RiscoProvider extends ChangeNotifier {
   bool _isLocalizando = false;
   String? _mensagemLocalizacao;
 
+  // Política de Cache Inteligente: TTL de 2 horas para evitar sobrecarga ao IPMA
+  static const Duration cacheTtl = Duration(hours: 2);
+
   // Getters
   List<Concelho> get concelhos => _concelhos;
   DadosRisco? get riscoHoje => _riscoHoje;
@@ -47,6 +50,12 @@ class RiscoProvider extends ChangeNotifier {
   bool get isOnline => _isOnline;
   String? get erro => _erro;
   DateTime? get ultimaAtualizacao => _ultimaAtualizacao;
+
+  /// Retorna se o cache local se encontra dentro do período válido de 2 horas
+  bool get isCacheValido =>
+      _ultimaAtualizacao != null &&
+      DateTime.now().difference(_ultimaAtualizacao!) < cacheTtl &&
+      _riscoHoje != null;
 
   bool get autoLocalizacao => _autoLocalizacao;
   bool get isLocalizando => _isLocalizando;
@@ -102,11 +111,12 @@ class RiscoProvider extends ChangeNotifier {
       });
     }
 
+    // Carrega dados respeitando o TTL do cache local
     await carregarDados();
     _iniciarAutoSync();
   }
 
-  /// Inicia timer periódico para sincronização automática em segundo plano a cada 30 minutos
+  /// Inicia timer periódico para sincronização automática em segundo plano
   void _iniciarAutoSync() {
     _autoSyncTimer?.cancel();
     _autoSyncTimer = Timer.periodic(const Duration(minutes: 30), (_) {
@@ -114,16 +124,16 @@ class RiscoProvider extends ChangeNotifier {
     });
   }
 
-  /// Verifica se os dados precisam de atualização automática (ao abrir a app ou após 20 min)
+  /// Verifica se os dados precisam de atualização automática (apenas quando o TTL expira)
   Future<void> verificarEAtualizarAutomatico() async {
     final agora = DateTime.now();
     final precisaAtualizar = _ultimaAtualizacao == null ||
-        agora.difference(_ultimaAtualizacao!) >= const Duration(minutes: 20) ||
+        agora.difference(_ultimaAtualizacao!) >= cacheTtl ||
         !_isOnline;
 
     if (precisaAtualizar && !_isLoading) {
-      debugPrint('Sincronização automática em segundo plano iniciada...');
-      await carregarDados(silencioso: true);
+      debugPrint('Sincronização automática periódica (TTL de 2h expirado)...');
+      await carregarDados(silencioso: true, forcar: true);
     }
   }
 
@@ -179,8 +189,19 @@ class RiscoProvider extends ChangeNotifier {
     }
   }
 
-  /// Fetch fresh data from the IPMA API and Scraper
-  Future<void> carregarDados({bool silencioso = false}) async {
+  /// Fetch fresh data from the IPMA API and Scraper.
+  /// Se [forcar] for false e o cache local for válido (< 2 horas), evita pedidos de rede desnecessários.
+  Future<void> carregarDados({bool silencioso = false, bool forcar = false}) async {
+    // Se o cache for válido e não for um pedido forçado (ex: pull-to-refresh), usa os dados locais
+    if (!forcar && isCacheValido) {
+      debugPrint('RiscoProvider: Cache local válido (< 2h). Pedido HTTP ao IPMA poupado.');
+      _isOnline = true;
+      _isLoading = false;
+      _erro = null;
+      notifyListeners();
+      return;
+    }
+
     if (!silencioso) {
       _isLoading = true;
       _erro = null;
