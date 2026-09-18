@@ -26,11 +26,11 @@ class IpmaScraperService {
       urlsParaTentar.add(pageUrl);
     }
 
-    // Proxies CORS para Web ou fallback resiliente
+    // Proxies CORS para Web ou fallback resiliente (com cors.eu.org prioritário)
     urlsParaTentar.addAll([
-      'https://api.allorigins.win/raw?url=${Uri.encodeComponent(pageUrl)}',
-      'https://corsproxy.io/?${Uri.encodeComponent(pageUrl)}',
+      'https://cors.eu.org/$pageUrl',
       'https://api.codetabs.com/v1/proxy?quest=${Uri.encodeComponent(pageUrl)}',
+      'https://api.allorigins.win/raw?url=${Uri.encodeComponent(pageUrl)}',
     ]);
 
     if (kIsWeb) {
