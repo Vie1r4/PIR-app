@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// URLs da API do IPMA
 class ApiUrls {
   static const String rcmHoje =
@@ -13,18 +15,37 @@ class HttpHeadersConfig {
   static const String userAgent =
       'PIR-App/1.1.0 (+https://github.com/Vie1r4/PIR-app; shovieira@gmail.com)';
 
-  static const Map<String, String> defaultHeaders = {
-    'User-Agent': userAgent,
-    'Accept': 'application/json, text/plain, */*',
-    'Accept-Encoding': 'gzip, deflate, br',
-  };
+  /// Cabeçalhos para a API oficial do IPMA.
+  /// Na Web (browsers), User-Agent e Accept-Encoding são geridos pelo browser e proibidos em fetch/XHR.
+  /// No nativo (iOS/Android/Desktop), são enviados explicitamente.
+  static Map<String, String> get defaultHeaders {
+    if (kIsWeb) {
+      return const {
+        'Accept': 'application/json, text/plain, */*',
+      };
+    }
+    return const {
+      'User-Agent': userAgent,
+      'Accept': 'application/json, text/plain, */*',
+      'Accept-Encoding': 'gzip, deflate, br',
+    };
+  }
 
-  static const Map<String, String> scraperHeaders = {
-    'User-Agent': userAgent,
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, br',
-  };
+  /// Cabeçalhos para o Scraper do IPMA
+  static Map<String, String> get scraperHeaders {
+    if (kIsWeb) {
+      return const {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
+      };
+    }
+    return const {
+      'User-Agent': userAgent,
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
+      'Accept-Encoding': 'gzip, deflate, br',
+    };
+  }
 
   HttpHeadersConfig._();
 }
