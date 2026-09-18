@@ -37,6 +37,7 @@ O objetivo não é reinventar um modelo de risco nem adicionar sobrecarga de aut
 - 📴 **Modo Offline & Cache Local:** Guarda as previsões na máquina local (usando Hive). Se a ligação à internet falhar, a app informa e exibe a última informação válida disponível.
 - 🎨 **Tema Automático:** Adaptação instantânea ao tema Claro (Light) ou Escuro (Dark) do sistema operativo.
 - 🖥️ **Interface Adaptativa para Desktop:** Janela moderna (1180x780 px) com barra lateral de navegação (NavigationRail) e visualização de cartões lado a lado.
+- 📍 **Geolocalização Automática Opcional:** Deteção rápida do concelho atual via GPS / Windows Location (com fallback inteligente por rede/IP) e mapeamento vetorial 100% offline aos 278 concelhos de Portugal Continental, sem envio de dados para servidores externos.
 
 ---
 
@@ -109,6 +110,7 @@ O projeto adota o formato *Architecture Decision Records* (ADR) para documentar 
 | [**0001**](docs/adr/0001-modelo-hibrido-ipma-api-e-scraper.md) | Modelo Híbrido IPMA (API Aberta + Scraper de 9 Dias) | Aceite | Resiliência de dados e previsão estendida sem backend intermediário |
 | [**0002**](docs/adr/0002-persistencia-local-com-hive.md) | Persistência Local e Cache Offline com Hive NoSQL | Aceite | Desempenho sub-milissegundo, tolerância a falhas de rede e zero setup nativo SQLite |
 | [**0003**](docs/adr/0003-projecao-cartografica-vetorial-canvas.md) | Projeção Cartográfica Vetorial Offline em CustomPainter | Aceite | Renderização de 278 concelhos a 60/120 FPS sem WebViews nem dependências de tiles pesadas |
+| [**0004**](docs/adr/0004-geolocalizacao-hibrida-e-mapeamento-poligonal.md) | Geolocalização Híbrida e Mapeamento Poligonal Offline | Aceite | Deteção resiliente GPS+IP e identificação geométrica local de concelhos com privacidade |
 
 Os registos detalhados encontram-se disponíveis no diretório [`docs/adr/`](docs/adr/).
 

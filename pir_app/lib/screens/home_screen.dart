@@ -268,6 +268,69 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
+        // Botão de Localização Rápida
+        Tooltip(
+          message: 'Localizar concelho atual',
+          child: Container(
+            width: favBtnSize,
+            height: favBtnSize,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.06)
+                  : Colors.black.withValues(alpha: 0.04),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.12)
+                    : Colors.black.withValues(alpha: 0.08),
+                width: 0.8,
+              ),
+            ),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: provider.isLocalizando
+                  ? SizedBox(
+                      width: favIconSize,
+                      height: favIconSize,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: isDark ? kBrandDark : kBrand,
+                      ),
+                    )
+                  : Icon(
+                      Icons.my_location_rounded,
+                      size: favIconSize,
+                      color: isDark ? kBrandDark : kBrand,
+                    ),
+              onPressed: provider.isLocalizando
+                  ? null
+                  : () async {
+                      HapticFeedback.lightImpact();
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      final concelhoDet =
+                          await provider.detetarEDefinirLocalizacaoAtual();
+                      if (concelhoDet != null) {
+                        scaffoldMessenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Concelho atual: ${concelhoDet.nome} (${concelhoDet.distrito})'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      } else {
+                        scaffoldMessenger.showSnackBar(
+                          SnackBar(
+                            content: Text(provider.mensagemLocalizacao ??
+                                'Não foi possível detetar a localização.'),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    },
+            ),
+          ),
+        ),
         // Botão de Favorito estilo cápsula circular
         Container(
           width: favBtnSize,
@@ -664,7 +727,108 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 28),
+        const SizedBox(height: 14),
+
+        // Botão de Localização Automática em destaque
+        Container(
+          decoration: BoxDecoration(
+            color: (Theme.of(context).brightness == Brightness.dark
+                    ? kBrandDark
+                    : kBrand)
+                .withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: (Theme.of(context).brightness == Brightness.dark
+                      ? kBrandDark
+                      : kBrand)
+                  .withValues(alpha: 0.35),
+              width: 0.8,
+            ),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: provider.isLocalizando
+                ? null
+                : () async {
+                    HapticFeedback.lightImpact();
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+                    final concelhoDet =
+                        await provider.detetarEDefinirLocalizacaoAtual();
+                    if (concelhoDet != null) {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Concelho detetado: ${concelhoDet.nome} (${concelhoDet.distrito})'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text(provider.mensagemLocalizacao ??
+                              'Não foi possível detetar a localização.'),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 14,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (provider.isLocalizando) ...[
+                    SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? kBrandDark
+                            : kBrand,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'A detetar a tua localização...',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? kBrandDark
+                            : kBrand,
+                      ),
+                    ),
+                  ] else ...[
+                    Icon(
+                      Icons.my_location_rounded,
+                      size: 20,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? kBrandDark
+                          : kBrand,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Usar a minha localização atual',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? kBrandDark
+                            : kBrand,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 24),
 
         // Seleção rápida por capitais
         Align(

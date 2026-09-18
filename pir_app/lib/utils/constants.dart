@@ -36,6 +36,7 @@ class CacheKeys {
   static const String rcmD1 = 'rcm_d1';
   static const String favoritos = 'favoritos';
   static const String concelhoPrincipal = 'concelho_principal';
+  static const String autoLocalizacao = 'auto_localizacao';
   static const String ultimaAtualizacaoPrefix = 'ultima_atualizacao_';
 
   CacheKeys._();

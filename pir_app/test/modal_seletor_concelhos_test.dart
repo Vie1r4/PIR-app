@@ -39,12 +39,25 @@ class MockRiscoProviderParaModal extends ChangeNotifier implements RiscoProvider
   }
 
   @override
+  bool get autoLocalizacao => false;
+
+  @override
+  bool get isLocalizando => false;
+
+  @override
+  String? get mensagemLocalizacao => null;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
   testWidgets('ModalSeletorConcelhos renderiza e filtra concelhos na pesquisa',
       (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
     final mockProvider = MockRiscoProviderParaModal();
     final accProvider = AcessibilidadeProvider();
 

@@ -46,6 +46,15 @@ class MockRiscoProvider extends ChangeNotifier implements RiscoProvider {
   String get statusConexaoDescricao => 'Online';
 
   @override
+  bool get autoLocalizacao => false;
+
+  @override
+  bool get isLocalizando => false;
+
+  @override
+  String? get mensagemLocalizacao => null;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 

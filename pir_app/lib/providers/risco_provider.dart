@@ -10,12 +10,14 @@ import '../models/risco_incendio.dart';
 import '../services/cache_service.dart';
 import '../services/ipma_api_service.dart';
 import '../services/ipma_scraper_service.dart';
+import '../services/localizacao_service.dart';
 import '../services/map_geometry_service.dart';
 
 class RiscoProvider extends ChangeNotifier {
   final IpmaApiService _apiService = IpmaApiService();
   final IpmaScraperService _scraperService = IpmaScraperService();
   final CacheService _cacheService = CacheService();
+  final LocalizacaoService _localizacaoService = LocalizacaoService();
 
   List<Concelho> _concelhos = [];
   DadosRisco? _riscoHoje;
@@ -29,6 +31,11 @@ class RiscoProvider extends ChangeNotifier {
   DateTime? _ultimaAtualizacao;
   Timer? _autoSyncTimer;
 
+  // Estado de Geolocalização
+  bool _autoLocalizacao = false;
+  bool _isLocalizando = false;
+  String? _mensagemLocalizacao;
+
   // Getters
   List<Concelho> get concelhos => _concelhos;
   DadosRisco? get riscoHoje => _riscoHoje;
@@ -40,6 +47,10 @@ class RiscoProvider extends ChangeNotifier {
   bool get isOnline => _isOnline;
   String? get erro => _erro;
   DateTime? get ultimaAtualizacao => _ultimaAtualizacao;
+
+  bool get autoLocalizacao => _autoLocalizacao;
+  bool get isLocalizando => _isLocalizando;
+  String? get mensagemLocalizacao => _mensagemLocalizacao;
 
   String get statusConexaoDescricao {
     if (_isOnline) {
@@ -74,12 +85,23 @@ class RiscoProvider extends ChangeNotifier {
     await _carregarConcelhos();
     _carregarFavoritos();
     _carregarConcelhoPrincipal();
+    _carregarAutoLocalizacao();
     await _carregarDadosDoCache();
     // Pré-carrega assincronamente as geometrias do mapa em background para abertura instantânea
     MapGeometryService().carregarGeometrias().catchError((e) {
       debugPrint('Aviso: pré-carregamento de geometrias: $e');
       return <ConcelhoGeometry>[];
     });
+
+    // Se auto-localização estiver ativa (ou se não houver concelho no primeiro arranque),
+    // tenta detetar a localização em background de forma resiliente
+    if (_autoLocalizacao || _concelhoPrincipal == null) {
+      detetarEDefinirLocalizacaoAtual(silencioso: true).catchError((e) {
+        debugPrint('Deteção de localização no arranque: $e');
+        return null;
+      });
+    }
+
     await carregarDados();
     _iniciarAutoSync();
   }
@@ -312,5 +334,54 @@ class RiscoProvider extends ChangeNotifier {
       ));
     }
     return list;
+  }
+
+  /// Carrega preferência de auto-localização do cache
+  void _carregarAutoLocalizacao() {
+    _autoLocalizacao = _cacheService.carregarAutoLocalizacao();
+  }
+
+  /// Alterna a opção de auto-localização e dispara deteção imediata se ativada
+  Future<void> alternarAutoLocalizacao(bool ativo) async {
+    _autoLocalizacao = ativo;
+    await _cacheService.salvarAutoLocalizacao(ativo);
+    notifyListeners();
+    if (ativo) {
+      await detetarEDefinirLocalizacaoAtual();
+    }
+  }
+
+  /// Deteta o concelho atual do utilizador via GPS/IP e define como concelho principal
+  Future<Concelho?> detetarEDefinirLocalizacaoAtual({bool silencioso = false}) async {
+    if (_isLocalizando) return null;
+
+    _isLocalizando = true;
+    _mensagemLocalizacao = null;
+    notifyListeners();
+
+    try {
+      final concelhoDetetado =
+          await _localizacaoService.detetarConcelhoAtual(_concelhos);
+      if (concelhoDetetado != null) {
+        selecionarConcelho(concelhoDetetado.dico);
+        _mensagemLocalizacao = 'Concelho detetado: ${concelhoDetetado.nome}';
+        return concelhoDetetado;
+      } else {
+        if (!silencioso) {
+          _mensagemLocalizacao =
+              'Não foi possível determinar o concelho a partir da localização.';
+        }
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Erro ao detetar concelho por localização: $e');
+      if (!silencioso) {
+        _mensagemLocalizacao = 'Erro ao aceder ao serviço de localização.';
+      }
+      return null;
+    } finally {
+      _isLocalizando = false;
+      notifyListeners();
+    }
   }
 }

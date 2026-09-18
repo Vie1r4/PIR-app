@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
@@ -37,6 +38,11 @@ class DefinicoesScreen extends StatelessWidget {
                 // ── Acessibilidade ────────────────────────────────────────
                 const _Secao(titulo: 'Acessibilidade'),
                 const _AcessibilidadeCard(),
+                const SizedBox(height: 28),
+
+                // ── Localização ──────────────────────────────────────────
+                const _Secao(titulo: 'Localização & Concelho de Arranque'),
+                const _LocalizacaoCard(),
                 const SizedBox(height: 28),
 
                 // ── Dados ─────────────────────────────────────────────
@@ -467,6 +473,169 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+// ── Card de Localização ──────────────────────────────────────────────────────
+
+class _LocalizacaoCard extends StatelessWidget {
+  const _LocalizacaoCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<RiscoProvider>();
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final concelhoAtual = provider.concelhoPrincipal;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: cs.outlineVariant.withValues(alpha: 0.4),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        children: [
+          // 1. Switch de Deteção Automática ao Iniciar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              secondary: Icon(
+                Icons.location_on_outlined,
+                color: isDark ? kBrandDark : kBrand,
+              ),
+              title: const Text(
+                'Detetar Concelho ao Iniciar',
+                style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
+              ),
+              subtitle: const Text(
+                'Usa GPS ou rede para selecionar automaticamente o concelho onde te encontras',
+                style: TextStyle(fontSize: 12),
+              ),
+              value: provider.autoLocalizacao,
+              onChanged: (val) {
+                HapticFeedback.lightImpact();
+                provider.alternarAutoLocalizacao(val);
+              },
+            ),
+          ),
+          Divider(
+            height: 1,
+            indent: 52,
+            color: cs.outlineVariant.withValues(alpha: 0.4),
+          ),
+
+          // 2. Concelho Atual Atribuído
+          _ItemLinha(
+            icone: Icons.home_work_outlined,
+            titulo: 'Concelho Selecionado',
+            valor: concelhoAtual != null
+                ? '${concelhoAtual.nome} (${concelhoAtual.distrito})'
+                : 'Nenhum concelho ativo',
+            corValor: concelhoAtual != null
+                ? (isDark ? kBrandDark : kBrand)
+                : cs.outline,
+          ),
+          Divider(
+            height: 1,
+            indent: 52,
+            color: cs.outlineVariant.withValues(alpha: 0.4),
+          ),
+
+          // 3. Botão de Ação Imediata: Obter Localização Agora
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Localização Atual',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        provider.mensagemLocalizacao ??
+                            'Mapeamento offline por coordenadas para os 278 concelhos',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: cs.outline,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton.icon(
+                  onPressed: provider.isLocalizando
+                      ? null
+                      : () async {
+                          HapticFeedback.lightImpact();
+                          final scaffoldMessenger =
+                              ScaffoldMessenger.of(context);
+                          final concelho =
+                              await provider.detetarEDefinirLocalizacaoAtual();
+                          if (concelho != null) {
+                            scaffoldMessenger.showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Concelho detetado: ${concelho.nome} (${concelho.distrito})'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          } else {
+                            scaffoldMessenger.showSnackBar(
+                              SnackBar(
+                                content: Text(provider.mensagemLocalizacao ??
+                                    'Não foi possível detetar a localização.'),
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark ? kBrandDark : kBrand,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: provider.isLocalizando
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.my_location_rounded, size: 16),
+                  label: Text(
+                    provider.isLocalizando ? 'A detetar...' : 'Localizar Já',
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

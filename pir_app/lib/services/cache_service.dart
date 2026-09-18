@@ -87,4 +87,16 @@ class CacheService {
       DateTime.now().toIso8601String(),
     );
   }
+
+  /// Save the auto-location preference
+  Future<void> salvarAutoLocalizacao(bool ativo) async {
+    await _box?.put(CacheKeys.autoLocalizacao, ativo);
+  }
+
+  /// Load the auto-location preference (false by default)
+  bool carregarAutoLocalizacao() {
+    final valor = _box?.get(CacheKeys.autoLocalizacao);
+    if (valor is bool) return valor;
+    return false;
+  }
 }

@@ -200,6 +200,95 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
             ),
           ),
 
+          // Botão Rápido: Usar Localização Atual
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: provider.isLocalizando
+                  ? null
+                  : () async {
+                      HapticFeedback.lightImpact();
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      final concelho =
+                          await provider.detetarEDefinirLocalizacaoAtual();
+                      if (context.mounted) {
+                        if (concelho != null) {
+                          Navigator.pop(context);
+                          scaffoldMessenger.showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Concelho detetado: ${concelho.nome} (${concelho.distrito})'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        } else {
+                          scaffoldMessenger.showSnackBar(
+                            SnackBar(
+                              content: Text(provider.mensagemLocalizacao ??
+                                  'Não foi possível detetar a localização.'),
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: (isDark ? kBrandDark : kBrand)
+                      .withValues(alpha: isDark ? 0.12 : 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: (isDark ? kBrandDark : kBrand)
+                        .withValues(alpha: isDark ? 0.35 : 0.25),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (provider.isLocalizando) ...[
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: isDark ? kBrandDark : kBrand,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'A detetar localização...',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? kBrandDark : kBrand,
+                        ),
+                      ),
+                    ] else ...[
+                      Icon(
+                        Icons.my_location_rounded,
+                        size: 17,
+                        color: isDark ? kBrandDark : kBrand,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Usar a minha localização atual',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? kBrandDark : kBrand,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+
           Divider(
             height: 1,
             color: cs.outlineVariant.withValues(alpha: isDark ? 0.25 : 0.35),
