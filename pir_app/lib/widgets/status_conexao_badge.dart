@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -167,7 +168,7 @@ class StatusConexaoBadge extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.history_toggle_off, size: 20),
+                        const Icon(CupertinoIcons.clock, size: 20),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
@@ -203,7 +204,7 @@ class StatusConexaoBadge extends StatelessWidget {
                             Navigator.pop(context);
                             await provider.carregarDados();
                           },
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(CupertinoIcons.arrow_clockwise, size: 18),
                     label: Text(
                       provider.isLoading
                           ? 'A sincronizar...'

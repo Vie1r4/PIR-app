@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -324,7 +325,7 @@ class _MapScreenState extends State<MapScreen>
               title: const Text('Mapa & Pesquisa'),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.center_focus_strong),
+                  icon: const Icon(CupertinoIcons.scope),
                   tooltip: 'Centrar / Repor Zoom (0)',
                   onPressed: _resetZoom,
                 ),
@@ -351,8 +352,6 @@ class _MapScreenState extends State<MapScreen>
           }
 
           final isNarrow = viewportSize.width < 680;
-          final cs = Theme.of(context).colorScheme;
-          final isDark = Theme.of(context).brightness == Brightness.dark;
 
           return Stack(
             children: [
@@ -446,46 +445,6 @@ class _MapScreenState extends State<MapScreen>
                     viewportSize,
                   ),
                 ),
-
-              // Dica contextual de navegação (quando ativada nas opções de Acessibilidade)
-              if (accProvider.dicasContextuais && concelhoGeoSelecionado == null)
-                Positioned(
-                  left: 14,
-                  bottom: isNarrow ? 150 : 135,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: cs.surface.withValues(alpha: isDark ? 0.90 : 0.94),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: cs.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.4),
-                        width: 0.8,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.pan_tool_outlined, size: 13, color: cs.primary),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Arrasta para mover • Usa scroll para zoom',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
               // 5. Botões de Zoom e Repor
               Positioned(
                 left: 14,
@@ -527,13 +486,13 @@ class _MapScreenState extends State<MapScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      width: isNarrow ? null : (isGrandes ? 310 : 290),
+      width: isNarrow ? null : 310,
       height: isGrandes ? 48 : 42,
       decoration: BoxDecoration(
         color: cs.surface.withValues(alpha: isDark ? 0.92 : 0.97),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0x22FFFFFF) : const Color(0x16000000),
+          color: isDark ? const Color(0x28FFFFFF) : const Color(0x18000000),
           width: 0.8,
         ),
         boxShadow: [
@@ -544,40 +503,45 @@ class _MapScreenState extends State<MapScreen>
           ),
         ],
       ),
-      child: TextField(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
-        style: const TextStyle(fontSize: 13),
-        decoration: InputDecoration(
-          hintText: isNarrow
-              ? 'Pesquisar concelho...'
-              : 'Pesquisar concelho ou distrito... (Ctrl+F)',
-          hintStyle: TextStyle(
-            fontSize: 12,
-            color: cs.outline.withValues(alpha: 0.8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: TextField(
+          controller: _searchController,
+          focusNode: _searchFocusNode,
+          style: const TextStyle(fontSize: 13),
+          decoration: InputDecoration(
+            filled: false,
+            fillColor: Colors.transparent,
+            hintText: isNarrow
+                ? 'Pesquisar concelho...'
+                : 'Pesquisar concelho ou distrito... (Ctrl+F)',
+            hintStyle: TextStyle(
+              fontSize: 12,
+              color: cs.outline.withValues(alpha: 0.8),
+            ),
+            prefixIcon: const Icon(CupertinoIcons.search, size: 19),
+            prefixIconConstraints: const BoxConstraints(minWidth: 36),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(CupertinoIcons.xmark_circle_fill, size: 16),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _searchQuery = '');
+                    },
+                  )
+                : null,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
           ),
-          prefixIcon: const Icon(Icons.search_rounded, size: 19),
-          prefixIconConstraints: const BoxConstraints(minWidth: 36),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 16),
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() => _searchQuery = '');
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          onChanged: (val) {
+            setState(() {
+              _searchQuery = val;
+              _mostrandoDropdownPesquisa = true;
+            });
+          },
         ),
-        onChanged: (val) {
-          setState(() {
-            _searchQuery = val;
-            _mostrandoDropdownPesquisa = true;
-          });
-        },
       ),
     );
   }
@@ -630,7 +594,7 @@ class _MapScreenState extends State<MapScreen>
               child: Row(
                 children: [
                   Icon(
-                    Icons.calendar_today_rounded,
+                    CupertinoIcons.calendar,
                     size: 13,
                     color: isDark ? kBrandDark : kBrand,
                   ),
@@ -743,7 +707,7 @@ class _MapScreenState extends State<MapScreen>
                               )
                             else if (isSelected)
                               Icon(
-                                Icons.check_rounded,
+                                CupertinoIcons.checkmark_alt,
                                 size: 15,
                                 color: corDestaque,
                               ),
@@ -790,9 +754,11 @@ class _MapScreenState extends State<MapScreen>
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           // Filtros rápidos por risco
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
@@ -904,7 +870,7 @@ class _MapScreenState extends State<MapScreen>
                                     color: Colors.grey.withValues(alpha: 0.25),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Icons.help_outline, size: 14),
+                                  child: const Icon(CupertinoIcons.question_circle, size: 14),
                                 ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -937,8 +903,8 @@ class _MapScreenState extends State<MapScreen>
                               IconButton(
                                 icon: Icon(
                                   isFavorito
-                                      ? Icons.favorite_rounded
-                                      : Icons.favorite_border_rounded,
+                                      ? CupertinoIcons.heart_fill
+                                      : CupertinoIcons.heart,
                                   size: 17,
                                   color: isFavorito
                                       ? const Color(0xFFFF453A)
@@ -957,6 +923,7 @@ class _MapScreenState extends State<MapScreen>
                   ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -1082,21 +1049,21 @@ class _MapScreenState extends State<MapScreen>
         children: [
           IconButton(
             padding: btnPadding,
-            icon: Icon(Icons.add, size: iconSize),
+            icon: Icon(CupertinoIcons.plus, size: iconSize),
             tooltip: 'Aumentar Zoom (+)',
             onPressed: _zoomIn,
           ),
           const Divider(height: 1, thickness: 0.8),
           IconButton(
             padding: btnPadding,
-            icon: Icon(Icons.remove, size: iconSize),
+            icon: Icon(CupertinoIcons.minus, size: iconSize),
             tooltip: 'Diminuir Zoom (-)',
             onPressed: _zoomOut,
           ),
           const Divider(height: 1, thickness: 0.8),
           IconButton(
             padding: btnPadding,
-            icon: Icon(Icons.center_focus_strong, size: iconSize),
+            icon: Icon(CupertinoIcons.scope, size: iconSize),
             tooltip: 'Centrar Portugal / Repor Zoom (0)',
             onPressed: _resetZoom,
           ),
@@ -1113,8 +1080,14 @@ class _MapScreenState extends State<MapScreen>
     final isFavorito = provider.isFavorito(concelhoGeo.dico);
 
     return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3),
+          width: 0.8,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
@@ -1124,7 +1097,7 @@ class _MapScreenState extends State<MapScreen>
             else
               const CircleAvatar(
                 backgroundColor: Colors.grey,
-                child: Icon(Icons.help_outline, color: Colors.white),
+                child: Icon(CupertinoIcons.question_circle, color: Colors.white),
               ),
             const SizedBox(width: 12),
             Expanded(
@@ -1163,6 +1136,7 @@ class _MapScreenState extends State<MapScreen>
                             style: TextStyle(
                               fontSize: 11.5,
                               color: Theme.of(context).colorScheme.outline,
+                              fontFeatures: const [FontFeature.tabularFigures()],
                             ),
                           ),
                       ],
@@ -1173,7 +1147,7 @@ class _MapScreenState extends State<MapScreen>
             ),
             IconButton(
               icon: Icon(
-                isFavorito ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                isFavorito ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
                 color: isFavorito ? const Color(0xFFFF453A) : null,
                 size: 20,
               ),
@@ -1184,7 +1158,7 @@ class _MapScreenState extends State<MapScreen>
               },
             ),
             IconButton(
-              icon: const Icon(Icons.close, size: 18),
+              icon: const Icon(CupertinoIcons.xmark, size: 18),
               tooltip: 'Fechar seleção',
               onPressed: () => setState(() => _dicoSelecionado = null),
             ),

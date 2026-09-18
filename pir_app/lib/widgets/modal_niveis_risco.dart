@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/risco_helpers.dart';
@@ -104,7 +105,7 @@ class _ModalNiveisRiscoState extends State<ModalNiveisRisco> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 22),
+                    icon: const Icon(CupertinoIcons.xmark_circle_fill, size: 22),
                     tooltip: 'Fechar',
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -236,7 +237,7 @@ class _ModalNiveisRiscoState extends State<ModalNiveisRisco> {
                     // Lista detalhada de regras e proibicoes
                     _buildItemRegra(
                       context,
-                      icone: Icons.local_fire_department_outlined,
+                      icone: CupertinoIcons.flame,
                       titulo: 'Queimas e Queimadas de Sobrantes',
                       descricao: restricoes.queimas,
                       permitido: restricoes.queimasPermitidas,
@@ -244,7 +245,7 @@ class _ModalNiveisRiscoState extends State<ModalNiveisRisco> {
                     const SizedBox(height: 14),
                     _buildItemRegra(
                       context,
-                      icone: Icons.agriculture_outlined,
+                      icone: CupertinoIcons.gear_alt,
                       titulo: 'Maquinaria Agrícola e Florestal',
                       descricao: restricoes.maquinaria,
                       permitido: !restricoes.maquinariaCondicionada,
@@ -252,7 +253,7 @@ class _ModalNiveisRiscoState extends State<ModalNiveisRisco> {
                     const SizedBox(height: 14),
                     _buildItemRegra(
                       context,
-                      icone: Icons.celebration_outlined,
+                      icone: CupertinoIcons.sparkles,
                       titulo: 'Fogo de Artifício e Pirotecnia',
                       descricao: restricoes.pirotecnia,
                       permitido: restricoes.pirotecniaPermitida,

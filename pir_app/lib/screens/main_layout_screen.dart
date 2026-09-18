@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -126,8 +127,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
               children: [
                 const SizedBox(height: 12),
                 _SidebarDestinationButton(
-                  icon: Icons.dashboard_outlined,
-                  selectedIcon: Icons.dashboard_rounded,
+                  icon: CupertinoIcons.house,
+                  selectedIcon: CupertinoIcons.house_fill,
                   label: 'Início',
                   isSelected: _indiceSelecionado == 0,
                   extended: extended,
@@ -135,8 +136,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
                   onTap: () => _mudarAba(0),
                 ),
                 _SidebarDestinationButton(
-                  icon: Icons.map_outlined,
-                  selectedIcon: Icons.map_rounded,
+                  icon: CupertinoIcons.map,
+                  selectedIcon: CupertinoIcons.map_fill,
                   label: 'Mapa & Pesquisa',
                   isSelected: _indiceSelecionado == 1,
                   extended: extended,
@@ -144,8 +145,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
                   onTap: () => _mudarAba(1),
                 ),
                 _SidebarDestinationButton(
-                  icon: Icons.favorite_border_rounded,
-                  selectedIcon: Icons.favorite_rounded,
+                  icon: CupertinoIcons.heart,
+                  selectedIcon: CupertinoIcons.heart_fill,
                   label: 'Favoritos',
                   isSelected: _indiceSelecionado == 2,
                   extended: extended,
@@ -154,8 +155,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
                 ),
                 const Spacer(),
                 _SidebarDestinationButton(
-                  icon: Icons.settings_outlined,
-                  selectedIcon: Icons.settings_rounded,
+                  icon: CupertinoIcons.gear_alt,
+                  selectedIcon: CupertinoIcons.gear_alt_fill,
                   label: 'Definições',
                   isSelected: _indiceSelecionado == 3,
                   extended: extended,
@@ -292,23 +293,23 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
         onDestinationSelected: _mudarAba,
         destinations: [
           const NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard_rounded),
+            icon: Icon(CupertinoIcons.house),
+            selectedIcon: Icon(CupertinoIcons.house_fill),
             label: 'Início',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map_rounded),
+            icon: Icon(CupertinoIcons.map),
+            selectedIcon: Icon(CupertinoIcons.map_fill),
             label: 'Mapa & Pesquisa',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.favorite_border_rounded),
-            selectedIcon: Icon(Icons.favorite_rounded),
+            icon: Icon(CupertinoIcons.heart),
+            selectedIcon: Icon(CupertinoIcons.heart_fill),
             label: 'Favoritos',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded),
+            icon: Icon(CupertinoIcons.gear_alt),
+            selectedIcon: Icon(CupertinoIcons.gear_alt_fill),
             label: 'Definições',
           ),
         ],

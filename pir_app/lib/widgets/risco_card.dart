@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../app.dart';
@@ -37,7 +38,7 @@ class RiscoCard extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: borderCor, width: 0.8),
       ),
       clipBehavior: Clip.antiAlias,
@@ -55,7 +56,7 @@ class RiscoCard extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      isHoje ? Icons.today_rounded : Icons.event_rounded,
+                      isHoje ? CupertinoIcons.calendar_today : CupertinoIcons.calendar,
                       size: 15,
                       color: isDark ? Colors.white60 : Colors.black45,
                     ),
@@ -134,6 +135,7 @@ class RiscoCard extends StatelessWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.1,
+                        fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],

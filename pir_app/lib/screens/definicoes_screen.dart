@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app.dart';
 import '../providers/acessibilidade_provider.dart';
@@ -50,8 +52,10 @@ class DefinicoesScreen extends StatelessWidget {
                 const _DadosCard(),
                 const SizedBox(height: 28),
 
-                // ── Informação ────────────────────────────────────────
-                const _Secao(titulo: 'Sobre a Aplicação'),
+                // ── Informação & Legal ────────────────────────────────
+                const _Secao(titulo: 'Sobre & Legal'),
+                const _EmergenciaLegalCard(),
+                const SizedBox(height: 14),
                 const _InfoCard(),
                 const SizedBox(height: 40),
 
@@ -59,7 +63,7 @@ class DefinicoesScreen extends StatelessWidget {
                 Center(
                   child: Column(
                     children: [
-                      Icon(Icons.local_fire_department_rounded,
+                      Icon(CupertinoIcons.flame_fill,
                           size: 26,
                           color: isDark ? kBrandDark : kBrand),
                       const SizedBox(height: 8),
@@ -160,7 +164,7 @@ class _TemaSwitcher extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4), width: 0.8),
       ),
       child: Padding(
@@ -170,7 +174,7 @@ class _TemaSwitcher extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.palette_outlined, size: 20, color: cs.primary),
+                Icon(CupertinoIcons.paintbrush, size: 20, color: cs.primary),
                 const SizedBox(width: 10),
                 Text(
                   'Tema da Aplicação',
@@ -196,17 +200,17 @@ class _TemaSwitcher extends StatelessWidget {
               segments: const [
                 ButtonSegment(
                   value: ThemeMode.light,
-                  icon: Icon(Icons.light_mode_outlined, size: 18),
+                  icon: Icon(CupertinoIcons.sun_max, size: 18),
                   label: Text('Claro'),
                 ),
                 ButtonSegment(
                   value: ThemeMode.system,
-                  icon: Icon(Icons.brightness_auto_outlined, size: 18),
+                  icon: Icon(CupertinoIcons.circle_righthalf_fill, size: 18),
                   label: Text('Sistema'),
                 ),
                 ButtonSegment(
                   value: ThemeMode.dark,
-                  icon: Icon(Icons.dark_mode_outlined, size: 18),
+                  icon: Icon(CupertinoIcons.moon, size: 18),
                   label: Text('Escuro'),
                 ),
               ],
@@ -255,7 +259,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: acc.altoContraste
               ? (isDark ? Colors.white70 : Colors.black)
@@ -269,7 +273,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(16),
               onTap: () {
                 setState(() => _expandido = !_expandido);
               },
@@ -284,7 +288,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        Icons.accessibility_new_rounded,
+                        CupertinoIcons.person_crop_circle,
                         size: 22,
                         color: cs.primary,
                       ),
@@ -317,8 +321,8 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                     ),
                     Icon(
                       _expandido
-                          ? Icons.keyboard_arrow_up_rounded
-                          : Icons.keyboard_arrow_down_rounded,
+                          ? CupertinoIcons.chevron_up
+                          : CupertinoIcons.chevron_down,
                       color: cs.onSurfaceVariant,
                       size: 22,
                     ),
@@ -343,7 +347,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                   // 1. Visão e Leitura: Tamanho do Texto
                   Row(
                     children: [
-                      Icon(Icons.format_size_rounded, size: 18, color: cs.primary),
+                      Icon(CupertinoIcons.textformat_size, size: 18, color: cs.primary),
                       const SizedBox(width: 8),
                       Text(
                         'TAMANHO DO TEXTO',
@@ -395,7 +399,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                   // 2. Alto Contraste
                   SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
-                    secondary: Icon(Icons.contrast_rounded, color: cs.primary),
+                    secondary: Icon(CupertinoIcons.circle_lefthalf_fill, color: cs.primary),
                     title: const Text(
                       'Alto Contraste',
                       style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
@@ -411,7 +415,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                   // 3. Elementos Grandes
                   SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
-                    secondary: Icon(Icons.zoom_out_map_rounded, color: cs.primary),
+                    secondary: Icon(CupertinoIcons.arrow_up_left_arrow_down_right, color: cs.primary),
                     title: const Text(
                       'Elementos e Toques Ampliados',
                       style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
@@ -427,7 +431,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                   // 4. Reduzir Animações
                   SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
-                    secondary: Icon(Icons.motion_photos_off_rounded, color: cs.primary),
+                    secondary: Icon(CupertinoIcons.play_circle, color: cs.primary),
                     title: const Text(
                       'Reduzir Animações',
                       style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
@@ -443,7 +447,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                   // 5. Dicas Contextuais e Ajuda
                   SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
-                    secondary: Icon(Icons.help_outline_rounded, color: cs.primary),
+                    secondary: Icon(CupertinoIcons.question_circle, color: cs.primary),
                     title: const Text(
                       'Dicas & Ajuda Contextual',
                       style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
@@ -462,7 +466,7 @@ class _AcessibilidadeCardState extends State<_AcessibilidadeCard> {
                     alignment: Alignment.centerRight,
                     child: TextButton.icon(
                       onPressed: () => acc.reporPredefinicoes(),
-                      icon: const Icon(Icons.restore_rounded, size: 16),
+                      icon: const Icon(CupertinoIcons.arrow_counterclockwise, size: 16),
                       label: const Text(
                         'Repor Predefinições',
                         style: TextStyle(fontSize: 12.5),
@@ -494,7 +498,7 @@ class _LocalizacaoCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: cs.outlineVariant.withValues(alpha: 0.4),
           width: 0.8,
@@ -508,7 +512,7 @@ class _LocalizacaoCard extends StatelessWidget {
             child: SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               secondary: Icon(
-                Icons.location_on_outlined,
+                CupertinoIcons.location,
                 color: isDark ? kBrandDark : kBrand,
               ),
               title: const Text(
@@ -534,7 +538,7 @@ class _LocalizacaoCard extends StatelessWidget {
 
           // 2. Concelho Atual Atribuído
           _ItemLinha(
-            icone: Icons.home_work_outlined,
+            icone: CupertinoIcons.placemark,
             titulo: 'Concelho Selecionado',
             valor: concelhoAtual != null
                 ? '${concelhoAtual.nome} (${concelhoAtual.distrito})'
@@ -568,7 +572,7 @@ class _LocalizacaoCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         provider.mensagemLocalizacao ??
-                            'Mapeamento offline por coordenadas para os 278 concelhos',
+                            'Resolução espacial offline por GPS ou rede',
                         style: TextStyle(
                           fontSize: 11.5,
                           color: cs.outline,
@@ -624,7 +628,7 @@ class _LocalizacaoCard extends StatelessWidget {
                             color: Colors.white,
                           ),
                         )
-                      : const Icon(Icons.my_location_rounded, size: 16),
+                      : const Icon(CupertinoIcons.location_fill, size: 16),
                   label: Text(
                     provider.isLocalizando ? 'A detetar...' : 'Localizar Já',
                     style: const TextStyle(
@@ -656,13 +660,13 @@ class _DadosCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4), width: 0.8),
       ),
       child: Column(
         children: [
           _ItemLinha(
-            icone: Icons.history_toggle_off_outlined,
+            icone: CupertinoIcons.clock,
             titulo: 'Último Registo',
             valor: ultimaAtualizacao != null
                 ? formatarDateTime(ultimaAtualizacao)
@@ -671,8 +675,8 @@ class _DadosCard extends StatelessWidget {
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           _ItemLinha(
             icone: provider.isOnline
-                ? Icons.wifi_rounded
-                : Icons.wifi_off_rounded,
+                ? CupertinoIcons.wifi
+                : CupertinoIcons.wifi_slash,
             titulo: 'Estado da Ligação',
             valor: provider.isOnline ? 'Online' : 'Offline',
             corValor: provider.isOnline
@@ -681,7 +685,7 @@ class _DadosCard extends StatelessWidget {
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           const _ItemLinha(
-            icone: Icons.sync_rounded,
+            icone: CupertinoIcons.arrow_2_circlepath,
             titulo: 'Sincronização Automática',
             valor: 'Ativa (a cada 30m / ao abrir)',
             corValor: Color(0xFF34C759),
@@ -701,10 +705,74 @@ class _DadosCard extends StatelessWidget {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.refresh_rounded, size: 18),
+                    : const Icon(CupertinoIcons.arrow_clockwise, size: 18),
                 label: Text(
                     provider.isLoading ? 'A sincronizar…' : 'Sincronizar Agora'),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Card de Emergência & Isenção de Responsabilidade ───────────────────────
+
+class _EmergenciaLegalCard extends StatelessWidget {
+  const _EmergenciaLegalCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF453A).withValues(alpha: isDark ? 0.12 : 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFFF453A).withValues(alpha: isDark ? 0.35 : 0.25),
+          width: 0.8,
+        ),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF453A).withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  CupertinoIcons.phone_fill,
+                  color: Color(0xFFFF453A),
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  'Em Caso de Incêndio: Ligue 112',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFFF453A),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Esta aplicação é uma ferramenta de consulta informativa baseada em dados públicos. Em caso de emergência ou avistamento de fumo/fogo, contacte de imediato as autoridades (112 ou Bombeiros) e siga sempre as orientações da Proteção Civil (ANEPC) e ICNF.',
+            style: TextStyle(
+              fontSize: 12.5,
+              height: 1.35,
+              color: isDark ? Colors.white.withValues(alpha: 0.85) : Colors.black87,
             ),
           ),
         ],
@@ -718,35 +786,152 @@ class _DadosCard extends StatelessWidget {
 class _InfoCard extends StatelessWidget {
   const _InfoCard();
 
+  Future<void> _abrirUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4), width: 0.8),
       ),
       child: Column(
         children: [
-          _ItemLinha(
-            icone: Icons.cloud_outlined,
-            titulo: 'Fonte de Dados',
-            valor: 'IPMA (api.ipma.pt)',
+          _ItemLinhaClicavel(
+            icone: CupertinoIcons.cloud,
+            titulo: 'Fonte dos Dados',
+            subtitulo: 'IPMA – Instituto Português do Mar e da Atmosfera',
+            onTap: () => _abrirUrl('https://www.ipma.pt/pt/riscoincendio/rcm.pt/'),
+          ),
+          Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
+          _ItemLinhaClicavel(
+            icone: CupertinoIcons.shield,
+            titulo: 'Proteção Civil & ICNF',
+            subtitulo: 'Legislação Decreto-Lei n.º 82/2021',
+            onTap: () => _abrirUrl('https://fogos.icnf.pt/'),
+          ),
+          Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
+          _ItemLinhaClicavel(
+            icone: CupertinoIcons.lock_shield,
+            titulo: 'Política de Privacidade',
+            subtitulo: 'Não guardamos dados pessoais · Processamento local',
+            onTap: () => _mostrarDialogoPrivacidade(context),
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           _ItemLinha(
-            icone: Icons.gavel_outlined,
-            titulo: 'Legislação',
-            valor: 'DL n.º 82/2021 · ICNF',
-          ),
-          Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
-          _ItemLinha(
-            icone: Icons.info_outline_rounded,
-            titulo: 'Sobre',
-            valor: 'App não oficial. Dados © IPMA.',
+            icone: CupertinoIcons.info_circle,
+            titulo: 'Natureza da App',
+            valor: 'App independente não oficial',
           ),
         ],
+      ),
+    );
+  }
+
+  void _mostrarDialogoPrivacidade(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(CupertinoIcons.lock_shield, size: 22),
+            SizedBox(width: 8),
+            Text('Política de Privacidade', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'A sua privacidade é uma prioridade.',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              SizedBox(height: 8),
+              Text(
+                '• Geolocalização: Utilizada única e exclusivamente no dispositivo para determinar o concelho atual. Nenhuma coordenada GPS ou endereço IP é transmitido para servidores de terceiros ou armazenado externamente.\n\n'
+                '• Dados e Favoritos: As preferências de tema, favoritos e concelho são guardadas exclusivamente na memória local do dispositivo (Hive Cache).\n\n'
+                '• Sem Registo ou Rastreio: Não existem contas de utilizador, cookies de rastreio ou plataformas de publicidade.',
+                style: TextStyle(fontSize: 12.5, height: 1.4),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Compreendi'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Linha clicável com chevron ──────────────────────────────────────────────
+
+class _ItemLinhaClicavel extends StatelessWidget {
+  final IconData icone;
+  final String titulo;
+  final String subtitulo;
+  final VoidCallback onTap;
+
+  const _ItemLinhaClicavel({
+    required this.icone,
+    required this.titulo,
+    required this.subtitulo,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icone, size: 20, color: cs.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    titulo,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w500,
+                      color: cs.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitulo,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: cs.outline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(CupertinoIcons.chevron_forward, size: 16, color: cs.outline.withValues(alpha: 0.6)),
+          ],
+        ),
       ),
     );
   }

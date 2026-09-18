@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/risco_provider.dart';
@@ -19,81 +20,93 @@ class FavoritosScreen extends StatelessWidget {
     final favoritos = provider.favoritos;
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: !isEmbedded,
-        title: const Text('Favoritos'),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => provider.carregarDados(),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: favoritos.isEmpty
-                ? ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.4,
-                        child: const Center(
-                          child: Text(
-                            'Sem favoritos.\n\nAdicione concelhos aos favoritos\nna pesquisa ou ecrã principal.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16),
-                          ),
+      appBar: isEmbedded
+          ? null
+          : AppBar(
+              title: const Text('Concelhos Favoritos'),
+            ),
+      body: favoritos.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      CupertinoIcons.heart,
+                      size: 32,
+                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Nenhum favorito guardado',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Guarda os teus concelhos frequentes para consulta rápida',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: favoritos.length,
+              itemBuilder: (context, index) {
+                final concelho = favoritos[index];
+                final riscoHoje = provider.getRiscoHoje(concelho.dico);
+
+                return Dismissible(
+                  key: Key(concelho.dico),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 20),
+                    child: const Icon(CupertinoIcons.trash_fill, color: Colors.white),
+                  ),
+                  onDismissed: (direction) {
+                    provider.toggleFavorito(concelho.dico);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${concelho.nome} removido dos favoritos',
                         ),
                       ),
-                    ],
-                  )
-                : ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: favoritos.length,
-                    itemBuilder: (context, index) {
-                      final concelho = favoritos[index];
-                      final riscoHoje = provider.getRiscoHoje(concelho.dico);
-
-                      return Dismissible(
-                        key: Key(concelho.dico),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (direction) {
-                          provider.toggleFavorito(concelho.dico);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '${concelho.nome} removido dos favoritos',
-                              ),
-                            ),
-                          );
-                        },
-                        child: ConcelhoTile(
-                          concelho: concelho,
-                          rcm: riscoHoje?.rcm,
-                          isFavorite: true,
-                          onTap: () {
-                            provider.selecionarConcelho(concelho.dico);
-                            if (onConcelhoSelected != null) {
-                              onConcelhoSelected!(concelho.dico);
-                            } else if (!isEmbedded && Navigator.canPop(context)) {
-                              Navigator.pop(context);
-                            }
-                          },
-                          onFavoriteToggle: () {
-                            provider.toggleFavorito(concelho.dico);
-                          },
-                        ),
-                      );
+                    );
+                  },
+                  child: ConcelhoTile(
+                    concelho: concelho,
+                    rcm: riscoHoje?.rcm,
+                    isFavorite: true,
+                    onTap: () {
+                      provider.selecionarConcelho(concelho.dico);
+                      if (onConcelhoSelected != null) {
+                        onConcelhoSelected!(concelho.dico);
+                      } else if (!isEmbedded && Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    onFavoriteToggle: () {
+                      provider.toggleFavorito(concelho.dico);
                     },
                   ),
-          ),
-        ),
-      ),
+                );
+              },
+            ),
     );
   }
 }

@@ -5,7 +5,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Pir App</string>
+	<string>PIR - Risco Incêndio</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>A sua localização é usada exclusivamente para detetar o concelho onde se encontra e apresentar o respetivo nível de risco de incêndio rural.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

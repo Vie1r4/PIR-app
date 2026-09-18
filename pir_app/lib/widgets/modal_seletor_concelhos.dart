@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -79,16 +80,16 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
       ),
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: cs.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.4),
           width: 0.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.18),
-            blurRadius: 36,
-            offset: const Offset(0, 16),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -109,7 +110,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.location_city_rounded,
+                    CupertinoIcons.building_2_fill,
                     color: isDark ? kBrandDark : kBrand,
                     size: 20,
                   ),
@@ -129,7 +130,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Seleciona entre todos os 278 concelhos do país',
+                        'Portugal Continental',
                         style: TextStyle(
                           fontSize: 12,
                           color: cs.outline,
@@ -139,7 +140,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 22),
+                  icon: const Icon(CupertinoIcons.xmark_circle_fill, size: 22),
                   tooltip: 'Fechar',
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -161,13 +162,13 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                   color: cs.outline.withValues(alpha: 0.7),
                 ),
                 prefixIcon: Icon(
-                  Icons.search_rounded,
+                  CupertinoIcons.search,
                   size: 20,
                   color: cs.outline,
                 ),
                 suffixIcon: _termoPesquisa.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear_rounded, size: 18),
+                        icon: const Icon(CupertinoIcons.clear_circled_solid, size: 18),
                         onPressed: () {
                           _searchController.clear();
                         },
@@ -179,18 +180,18 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                     ? Colors.white.withValues(alpha: 0.05)
                     : Colors.black.withValues(alpha: 0.04),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: cs.outlineVariant.withValues(alpha: isDark ? 0.2 : 0.3),
                     width: 0.8,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: isDark ? kBrandDark : kBrand,
                     width: 1.2,
@@ -269,7 +270,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                       ),
                     ] else ...[
                       Icon(
-                        Icons.my_location_rounded,
+                        CupertinoIcons.location_fill,
                         size: 17,
                         color: isDark ? kBrandDark : kBrand,
                       ),
@@ -336,7 +337,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.search_off_rounded,
+              CupertinoIcons.search,
               size: 42,
               color: cs.outline.withValues(alpha: 0.5),
             ),
@@ -349,39 +350,41 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                 color: cs.onSurface,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
-              'Tenta pesquisar por outro nome ou distrito.',
+              'Tenta pesquisar sem acentos ou pelo nome do distrito',
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12.5,
                 color: cs.outline,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
       );
     }
 
-    return ListView.separated(
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       itemCount: concelhos.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 4),
       itemBuilder: (context, index) {
-        final concelho = concelhos[index];
-        return _buildConcelhoItem(
-          context,
-          provider,
-          concelho,
-          concelhoAtual,
-          isDark,
-          cs,
+        final c = concelhos[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: _buildConcelhoItem(
+            context,
+            provider,
+            c,
+            concelhoAtual,
+            isDark,
+            cs,
+          ),
         );
       },
     );
   }
 
-  /// Constrói a lista com secção de Favoritos (se existirem) seguida por Todos os Concelhos
+  /// Constrói a lista padrão agrupada por favoritos e todos
   Widget _buildListaCompletaComFavoritos(
     BuildContext context,
     RiscoProvider provider,
@@ -401,7 +404,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
             child: Row(
               children: [
                 const Icon(
-                  Icons.favorite_rounded,
+                  CupertinoIcons.heart_fill,
                   size: 14,
                   color: Color(0xFFFF453A),
                 ),
@@ -443,7 +446,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
           child: Row(
             children: [
               Icon(
-                Icons.map_outlined,
+                CupertinoIcons.map,
                 size: 14,
                 color: cs.outline,
               ),
@@ -527,7 +530,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.location_on_outlined,
+                    CupertinoIcons.placemark,
                     color: cs.outline,
                     size: 16,
                   ),
@@ -591,7 +594,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
               ),
               IconButton(
                 icon: Icon(
-                  isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                  isFav ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
                   color: isFav ? const Color(0xFFFF453A) : cs.outline.withValues(alpha: 0.4),
                   size: 18,
                 ),
@@ -603,7 +606,7 @@ class _ModalSeletorConcelhosState extends State<ModalSeletorConcelhos> {
               ),
               if (isSelected)
                 Icon(
-                  Icons.check_rounded,
+                  CupertinoIcons.checkmark_alt,
                   color: isDark ? kBrandDark : kBrand,
                   size: 18,
                 ),

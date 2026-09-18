@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/concelho.dart';
@@ -52,7 +53,7 @@ class ConcelhoTile extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.location_on_outlined,
+                    CupertinoIcons.placemark,
                     color: cs.outline,
                     size: 20,
                   ),
@@ -77,7 +78,7 @@ class ConcelhoTile extends StatelessWidget {
               ? IconButton(
                   tooltip: isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos',
                   icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border_rounded,
+                    isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
                     color: isFavorite
                         ? const Color(0xFFFF453A)
                         : cs.outline,
@@ -86,8 +87,8 @@ class ConcelhoTile extends StatelessWidget {
                   onPressed: onFavoriteToggle,
                 )
               : Icon(
-                  Icons.chevron_right_rounded,
-                  size: 20,
+                  CupertinoIcons.chevron_right,
+                  size: 16,
                   color: isDark ? Colors.white24 : Colors.black26,
                 ),
           onTap: onTap,

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// Cores base (para cartões e indicadores em modo claro)
@@ -92,17 +93,17 @@ Color corDoRiscoTextoEmFundoClaro(int rcm) {
 IconData iconeDoRisco(int rcm) {
   switch (rcm) {
     case 1:
-      return Icons.check_circle_outline;
+      return CupertinoIcons.checkmark_shield;
     case 2:
-      return Icons.info_outline;
+      return CupertinoIcons.info_circle;
     case 3:
-      return Icons.warning_amber_rounded;
+      return CupertinoIcons.exclamationmark_triangle;
     case 4:
-      return Icons.local_fire_department;
+      return CupertinoIcons.flame;
     case 5:
-      return Icons.dangerous_outlined;
+      return CupertinoIcons.flame_fill;
     default:
-      return Icons.help_outline;
+      return CupertinoIcons.question_circle;
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/acessibilidade_provider.dart';
@@ -71,10 +72,18 @@ class PirApp extends StatelessWidget {
       outlineVariant: altoContraste ? const Color(0xFF555555) : const Color(0xFFE0E2EA),
     );
 
+    final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme(
+      ThemeData(brightness: Brightness.light).textTheme,
+    ).apply(
+      bodyColor: altoContraste ? Colors.black : const Color(0xFF1C1C1E),
+      displayColor: altoContraste ? Colors.black : const Color(0xFF1C1C1E),
+    );
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: cs,
       scaffoldBackgroundColor: altoContraste ? Colors.white : kLightBg,
+      textTheme: baseTextTheme,
       splashColor: Colors.transparent,
       highlightColor: cs.primary.withValues(alpha: 0.06),
       hoverColor: Colors.black.withValues(alpha: 0.03),
@@ -84,10 +93,10 @@ class PirApp extends StatelessWidget {
         scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: cs.onSurface,
-        titleTextStyle: TextStyle(
+        titleTextStyle: GoogleFonts.plusJakartaSans(
           fontSize: 17,
-          fontWeight: altoContraste ? FontWeight.bold : FontWeight.w600,
-          letterSpacing: -0.2,
+          fontWeight: altoContraste ? FontWeight.bold : FontWeight.w700,
+          letterSpacing: -0.3,
           color: altoContraste ? Colors.black : const Color(0xFF1C1C1E),
         ),
       ),
@@ -95,7 +104,7 @@ class PirApp extends StatelessWidget {
         elevation: 0,
         color: kLightCard,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: altoContraste ? Colors.black : const Color(0x12000000),
             width: altoContraste ? 1.5 : 0.8,
@@ -107,11 +116,11 @@ class PirApp extends StatelessWidget {
         backgroundColor: kLightCard.withValues(alpha: 0.94),
         indicatorColor: (altoContraste ? const Color(0xFFC43A00) : kBrand).withValues(alpha: 0.14),
         indicatorShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final isSelected = states.contains(WidgetState.selected);
-          return TextStyle(
+          return GoogleFonts.plusJakartaSans(
             fontSize: 11,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             letterSpacing: 0.1,
@@ -122,7 +131,7 @@ class PirApp extends StatelessWidget {
         backgroundColor: kLightCard,
         indicatorColor: (altoContraste ? const Color(0xFFC43A00) : kBrand).withValues(alpha: 0.14),
         indicatorShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
       listTileTheme: const ListTileThemeData(
@@ -137,60 +146,64 @@ class PirApp extends StatelessWidget {
           backgroundColor: altoContraste ? const Color(0xFFC43A00) : kBrand,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-          textStyle: const TextStyle(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+          textStyle: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w700,
-            fontSize: 15,
+            fontSize: 14.5,
             letterSpacing: -0.2,
           ),
         ),
       ),
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           side: BorderSide(
             color: altoContraste ? Colors.black : const Color(0x10000000),
             width: altoContraste ? 1.2 : 0.8,
           ),
         ),
         backgroundColor: const Color(0xFFEBECEF),
-        labelStyle: const TextStyle(
+        labelStyle: GoogleFonts.plusJakartaSans(
           fontWeight: FontWeight.w600,
-          fontSize: 13,
+          fontSize: 12.5,
           letterSpacing: 0.1,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: altoContraste ? const Color(0xFFC43A00) : kBrand,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: kLightCard,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: altoContraste ? Colors.black : const Color(0x16000000),
             width: altoContraste ? 1.5 : 0.8,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: altoContraste ? Colors.black : const Color(0x16000000),
             width: altoContraste ? 1.5 : 0.8,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: altoContraste ? const Color(0xFFC43A00) : kBrand,
-            width: 2.0,
+            width: 1.8,
           ),
         ),
       ),
@@ -212,10 +225,18 @@ class PirApp extends StatelessWidget {
       outlineVariant: altoContraste ? const Color(0xFF444444) : const Color(0xFF26282E),
     );
 
+    final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme(
+      ThemeData(brightness: Brightness.dark).textTheme,
+    ).apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+    );
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: cs,
       scaffoldBackgroundColor: altoContraste ? Colors.black : kDarkBg,
+      textTheme: baseTextTheme,
       splashColor: Colors.transparent,
       highlightColor: cs.primary.withValues(alpha: 0.08),
       hoverColor: Colors.white.withValues(alpha: 0.03),
@@ -225,10 +246,10 @@ class PirApp extends StatelessWidget {
         scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(
+        titleTextStyle: GoogleFonts.plusJakartaSans(
           fontSize: 17,
-          fontWeight: altoContraste ? FontWeight.bold : FontWeight.w600,
-          letterSpacing: -0.2,
+          fontWeight: altoContraste ? FontWeight.bold : FontWeight.w700,
+          letterSpacing: -0.3,
           color: Colors.white,
         ),
       ),
@@ -236,7 +257,7 @@ class PirApp extends StatelessWidget {
         elevation: 0,
         color: altoContraste ? const Color(0xFF0F1014) : kDarkCard,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: altoContraste ? Colors.white70 : const Color(0x16FFFFFF),
             width: altoContraste ? 1.5 : 0.8,
@@ -248,11 +269,11 @@ class PirApp extends StatelessWidget {
         backgroundColor: kDarkCard.withValues(alpha: 0.96),
         indicatorColor: kBrandDark.withValues(alpha: 0.18),
         indicatorShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final isSelected = states.contains(WidgetState.selected);
-          return TextStyle(
+          return GoogleFonts.plusJakartaSans(
             fontSize: 11,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             letterSpacing: 0.1,
@@ -263,7 +284,7 @@ class PirApp extends StatelessWidget {
         backgroundColor: kDarkCard,
         indicatorColor: kBrandDark.withValues(alpha: 0.18),
         indicatorShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
       listTileTheme: const ListTileThemeData(
@@ -278,48 +299,52 @@ class PirApp extends StatelessWidget {
           backgroundColor: kBrandDark,
           foregroundColor: kDarkBg,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-          textStyle: const TextStyle(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+          textStyle: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w600,
-            fontSize: 15,
+            fontSize: 14.5,
             letterSpacing: -0.2,
           ),
         ),
       ),
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           side: const BorderSide(color: Color(0x16FFFFFF), width: 0.8),
         ),
         backgroundColor: kDarkCard2,
-        labelStyle: const TextStyle(
+        labelStyle: GoogleFonts.plusJakartaSans(
           fontWeight: FontWeight.w500,
-          fontSize: 13,
+          fontSize: 12.5,
           letterSpacing: 0.1,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: kBrandDark,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: kDarkCard,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0x22FFFFFF), width: 0.8),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0x22FFFFFF), width: 0.8),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: kBrandDark, width: 1.5),
         ),
         hintStyle: const TextStyle(color: Color(0x70FFFFFF)),

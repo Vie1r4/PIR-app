@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -61,7 +62,7 @@ class _AlertaGovernoCardState extends State<AlertaGovernoCard> {
           Padding(
             padding: const EdgeInsets.only(top: 2, right: 12),
             child: Icon(
-              Icons.warning_amber_rounded,
+              CupertinoIcons.exclamationmark_triangle_fill,
               color: amberCor,
               size: 20,
             ),

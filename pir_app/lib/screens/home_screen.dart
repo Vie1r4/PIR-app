@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -69,7 +70,7 @@ class HomeScreen extends StatelessWidget {
               backgroundColor:
                   Theme.of(context).colorScheme.errorContainer,
               leading: Icon(
-                Icons.cloud_off,
+                CupertinoIcons.wifi_slash,
                 color: Theme.of(context).colorScheme.error,
               ),
               actions: [
@@ -82,7 +83,13 @@ class HomeScreen extends StatelessWidget {
 
           // Loading indicator subtil no topo
           if (provider.isLoading)
-            const LinearProgressIndicator(),
+            LinearProgressIndicator(
+              minHeight: 2,
+              backgroundColor: Colors.transparent,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? kBrandDark
+                  : kBrand,
+            ),
 
           // Conteúdo Principal
           Expanded(
@@ -211,7 +218,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Icon(
-                        Icons.unfold_more_rounded,
+                        CupertinoIcons.chevron_up_chevron_down,
                         size: 20,
                         color: cs.outline.withValues(alpha: 0.6),
                       ),
@@ -243,24 +250,14 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                   if (acc.dicasContextuais) ...[
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.touch_app_outlined,
-                          size: 13,
-                          color: cs.primary,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Toca no nome para trocar de concelho',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w500,
-                            color: cs.outline,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 5),
+                    Text(
+                      'Selecionar outro concelho',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                        color: cs.outline.withValues(alpha: 0.8),
+                      ),
                     ),
                   ],
                 ],
@@ -299,7 +296,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     )
                   : Icon(
-                      Icons.my_location_rounded,
+                      CupertinoIcons.location_fill,
                       size: favIconSize,
                       color: isDark ? kBrandDark : kBrand,
                     ),
@@ -351,7 +348,7 @@ class HomeScreen extends StatelessWidget {
             padding: EdgeInsets.zero,
             tooltip: isFav ? 'Remover dos favoritos' : 'Guardar nos favoritos',
             icon: Icon(
-              isFav ? Icons.favorite : Icons.favorite_border_rounded,
+              isFav ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
               color: isFav
                   ? const Color(0xFFFF453A)
                   : cs.outline,
@@ -428,7 +425,7 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
-                    Icons.shield_outlined,
+                    CupertinoIcons.shield,
                     size: 18,
                     color: isDark ? kBrandDark : kBrand,
                   ),
@@ -439,7 +436,7 @@ class HomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Regras & Níveis de Risco',
+                        'Níveis de Perigo & Legislação',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -449,7 +446,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Vê o significado dos 5 níveis e o que é permitido por lei',
+                        'Classificação de risco e restrições legais de uso do fogo',
                         style: TextStyle(
                           fontSize: 11,
                           color: cs.outline,
@@ -460,7 +457,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  Icons.chevron_right_rounded,
+                  CupertinoIcons.chevron_right,
                   size: 18,
                   color: isDark ? Colors.white30 : Colors.black26,
                 ),
@@ -468,6 +465,100 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Barra de horizonte de tendência diária compacta (estilo Apple Weather)
+  Widget _buildTrendHorizon(BuildContext context, List<RiscoPrevisaoDia> dias) {
+    if (dias.isEmpty) return const SizedBox.shrink();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 10, bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.03)
+            : cs.surfaceContainerHighest.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: cs.outlineVariant.withValues(alpha: isDark ? 0.15 : 0.25),
+          width: 0.6,
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final itemWidth = (constraints.maxWidth / dias.length).clamp(46.0, 70.0);
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: dias.map((dia) {
+                final cor = corDoRiscoContextual(dia.risco.rcm, Theme.of(context).brightness);
+                final corTexto = isDark ? cor : corDoRiscoTextoEmFundoClaro(dia.risco.rcm);
+                final isHoje = dia.diaIndex == 0;
+                final diaLabel = isHoje
+                    ? 'Hoje'
+                    : (dia.diaIndex == 1
+                        ? 'Amanhã'
+                        : dia.rotuloDia.split(',').first.trim().split(' ').first);
+
+                return SizedBox(
+                  width: itemWidth,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        diaLabel,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: isHoje ? FontWeight.bold : FontWeight.w500,
+                          color: isHoje
+                              ? (isDark ? Colors.white : Colors.black)
+                              : cs.outline,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: cor.withValues(alpha: isDark ? 0.25 : 0.18),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: cor.withValues(alpha: 0.7), width: 1),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${dia.risco.rcm}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: corTexto,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      if (dia.risco.tMax != null)
+                        Text(
+                          '${dia.risco.tMax!.round()}°',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -492,7 +583,7 @@ class HomeScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: cs.outlineVariant.withValues(alpha: isDark ? 0.28 : 0.35),
           width: 0.8,
@@ -506,13 +597,13 @@ class HomeScreen extends StatelessWidget {
           Row(
             children: [
               Icon(
-                Icons.calendar_month_outlined,
+                CupertinoIcons.calendar,
                 size: 16,
                 color: isDark ? kBrandDark : kBrand,
               ),
               const SizedBox(width: 8),
               Text(
-                'PREVISÃO PRÓXIMOS DIAS (${diasFuturos.length} DIAS)',
+                'TENDÊNCIA & PREVISÃO (${diasFuturos.length} DIAS)',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -522,7 +613,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          // Micro horizonte de tendência visual
+          _buildTrendHorizon(context, todosDias),
+          const SizedBox(height: 6),
 
           // Lista de dias com hairline dividers
           ListView.separated(
@@ -599,6 +692,7 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.1,
                           color: isDark ? Colors.white70 : Colors.black87,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       )
                     else
@@ -664,7 +758,7 @@ class HomeScreen extends StatelessWidget {
                 .colorScheme
                 .surfaceContainerHighest
                 .withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: Theme.of(context)
                   .colorScheme
@@ -674,7 +768,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           child: InkWell(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
               HapticFeedback.lightImpact();
               _navegarPara(context, 1);
@@ -682,19 +776,19 @@ class HomeScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 18,
-                vertical: 15,
+                vertical: 14,
               ),
               child: Row(
                 children: [
                   Icon(
-                    Icons.search_rounded,
-                    size: 22,
+                    CupertinoIcons.search,
+                    size: 20,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Escreve o teu concelho para começar...',
+                      'Pesquisar concelho ou distrito...',
                       style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.outline,
@@ -709,10 +803,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      'Procurar',
+                      'Pesquisar',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -804,7 +898,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ] else ...[
                     Icon(
-                      Icons.my_location_rounded,
+                      CupertinoIcons.location_fill,
                       size: 20,
                       color: Theme.of(context).brightness == Brightness.dark
                           ? kBrandDark
@@ -873,7 +967,7 @@ class HomeScreen extends StatelessWidget {
               .surfaceContainerHighest
               .withValues(alpha: 0.6),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             side: BorderSide(
               color: Theme.of(context)
                   .colorScheme
@@ -883,7 +977,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           child: InkWell(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
               HapticFeedback.lightImpact();
               _navegarPara(context, 1);
@@ -899,10 +993,10 @@ class HomeScreen extends StatelessWidget {
                           .colorScheme
                           .primary
                           .withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
-                      Icons.map_outlined,
+                      CupertinoIcons.map,
                       color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
@@ -913,7 +1007,7 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Explorar Mapa de Portugal',
+                          'Mapa de Portugal',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -922,7 +1016,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Consulta visualmente o perigo em todos os concelhos',
+                          'Visualização cartográfica do perigo por concelho',
                           style: TextStyle(
                             fontSize: 13,
                             color: Theme.of(context).colorScheme.outline,
@@ -932,7 +1026,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   Icon(
-                    Icons.arrow_forward_ios,
+                    CupertinoIcons.chevron_right,
                     size: 14,
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -953,7 +1047,7 @@ class HomeScreen extends StatelessWidget {
   ) {
     return ActionChip(
       avatar: Icon(
-        Icons.location_on_outlined,
+        CupertinoIcons.placemark,
         size: 16,
         color: Theme.of(context).colorScheme.primary,
       ),
@@ -976,7 +1070,7 @@ class HomeScreen extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         side: BorderSide(
           color: isDark ? const Color(0x18FFFFFF) : const Color(0x12000000),
           width: 0.8,
@@ -997,7 +1091,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Icon(
-              Icons.cloud_off_rounded,
+              CupertinoIcons.wifi_slash,
               size: 32,
               color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.6),
             ),
