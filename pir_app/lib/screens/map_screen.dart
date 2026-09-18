@@ -352,6 +352,8 @@ class _MapScreenState extends State<MapScreen>
           }
 
           final isNarrow = viewportSize.width < 680;
+          final topPadding = MediaQuery.of(context).padding.top;
+          final effectiveTop = (topPadding > 0 ? topPadding + 6 : 14.0);
 
           return Stack(
             children: [
@@ -415,7 +417,7 @@ class _MapScreenState extends State<MapScreen>
               // 2. Barra de Pesquisa Flutuante no Topo Esquerdo
               Positioned(
                 left: 14,
-                top: 14,
+                top: effectiveTop,
                 right: isNarrow ? 14 : null,
                 child: _buildSearchBar(isNarrow, accProvider.elementosGrandes),
               ),
@@ -425,7 +427,7 @@ class _MapScreenState extends State<MapScreen>
                 Positioned(
                   left: 14,
                   right: isNarrow ? 14 : null,
-                  top: accProvider.elementosGrandes ? 68 : 62,
+                  top: effectiveTop + (accProvider.elementosGrandes ? 54 : 48),
                   child: _buildSearchDropdown(
                     provider,
                     dadosRiscoDia,
@@ -438,7 +440,7 @@ class _MapScreenState extends State<MapScreen>
               if (diasDisponiveis.isNotEmpty)
                 Positioned(
                   right: 14,
-                  top: isNarrow ? (accProvider.elementosGrandes ? 72 : 66) : 14,
+                  top: isNarrow ? effectiveTop + (accProvider.elementosGrandes ? 58 : 52) : effectiveTop,
                   child: _buildDiasVerticalColumn(
                     diasDisponiveis,
                     provider,

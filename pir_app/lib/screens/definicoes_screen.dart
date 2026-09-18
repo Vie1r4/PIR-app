@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -600,11 +601,27 @@ class _LocalizacaoCard extends StatelessWidget {
                               ),
                             );
                           } else {
+                            final servicoAtivo = await Geolocator.isLocationServiceEnabled();
+                            final permissao = await Geolocator.checkPermission();
+                            final precisaDefinicoes = !servicoAtivo || permissao == LocationPermission.deniedForever;
+
                             scaffoldMessenger.showSnackBar(
                               SnackBar(
                                 content: Text(provider.mensagemLocalizacao ??
                                     'Não foi possível detetar a localização.'),
-                                duration: const Duration(seconds: 3),
+                                duration: const Duration(seconds: 4),
+                                action: precisaDefinicoes
+                                    ? SnackBarAction(
+                                        label: 'Definições',
+                                        onPressed: () {
+                                          if (!servicoAtivo) {
+                                            Geolocator.openLocationSettings();
+                                          } else {
+                                            Geolocator.openAppSettings();
+                                          }
+                                        },
+                                      )
+                                    : null,
                               ),
                             );
                           }
