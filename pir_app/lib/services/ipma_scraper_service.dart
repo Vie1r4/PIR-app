@@ -15,12 +15,33 @@ class IpmaScraperService {
 
   final http.Client _client;
 
+  // Mecanismo de Circuit Breaker & Exponential Backoff anti-WAF
+  int _falhasConsecutivas = 0;
+  DateTime? _proximaTentativaPermitida;
+
   IpmaScraperService({http.Client? client}) : _client = client ?? http.Client();
+
+  /// Indica se o scraper está em período de arrefecimento (cooldown/backoff)
+  bool get emBackoff =>
+      _proximaTentativaPermitida != null &&
+      DateTime.now().isBefore(_proximaTentativaPermitida!);
+
+  /// Tempo restante de backoff
+  Duration get tempoRestanteBackoff =>
+      emBackoff ? _proximaTentativaPermitida!.difference(DateTime.now()) : Duration.zero;
 
   /// Descarrega a página do IPMA e extrai a lista de previsões (até 9 dias).
   /// Na Web, utiliza proxies CORS transparentes de fallback para contornar
   /// a ausência de cabeçalhos CORS no servidor do IPMA.
   Future<List<DadosRisco>> fetchPrevisao9Dias() async {
+    // 1. Verificar Circuit Breaker / Backoff
+    if (emBackoff) {
+      debugPrint(
+        'IpmaScraperService: Circuit Breaker ativo (faltam ${tempoRestanteBackoff.inSeconds}s). A poupar pedidos HTML.',
+      );
+      return [];
+    }
+
     final urlsParaTentar = <String>[];
 
     if (!kIsWeb) {
@@ -39,6 +60,8 @@ class IpmaScraperService {
       urlsParaTentar.add(pageUrl);
     }
 
+    bool encontrouBloqueioWaf = false;
+
     for (final url in urlsParaTentar) {
       try {
         final response = await _client.get(
@@ -49,13 +72,34 @@ class IpmaScraperService {
         if (response.statusCode == 200 && response.body.isNotEmpty) {
           final resultados = parseHtml(response.body);
           if (resultados.isNotEmpty) {
+            // Sucesso: repor contadores de backoff
+            _falhasConsecutivas = 0;
+            _proximaTentativaPermitida = null;
             return resultados;
           }
+        } else if (response.statusCode == 403 || response.statusCode == 429) {
+          encontrouBloqueioWaf = true;
+          debugPrint('IpmaScraperService: Detetado código de proteção WAF/RateLimit (${response.statusCode}) em $url');
+          break; // Não insistir noutros proxies se detetar bloqueio
         }
       } catch (e) {
         debugPrint('IpmaScraperService: Falha na URL $url: $e');
         continue;
       }
+    }
+
+    // Se chegou aqui, todos falharam ou houve bloqueio WAF
+    _falhasConsecutivas++;
+
+    if (encontrouBloqueioWaf) {
+      // Se for 403/429 (WAF), pausa mínima obrigatória de 15 minutos
+      _proximaTentativaPermitida = DateTime.now().add(const Duration(minutes: 15));
+      debugPrint('IpmaScraperService: Bloqueio WAF registado. Pausa de 15m ativada.');
+    } else {
+      // Exponential backoff progressivo: 1m, 2m, 4m, 8m, até máx 30m
+      final segundosEspera = (60 * (1 << (_falhasConsecutivas - 1))).clamp(60, 1800);
+      _proximaTentativaPermitida = DateTime.now().add(Duration(seconds: segundosEspera));
+      debugPrint('IpmaScraperService: Falha de rede nº $_falhasConsecutivas. Backoff de ${segundosEspera}s ativado.');
     }
 
     return [];

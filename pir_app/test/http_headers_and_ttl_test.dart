@@ -1,6 +1,7 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:pir_app/utils/constants.dart';
 import 'package:pir_app/providers/risco_provider.dart';
+import 'package:pir_app/services/ipma_scraper_service.dart';
 
 void main() {
   group('HttpHeadersConfig & Best Practices Tests', () {
@@ -18,6 +19,16 @@ void main() {
 
     test('RiscoProvider cacheTtl esta calibrado para 2 horas', () {
       expect(RiscoProvider.cacheTtl, equals(const Duration(hours: 2)));
+    });
+
+    test('RiscoProvider cooldownForcar anti-metralhadora esta calibrado para 30 segundos', () {
+      expect(RiscoProvider.cooldownForcar, equals(const Duration(seconds: 30)));
+    });
+
+    test('IpmaScraperService inicia com circuit breaker inativo', () {
+      final scraper = IpmaScraperService();
+      expect(scraper.emBackoff, isFalse);
+      expect(scraper.tempoRestanteBackoff, equals(Duration.zero));
     });
   });
 }

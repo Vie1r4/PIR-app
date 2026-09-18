@@ -36,8 +36,10 @@ class RiscoProvider extends ChangeNotifier {
   bool _isLocalizando = false;
   String? _mensagemLocalizacao;
 
-  // Política de Cache Inteligente: TTL de 2 horas para evitar sobrecarga ao IPMA
+  // Política de Cache Inteligente & Cooldown Anti-Metralhadora
   static const Duration cacheTtl = Duration(hours: 2);
+  static const Duration cooldownForcar = Duration(seconds: 30);
+  DateTime? _ultimoPedidoRede;
 
   // Getters
   List<Concelho> get concelhos => _concelhos;
@@ -57,6 +59,12 @@ class RiscoProvider extends ChangeNotifier {
       DateTime.now().difference(_ultimaAtualizacao!) < cacheTtl &&
       _riscoHoje != null;
 
+  /// Retorna se o cooldown de refresh forçado (30s) se encontra ativo
+  bool get isCooldownForcarAtivo =>
+      _ultimoPedidoRede != null &&
+      DateTime.now().difference(_ultimoPedidoRede!) < cooldownForcar &&
+      _riscoHoje != null;
+
   bool get autoLocalizacao => _autoLocalizacao;
   bool get isLocalizando => _isLocalizando;
   String? get mensagemLocalizacao => _mensagemLocalizacao;
@@ -71,11 +79,17 @@ class RiscoProvider extends ChangeNotifier {
       return 'Online • IPMA atualizado';
     } else {
       if (_ultimaAtualizacao != null) {
-        final d = _ultimaAtualizacao!.day.toString().padLeft(2, '0');
-        final m = _ultimaAtualizacao!.month.toString().padLeft(2, '0');
-        final h = _ultimaAtualizacao!.hour.toString().padLeft(2, '0');
-        final min = _ultimaAtualizacao!.minute.toString().padLeft(2, '0');
-        return 'Modo Offline • Registo de $d/$m às $h:$min';
+        final diff = DateTime.now().difference(_ultimaAtualizacao!);
+        if (diff.inMinutes < 60) {
+          final m = diff.inMinutes.clamp(1, 59);
+          return 'Offline • Dados de há ${m}m';
+        } else if (diff.inHours < 24) {
+          return 'Offline • Dados de há ${diff.inHours}h';
+        } else {
+          final d = _ultimaAtualizacao!.day.toString().padLeft(2, '0');
+          final m = _ultimaAtualizacao!.month.toString().padLeft(2, '0');
+          return 'Offline • Registo de $d/$m';
+        }
       }
       return 'Modo Offline • A usar cache';
     }
@@ -192,7 +206,7 @@ class RiscoProvider extends ChangeNotifier {
   /// Fetch fresh data from the IPMA API and Scraper.
   /// Se [forcar] for false e o cache local for válido (< 2 horas), evita pedidos de rede desnecessários.
   Future<void> carregarDados({bool silencioso = false, bool forcar = false}) async {
-    // Se o cache for válido e não for um pedido forçado (ex: pull-to-refresh), usa os dados locais
+    // 1. Se o cache for válido (< 2h) e não for um pedido forçado, usa os dados locais
     if (!forcar && isCacheValido) {
       debugPrint('RiscoProvider: Cache local válido (< 2h). Pedido HTTP ao IPMA poupado.');
       _isOnline = true;
@@ -202,11 +216,28 @@ class RiscoProvider extends ChangeNotifier {
       return;
     }
 
+    // 2. Proteção Anti-Metralhadora: Cooldown de 30s para pull-to-refresh
+    if (forcar && isCooldownForcarAtivo) {
+      debugPrint('RiscoProvider: Cooldown de pull-to-refresh ativo (< 30s). A responder via cache local.');
+      if (!silencioso) {
+        _isLoading = true;
+        notifyListeners();
+        // Pequena animação suave de 300ms para feedback tátil antes de retornar
+        await Future.delayed(const Duration(milliseconds: 300));
+        _isLoading = false;
+        notifyListeners();
+      }
+      return;
+    }
+
     if (!silencioso) {
       _isLoading = true;
       _erro = null;
       notifyListeners();
     }
+
+    // Registar timestamp da tentativa de rede
+    _ultimoPedidoRede = DateTime.now();
 
     try {
       // 1. Executar API oficial e Scraper em simultâneo com tratamento isolado
@@ -248,7 +279,7 @@ class RiscoProvider extends ChangeNotifier {
         );
       }
 
-      // Se obtivemos dados (seja por API oficial ou Scraper fallback)
+      // Se obtivemos dados novos com sucesso
       if (redeSucesso && _riscoHoje != null && _riscoAmanha != null) {
         _isOnline = true;
         _ultimaAtualizacao = DateTime.now();
@@ -257,21 +288,24 @@ class RiscoProvider extends ChangeNotifier {
         await _cacheService.salvarUltimaAtualizacao('rcm_d0');
         _erro = null;
       } else {
+        // Stale-While-Revalidate: preserva dados em cache anteriores intactos
         _isOnline = false;
-        // Mantém a data original do cache
         _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
         if (!silencioso && _riscoHoje == null) {
-          _erro =
-              'Sem ligação à internet. Não existem dados em cache.';
+          _erro = 'Sem ligação à internet. Não existem dados em cache.';
+        } else {
+          _erro = null; // Mantém os dados visíveis com aviso de idade no badge
         }
       }
     } catch (e) {
+      // Stale-While-Revalidate: falha de socket/rede não apaga cache
       _isOnline = false;
       _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
       debugPrint('Erro ao carregar dados: $e');
       if (!silencioso && _riscoHoje == null) {
-        _erro =
-            'Sem ligação à internet. A aguardar reconexão.';
+        _erro = 'Sem ligação à internet. A aguardar reconexão.';
+      } else {
+        _erro = null;
       }
     } finally {
       _isLoading = false;
