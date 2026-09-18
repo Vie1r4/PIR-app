@@ -44,23 +44,18 @@ class IpmaScraperService {
 
     final urlsParaTentar = <String>[];
 
+    // No nativo (iOS/Android/Desktop), tentar sempre o IPMA diretamente primeiro
     if (!kIsWeb) {
       urlsParaTentar.add(pageUrl);
     }
 
-    // Proxies CORS para Web ou fallback resiliente (com cors.eu.org prioritário)
+    // Proxies CORS para Web e fallback resiliente
     urlsParaTentar.addAll([
       'https://cors.eu.org/$pageUrl',
       'https://api.codetabs.com/v1/proxy?quest=${Uri.encodeComponent(pageUrl)}',
       'https://api.allorigins.win/raw?url=${Uri.encodeComponent(pageUrl)}',
+      if (kIsWeb) pageUrl,
     ]);
-
-    if (kIsWeb) {
-      // Também adiciona o direto no final caso o browser suporte ou ambiente permita
-      urlsParaTentar.add(pageUrl);
-    }
-
-    bool encontrouBloqueioWaf = false;
 
     for (final url in urlsParaTentar) {
       try {
@@ -77,10 +72,8 @@ class IpmaScraperService {
             _proximaTentativaPermitida = null;
             return resultados;
           }
-        } else if (response.statusCode == 403 || response.statusCode == 429) {
-          encontrouBloqueioWaf = true;
-          debugPrint('IpmaScraperService: Detetado código de proteção WAF/RateLimit (${response.statusCode}) em $url');
-          break; // Não insistir noutros proxies se detetar bloqueio
+        } else {
+          debugPrint('IpmaScraperService: Código ${response.statusCode} em $url. A tentar próximo fallback...');
         }
       } catch (e) {
         debugPrint('IpmaScraperService: Falha na URL $url: $e');
@@ -88,19 +81,11 @@ class IpmaScraperService {
       }
     }
 
-    // Se chegou aqui, todos falharam ou houve bloqueio WAF
+    // Se todos os proxies falharem, ativar backoff curto de 1 minuto
     _falhasConsecutivas++;
-
-    if (encontrouBloqueioWaf) {
-      // Se for 403/429 (WAF), pausa mínima obrigatória de 15 minutos
-      _proximaTentativaPermitida = DateTime.now().add(const Duration(minutes: 15));
-      debugPrint('IpmaScraperService: Bloqueio WAF registado. Pausa de 15m ativada.');
-    } else {
-      // Exponential backoff progressivo: 1m, 2m, 4m, 8m, até máx 30m
-      final segundosEspera = (60 * (1 << (_falhasConsecutivas - 1))).clamp(60, 1800);
-      _proximaTentativaPermitida = DateTime.now().add(Duration(seconds: segundosEspera));
-      debugPrint('IpmaScraperService: Falha de rede nº $_falhasConsecutivas. Backoff de ${segundosEspera}s ativado.');
-    }
+    final segundosEspera = (60 * (1 << (_falhasConsecutivas - 1))).clamp(60, 600);
+    _proximaTentativaPermitida = DateTime.now().add(Duration(seconds: segundosEspera));
+    debugPrint('IpmaScraperService: Todos os endpoints falharam. Backoff de ${segundosEspera}s.');
 
     return [];
   }
