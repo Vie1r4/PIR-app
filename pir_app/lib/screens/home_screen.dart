@@ -7,11 +7,10 @@ import '../app.dart';
 import '../providers/acessibilidade_provider.dart';
 import '../providers/risco_provider.dart';
 import '../models/risco_incendio.dart';
-import '../utils/risco_helpers.dart';
 import '../widgets/alerta_governo_card.dart';
 import '../widgets/modal_niveis_risco.dart';
 import '../widgets/modal_seletor_concelhos.dart';
-import '../widgets/risco_badge.dart';
+import '../widgets/previsao_alargada_card.dart';
 import '../widgets/risco_card.dart';
 import '../widgets/status_conexao_badge.dart';
 import 'favoritos_screen.dart';
@@ -383,7 +382,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// Bloco de previsão alargada para os próximos dias (estilo Apple Weather limpo e sem poluição visual)
+  /// Bloco de previsão alargada para os próximos dias (compacto/minimizável e expansível)
   Widget _buildPrevisaoAlargada(
     BuildContext context,
     RiscoProvider provider,
@@ -402,138 +401,11 @@ class HomeScreen extends StatelessWidget {
       }
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cs = Theme.of(context).colorScheme;
+    final isDesktop = MediaQuery.of(context).size.width >= 800;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.04)
-            : cs.surfaceContainerHighest.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: cs.outlineVariant.withValues(alpha: isDark ? 0.22 : 0.35),
-          width: 0.8,
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Cabeçalho da secção
-          Row(
-            children: [
-              Icon(
-                CupertinoIcons.calendar,
-                size: 15,
-                color: isDark ? kBrandDark : kBrand,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'PREVISÃO PRÓXIMOS DIAS (${diasFuturos.length} DIAS)',
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
-                  color: isDark ? Colors.white60 : Colors.black54,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Lista de dias com divisores subtis
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: diasFuturos.length,
-            separatorBuilder: (_, __) => Divider(
-              height: 1,
-              thickness: 0.6,
-              color: cs.outlineVariant.withValues(alpha: isDark ? 0.15 : 0.22),
-            ),
-            itemBuilder: (context, index) {
-              final item = diasFuturos[index];
-              final cor = corDoRiscoContextual(
-                item.risco.rcm,
-                Theme.of(context).brightness,
-              );
-              final corTexto = isDark
-                  ? cor
-                  : corDoRiscoTextoEmFundoClaro(item.risco.rcm);
-              final isAmanha = item.diaIndex == 1;
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 2),
-                child: Row(
-                  children: [
-                    // Coluna do Dia (ex: Amanhã, Sex, 19 Set)
-                    SizedBox(
-                      width: 96,
-                      child: Text(
-                        item.rotuloDia,
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: isAmanha ? FontWeight.bold : FontWeight.w500,
-                          letterSpacing: -0.1,
-                          color: isAmanha
-                              ? (isDark ? Colors.white : Colors.black87)
-                              : (isDark ? Colors.white70 : Colors.black54),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-
-                    // Badge discreto com o nível de perigo
-                    RiscoBadge(
-                      rcm: item.risco.rcm,
-                      size: 26,
-                    ),
-                    const SizedBox(width: 10),
-
-                    // Nome do Risco
-                    Expanded(
-                      child: Text(
-                        textoDoRisco(item.risco.rcm),
-                        style: TextStyle(
-                          color: corTexto,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          letterSpacing: -0.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-
-                    // Temperaturas Mín / Máx
-                    if (item.risco.tMin != null && item.risco.tMax != null)
-                      Text(
-                        '${item.risco.tMin!.round()}° / ${item.risco.tMax!.round()}°C',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.1,
-                          color: isDark ? Colors.white70 : Colors.black87,
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                        ),
-                      )
-                    else
-                      Text(
-                        '—',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          color: cs.outline.withValues(alpha: 0.5),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+    return PrevisaoAlargadaCard(
+      dias: diasFuturos,
+      initialExpanded: isDesktop,
     );
   }
 
