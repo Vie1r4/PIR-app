@@ -6,7 +6,7 @@
 
 #define MyAppName "PIR - Perigo de Incendio Rural"
 #define MyAppShortName "PIR App"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "Equipa PIR"
 #define MyAppExeName "pir_app.exe"
 #define MyAppIcon "..\windows\runner\resources\app_icon.ico"
