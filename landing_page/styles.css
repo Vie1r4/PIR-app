@@ -2,8 +2,8 @@
   --bg-main: #0D0E11;
   --bg-surface: #16171B;
   --bg-card-inner: #202227;
-  --accent: #10B981; /* Verde esmeralda florestal inspirado na fotografia */
-  --accent-hover: #059669; /* Verde pinheiro profundo */
+  --accent: #FF6B35; /* Laranja de marca oficial PIR (kBrand) */
+  --accent-hover: #FF7A30; /* Laranja vivo quente (kBrandDark) */
   --border-subtle: rgba(255, 255, 255, 0.06);
   --border-card: rgba(255, 255, 255, 0.08);
   --text-white: #FFFFFF;
@@ -343,8 +343,8 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: rgba(255, 107, 53, 0.12);
+  border: 1px solid rgba(255, 107, 53, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -373,7 +373,7 @@ body {
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--accent);
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(255, 107, 53, 0.15);
   padding: 2px 7px;
   border-radius: 5px;
 }
