@@ -829,31 +829,17 @@ class _InfoCard extends StatelessWidget {
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           _ItemLinhaClicavel(
-            icone: CupertinoIcons.calendar,
-            titulo: 'Previsão Alargada',
-            subtitulo: 'Modelo RCM até 9 dias (IPMA & Proteção Civil)',
-            onTap: () => _abrirUrl('https://www.ipma.pt/pt/ambiente/risco.incendio/'),
+            icone: CupertinoIcons.shield_lefthalf_fill,
+            titulo: 'Aviso Legal & Privacidade',
+            subtitulo: 'Dados Abertos (Lei n.º 68/2021) · Proteção de Dados (RGPD)',
+            onTap: () => _mostrarDialogoLegalEPrivacidade(context),
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           _ItemLinhaClicavel(
-            icone: CupertinoIcons.doc_text_search,
-            titulo: 'Enquadramento Legal & Dados Abertos',
-            subtitulo: 'Lei n.º 68/2021 · Diretiva (UE) 2019/1024',
-            onTap: () => _mostrarDialogoAvisoLegal(context),
-          ),
-          Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
-          _ItemLinhaClicavel(
-            icone: CupertinoIcons.shield,
+            icone: CupertinoIcons.flame,
             titulo: 'Proteção Civil & ICNF',
-            subtitulo: 'Legislação Decreto-Lei n.º 82/2021',
+            subtitulo: 'Legislação e Sistema de Gestão Integrada de Fogos Rurais',
             onTap: () => _abrirUrl('https://fogos.icnf.pt/'),
-          ),
-          Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
-          _ItemLinhaClicavel(
-            icone: CupertinoIcons.lock_shield,
-            titulo: 'Política de Privacidade',
-            subtitulo: 'Não guardamos dados pessoais · Processamento local',
-            onTap: () => _mostrarDialogoPrivacidade(context),
           ),
           Divider(height: 1, indent: 52, color: cs.outlineVariant.withValues(alpha: 0.4)),
           const _ItemLinha(
@@ -866,17 +852,17 @@ class _InfoCard extends StatelessWidget {
     );
   }
 
-  void _mostrarDialogoAvisoLegal(BuildContext context) {
+  void _mostrarDialogoLegalEPrivacidade(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Row(
           children: [
-            Icon(CupertinoIcons.doc_text_search, size: 22),
+            Icon(CupertinoIcons.shield_fill, size: 22),
             SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Aviso Legal & Dados Abertos',
+                'Aviso Legal & Privacidade',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
@@ -888,63 +874,38 @@ class _InfoCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Enquadramento Legal da Informação:',
+                '1. Privacidade & Proteção de Dados (RGPD)',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
               SizedBox(height: 6),
               Text(
-                '1. Princípio de Dados Abertos (Open Data):\n'
-                'Esta aplicação reutiliza dados públicos meteorológicos e de perigo de incêndio rural disponibilizados pelo Instituto Português do Mar e da Atmosfera (IPMA, I.P.), ao abrigo da Lei n.º 68/2021, de 24 de agosto, que transpõe a Diretiva (UE) 2019/1024 relativa a dados abertos e à reutilização de informação do setor público.\n\n'
-                '2. Isenção de Responsabilidade Operacional:\n'
-                'O PIR-App é uma plataforma de agregação e visualização cívica independente. A informação aqui apresentada não substitui, em circunstância alguma, as comunicações, avisos à população ou ordens operacionais emanadas pela Autoridade Nacional de Emergência e Proteção Civil (ANEPC), pelo Instituto da Conservação da Natureza e das Florestas (ICNF) ou pelas Forças de Segurança.\n\n'
-                '3. Atribuição de Fontes:\n'
-                '• Perigo de Incêndio Rural (RCM): IPMA, I.P.\n'
-                '• Limites Administrativos (CAOP): Direção-Geral do Território (DGT)\n\n'
-                '4. Contactos de Emergência:\n'
-                '• Número Europeu de Emergência: 112\n'
-                '• Linha SOS Ambiente e Território (GNR): 808 200 520\n'
-                '• Informações ICNF: 808 200 500',
-                style: TextStyle(fontSize: 12.5, height: 1.4),
+                '• Geolocalização no Dispositivo: O acesso ao GPS/localização é processado estritamente de forma local no seu telemóvel para mapear o concelho correspondente. Nenhuma coordenada geográfica, morada ou IP é armazenada ou enviada para servidores externos.\n\n'
+                '• Armazenamento Local: Os seus favoritos, histórico e preferências de interface são guardados exclusivamente no armazenamento interno do dispositivo (Hive Cache / LocalStorage).\n\n'
+                '• Sem Rastreio: Não existem contas de utilizador, cookies de rastreamento, nem plataformas de publicidade ou telemetria invasiva.\n',
+                style: TextStyle(fontSize: 12, height: 1.35),
               ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Compreendi'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _mostrarDialogoPrivacidade(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(CupertinoIcons.lock_shield, size: 22),
-            SizedBox(width: 8),
-            Text('Política de Privacidade', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
+              Divider(height: 16),
               Text(
-                'A sua privacidade é uma prioridade.',
+                '2. Reutilização de Dados Abertos (Open Data)',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 6),
               Text(
-                '• Geolocalização: Utilizada única e exclusivamente no dispositivo para determinar o concelho atual. Nenhuma coordenada GPS ou endereço IP é transmitido para servidores de terceiros ou armazenado externamente.\n\n'
-                '• Dados e Favoritos: As preferências de tema, favoritos e concelho são guardadas exclusivamente na memória local do dispositivo (Hive Cache).\n\n'
-                '• Sem Registo ou Rastreio: Não existem contas de utilizador, cookies de rastreio ou plataformas de publicidade.',
-                style: TextStyle(fontSize: 12.5, height: 1.4),
+                'Esta aplicação reutiliza dados públicos meteorológicos e de perigo de incêndio rural (RCM) disponibilizados pelo IPMA, I.P., bem como a Carta Administrativa Oficial de Portugal (DGT), ao abrigo da Lei n.º 68/2021, de 24 de agosto, e da Diretiva (UE) 2019/1024 relativa a dados abertos e à reutilização de informação do setor público.\n',
+                style: TextStyle(fontSize: 12, height: 1.35),
+              ),
+              Divider(height: 16),
+              Text(
+                '3. Isenção de Responsabilidade Operacional',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'O PIR é uma iniciativa cívica de visualização de dados abertos. A informação disponibilizada tem caráter puramente informativo e não substitui, em circunstância alguma, as orientações, despachos, avisos à população ou ordens de evacuação da ANEPC (Proteção Civil), ICNF ou autoridades policiais.\n\n'
+                '• Em caso de emergência ou incêndio: Ligue 112\n'
+                '• SOS Ambiente (GNR): 808 200 520\n'
+                '• Apoio a Queimas e Queimadas (ICNF): 808 200 500',
+                style: TextStyle(fontSize: 12, height: 1.35),
               ),
             ],
           ),

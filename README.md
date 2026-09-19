@@ -1,43 +1,44 @@
 # PIR - Perigo de Incêndio Rural (IPMA)
 
-Aplicação multiplataforma (Desktop Windows, Android e iOS) concebida para consultar de forma rápida, simples e direta o **Perigo de Incêndio Rural (PIR)** oficial disponibilizado pelo **IPMA (Instituto Português do Mar e da Atmosfera)**.
+Aplicação multiplataforma moderna (**Web PWA / iOS, Android e Windows Desktop**) concebida para consultar de forma rápida, simples e direta o **Perigo de Incêndio Rural (PIR)** oficial disponibilizado pelo **IPMA (Instituto Português do Mar e da Atmosfera)**.
+
+🌐 **Versão Web / PWA Online:** [https://vie1r4.github.io/PIR-app/](https://vie1r4.github.io/PIR-app/)
 
 ---
 
 ## 📌 Índice
 1. [Sobre o Projeto](#-sobre-o-projeto)
 2. [Funcionalidades](#-funcionalidades)
-3. [Fonte de Dados](#-fonte-de-dados)
-4. [Como Usar](#-como-usar)
-5. [Distribuição e Instalador (Windows)](#-distribuição-e-instalador-windows)
+3. [Fonte de Dados & Escala RCM](#-fonte-de-dados)
+4. [Como Usar (Web, iOS, Desktop)](#-como-usar)
+5. [Widget iOS (Scriptable)](#-widget-ios-scriptable)
 6. [Decisões de Arquitetura (ADRs)](#-decisões-de-arquitetura-adrs)
-7. [Roteiro de Testes Recomendado](#-roteiro-de-testes-recomendado)
+7. [Distribuição e Instalador (Windows)](#-distribuição-e-instalador-windows)
 8. [Estrutura do Projeto](#-estrutura-do-projeto)
-9. [Para Programadores (Desenvolvimento & Build)](#-para-programadores)
-10. [Próximos Passos (Roadmap)](#-próximos-passos-roadmap)
+9. [Para Programadores (Desenvolvimento & Testes)](#-para-programadores)
 
 ---
 
 ## 🌲 Sobre o Projeto
 
-O objetivo não é reinventar um modelo de risco nem adicionar sobrecarga de autenticação ou servidores próprios. A aplicação consome diretamente a API pública do IPMA, transformando ficheiros técnicos em interfaces visuais legíveis, com:
-- **Execução leve e rápida** no ambiente de trabalho e dispositivos móveis.
-- **Armazenamento em cache local**, permitindo a consulta dos últimos dados conhecidos mesmo sem acesso à internet.
-- **Foco no concelho do utilizador**, destacando a situação para **Hoje** e **Amanhã**.
+O objetivo não é reinventar um modelo de risco nem adicionar sobrecarga de autenticação ou servidores proprietários. A aplicação consome diretamente a API pública do IPMA e modelos cartográficos oficiais, transformando dados técnicos em interfaces visuais legíveis e operacionais:
+- **Execução ultrarrápida e fluida:** Suporte completo para 60/120 FPS em ecrãs táteis de alta taxa de atualização.
+- **Armazenamento em cache local e resiliência offline:** Consulta dos últimos dados conhecidos mesmo em serras ou zonas rurais sem cobertura de rede móvel.
+- **Previsão Estendida Garantida (9 Dias):** Modelo de projeção matemática e APIs oficiais (D0, D1 e D2) para contornar limitações de rede ou CORS em ambiente Web.
+- **Foco no cidadão e na prevenção:** Visualização do concelho do utilizador, regras legais para queimas/queimadas e atalhos de emergência.
 
 ---
 
 ## ✨ Funcionalidades
 
-- 🔍 **Pesquisa Inteligente de Concelhos:** 278 concelhos de Portugal Continental indexados. A pesquisa é tolerante a maiúsculas, minúsculas e acentos (ex: pesquisar `agueda`, `águeda` ou `Águeda` devolve os mesmos resultados).
-- 📅 **Previsão Estendida (até 9 Dias):** Apresentação detalhada para Hoje, Amanhã e os restantes 7 dias com níveis de risco, temperaturas (mín/máx) e vento.
-- 🗺️ **Mapa Vetorial Interativo Oficial:** Mapa geográfico offline de todos os concelhos de Portugal Continental com zoom, pan, seleção interativa e cores cartográficas oficiais do IPMA.
-- ⭐ **Gestão de Favoritos:** Marcação de concelhos com acesso rápido e gestão simplificada com badge de contagem.
-- 🕒 **Data e Hora de Atualização:** Indicação clara de quando o ficheiro do IPMA foi emitido e quando a app sincronizou os dados.
-- 📴 **Modo Offline & Cache Local:** Guarda as previsões na máquina local (usando Hive). Se a ligação à internet falhar, a app informa e exibe a última informação válida disponível.
-- 🎨 **Tema Automático:** Adaptação instantânea ao tema Claro (Light) ou Escuro (Dark) do sistema operativo.
-- 🖥️ **Interface Adaptativa para Desktop:** Janela moderna (1180x780 px) com barra lateral de navegação (NavigationRail) e visualização de cartões lado a lado.
-- 📍 **Geolocalização Automática Opcional:** Deteção rápida do concelho atual via GPS / Windows Location (com fallback inteligente por rede/IP) e mapeamento vetorial 100% offline aos 278 concelhos de Portugal Continental, sem envio de dados para servidores externos.
+- 🔍 **Pesquisa Inteligente de Concelhos:** 278 concelhos de Portugal Continental indexados com tolerância total a maiúsculas, minúsculas e acentuação (ex: `agueda`, `águeda` ou `Águeda`).
+- 📅 **Previsão Alargada (9 Dias) Estilo Apple Weather:** Cartão compacto e retrátil com carrossel horizontal de 116px e modo expandido com animação suave, apresentando temperaturas e direção/intensidade do vento.
+- 🗺️ **Mapa Vetorial Interativo a 60/120 FPS:** Renderização vetorial dos 278 concelhos em Canvas 1000x1600 com memoização estática de fronteiras (~8 draw calls por frame), duplo toque inteligente (*double-tap to zoom*) e inércia física natural (*iOS momentum glide*).
+- ⭐ **Gestão de Favoritos:** Acesso imediato a concelhos habituais com badge de contagem na barra inferior.
+- 📴 **Deteção Realista de Conectividade:** Indicador em tempo real de estado Online/Offline com sincronização sob demanda (`forcar: true`) e cache Hive NoSQL.
+- 📍 **Geolocalização Resiliente & Privada:** Deteção automática do concelho via GPS/Location com resolução poligonal vetorial 100% offline (nenhuma coordenada é enviada para a internet).
+- 🎨 **Acessibilidade & Temas:** Tema Claro, Escuro (True Dark Apple style), modo de Alto Contraste para máxima legibilidade sob sol forte, e escala dinâmica de texto.
+- ⚖️ **Aviso Legal & Privacidade Unificado:** Em total conformidade com a Lei de Dados Abertos (Lei n.º 68/2021) e privacidade estrita pelo Regulamento Geral sobre a Proteção de Dados (RGPD).
 
 ---
 
@@ -62,6 +63,11 @@ Os dados são recolhidos diretamente das fontes abertas e oficiais do IPMA:
 
 ## 🚀 Como Usar
 
+### No iPhone / iPad / Android (Web PWA):
+1. Acede a **[https://vie1r4.github.io/PIR-app/](https://vie1r4.github.io/PIR-app/)** no Safari (iOS) ou Chrome (Android).
+2. No iOS (Safari), toca no botão de **Partilhar** (`Compartilhar`) e seleciona **"Ecrã Principal"** (*Add to Home Screen*).
+3. A aplicação abre instantaneamente em modo nativo de ecrã inteiro (Standalone), com suporte offline, ícone de alta resolução e transições táteis fluidas.
+
 ### No Computador (Windows Desktop):
 1. **Pelo Atalho do Ambiente de Trabalho:**
    - Clica duas vezes no ícone **`PIR - Incêndio Rural`** no teu Ambiente de Trabalho.
@@ -70,34 +76,21 @@ Os dados são recolhidos diretamente das fontes abertas e oficiais do IPMA:
      `pir_app\build\windows\x64\runner\Release\pir_app.exe`
 
 ### Primeiros Passos na Aplicação:
-1. Ao abrir, podes navegar pela **Barra Lateral**:
-   - **Início**: Cartões de Hoje e Amanhã + carrossel com os 9 dias.
-   - **Mapa de Risco**: Visualização completa de Portugal pintado por risco com seletor de dias.
-   - **Pesquisa**: Busca direta por concelho ou distrito.
-   - **Favoritos**: Acesso imediato aos teus locais marcados.
-2. Para atualizar os dados manualmente, basta fazer pull-to-refresh na página inicial ou reabrir a aplicação.
+1. Podes navegar pelas abas principais:
+   - **Início**: Concelho principal, risco de Hoje e Amanhã, regras legais e carrossel retrátil com os 9 dias.
+   - **Mapa**: Visualização vetorial completa de Portugal a 60/120 FPS com duplo toque para zoom e pesquisa rápida.
+   - **Favoritos**: Acesso imediato aos teus locais marcados com badge de contagem.
+   - **Definições**: Acessibilidade (alto contraste, tamanho de letra), GPS automático, modo escuro e aviso legal/privacidade.
+2. Para atualizar os dados manualmente, basta fazer pull-to-refresh na página inicial ou premir o botão de sincronização nas Definições.
 
 ---
 
-## 📦 Distribuição e Instalador (Windows)
+## 📱 Widget iOS (Scriptable)
 
-A aplicação suporta duas modalidades de entrega prontas para produção:
-
-1. **Pacote Portátil (ZIP):**
-   - Pasta autónoma com o executável `pir_app.exe`, bibliotecas dinâmicas e assets em `data/flutter_assets`.
-   - Pode ser descompactado e executado em qualquer computador com Windows 10/11 x64 sem necessidade de instalação ou privilégios de administrador.
-2. **Instalador Nativo (Inno Setup):**
-   - Cria o executável `PIR_App_v1.1.0_Setup.exe` que instala a aplicação em `%LOCALAPPDATA%\Programs\PIR App` (instalação por utilizador sem necessidade de UAC/admin).
-   - Cria atalhos no Menu Iniciar e no Ambiente de Trabalho.
-   - Integração completa com o Desinstalador nativo do Windows.
-
-Para gerar os artefactos automaticamente, executa o script PowerShell:
-```powershell
-.\installer\build_installer.ps1
-```
-Os ficheiros gerados serão guardados na pasta `dist/`:
-- `dist/PIR_App_v1.1.0_Windows_x64.zip` (Portátil)
-- `dist/PIR_App_v1.1.0_Setup.exe` (Instalador, se o Inno Setup estiver instalado)
+Para além da PWA, o projeto inclui um **Widget nativo para o ecrã inicial do iPhone/iPad**, desenvolvido em JavaScript para a app gratuita **Scriptable**:
+- **Design Apple Weather:** Apresenta o concelho, nível de risco de hoje, temperaturas mínima/máxima, direção e velocidade do vento.
+- **Cor Dinâmica Contextual:** O fundo do widget adapta-se automaticamente à cor oficial do nível de risco emitido pelo IPMA (Verde a Roxo).
+- **Sem Servidores Externos:** O widget comunica diretamente com a API pública do IPMA e atualiza-se em segundo plano no iOS.
 
 ---
 
@@ -107,12 +100,13 @@ O projeto adota o formato *Architecture Decision Records* (ADR) para documentar 
 
 | ADR | Título | Estado | Foco Principal |
 | :---: | :--- | :---: | :--- |
-| [**0001**](docs/adr/0001-modelo-hibrido-ipma-api-e-scraper.md) | Modelo Híbrido IPMA (API Aberta + Scraper de 9 Dias) | Aceite | Resiliência de dados e previsão estendida sem backend intermediário |
-| [**0002**](docs/adr/0002-persistencia-local-com-hive.md) | Persistência Local e Cache Offline com Hive NoSQL | Aceite | Desempenho sub-milissegundo, tolerância a falhas de rede e zero setup nativo SQLite |
-| [**0003**](docs/adr/0003-projecao-cartografica-vetorial-canvas.md) | Projeção Cartográfica Vetorial Offline em CustomPainter | Aceite | Renderização de 278 concelhos a 60/120 FPS sem WebViews nem dependências de tiles pesadas |
-| [**0004**](docs/adr/0004-geolocalizacao-hibrida-e-mapeamento-poligonal.md) | Geolocalização Híbrida e Mapeamento Poligonal Offline | Aceite | Deteção resiliente GPS+IP e identificação geométrica local de concelhos com privacidade |
+| [**0001**](pir_app/docs/adr/0001-modelo-hibrido-ipma-api-e-scraper.md) | Modelo Híbrido IPMA (API Aberta + Scraper de 9 Dias) | Aceite | Resiliência de dados e previsão estendida sem backend intermediário |
+| [**0002**](pir_app/docs/adr/0002-persistencia-local-com-hive.md) | Persistência Local e Cache Offline com Hive NoSQL | Aceite | Desempenho sub-milissegundo, tolerância a falhas de rede e zero setup nativo SQLite |
+| [**0003**](pir_app/docs/adr/0003-projecao-cartografica-vetorial-canvas.md) | Projeção Cartográfica Vetorial Offline em CustomPainter | Aceite | Renderização de 278 concelhos a 60/120 FPS sem WebViews nem dependências de tiles pesadas |
+| [**0004**](pir_app/docs/adr/0004-geolocalizacao-hibrida-e-mapeamento-poligonal.md) | Geolocalização Híbrida e Mapeamento Poligonal Offline | Aceite | Deteção resiliente GPS+IP e identificação geométrica local de concelhos com privacidade |
+| [**0005**](pir_app/docs/adr/0005-motor-preditivo-multidias-e-otimizacao-vetorial.md) | Motor Preditivo Multi-Dias e Memoização Vetorial Cartográfica | Aceite | Continuidade de 9 dias via D0/D1/D2 e 60/120 FPS no mapa com duplo toque inteligente |
 
-Os registos detalhados encontram-se disponíveis no diretório [`docs/adr/`](docs/adr/).
+Os registos detalhados encontram-se disponíveis no diretório [`pir_app/docs/adr/`](pir_app/docs/adr/).
 
 ---
 
@@ -166,12 +160,17 @@ Pir-app/
     │   └── utils/
     │       ├── constants.dart         # URLs e constantes da aplicação
     │       └── risco_helpers.dart     # Cores cartográficas oficiais e datas
-    ├── test/                          # Bateria de testes automatizados (21 testes)
-    │   ├── concelho_test.dart
-    │   ├── ipma_scraper_test.dart
-    │   ├── risco_helpers_test.dart
+    ├── test/                          # Bateria de testes automatizados (48 testes)
     │   ├── acessibilidade_provider_test.dart
+    │   ├── concelho_test.dart
+    │   ├── favoritos_screen_test.dart
+    │   ├── ipma_scraper_test.dart
+    │   ├── localizacao_test.dart
+    │   ├── map_geometry_service_test.dart
     │   ├── modal_seletor_concelhos_test.dart
+    │   ├── previsao_alargada_card_test.dart
+    │   ├── risco_helpers_test.dart
+    │   ├── risco_provider_offline_test.dart
     │   └── widget_test.dart
     ├── pubspec.yaml                   # Dependências e versão do projeto
     └── windows/                       # Configurações nativas do Windows (janela, titlebar)
@@ -199,7 +198,8 @@ O Flutter encontra-se instalado em `C:\Users\Utilizador\flutter\bin`.
 
 ### Executar em Modo de Desenvolvimento:
 ```powershell
-flutter run -d windows
+flutter run -d chrome     # Web / PWA
+flutter run -d windows    # Windows Desktop
 ```
 
 ### Executar Testes Automatizados:
@@ -214,5 +214,9 @@ flutter analyze
 
 ### Gerar Build de Produção:
 ```powershell
+# Web (GitHub Pages / PWA)
+flutter build web --release --base-href /PIR-app/
+
+# Windows Desktop
 flutter build windows --release
 ```
