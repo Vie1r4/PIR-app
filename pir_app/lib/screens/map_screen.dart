@@ -47,6 +47,8 @@ class _MapScreenState extends State<MapScreen>
   // Ajuste de zoom e centramento
   Size? _lastViewportSize;
   bool _hasInitialFit = false;
+  DateTime? _ultimoToqueTempo;
+  Offset? _ultimoToquePosicao;
 
   // Controlos de Pesquisa Integrada
   final TextEditingController _searchController = TextEditingController();
@@ -274,6 +276,31 @@ class _MapScreenState extends State<MapScreen>
     });
   }
 
+  void _aoDuploToqueNoMapa(Offset scenePoint) {
+    HapticFeedback.mediumImpact();
+    final currentScale = _transformationController.value.getMaxScaleOnAxis();
+    final viewportSize = _lastViewportSize ?? MediaQuery.of(context).size;
+
+    // Se já estiver com zoom considerável (>= 1.8x), duplo toque afasta e repõe o enquadramento geral
+    if (currentScale >= 1.8) {
+      _animarParaMatriz(_calcularMatrizAjuste(viewportSize));
+      return;
+    }
+
+    // Zoom fluido (~2.4x) centrado precisamente no ponto onde o utilizador tocou
+    const targetScale = 2.4;
+    final isNarrow = viewportSize.width < 680;
+    final focalX = isNarrow ? (viewportSize.width / 2.0) : ((viewportSize.width - 210) / 2.0 + 10);
+    final focalY = (viewportSize.height - 30) / 2.0;
+
+    final targetMatrix = Matrix4.identity()
+      ..translate(focalX, focalY)
+      ..scale(targetScale)
+      ..translate(-scenePoint.dx, -scenePoint.dy);
+
+    _animarParaMatriz(targetMatrix);
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<RiscoProvider>();
@@ -400,18 +427,34 @@ class _MapScreenState extends State<MapScreen>
                             panEnabled: true,
                             scaleEnabled: true,
                             constrained: false,
-                            clipBehavior: Clip.hardEdge,
+                            clipBehavior: Clip.none,
                             trackpadScrollCausesScale: true,
-                            interactionEndFrictionCoefficient: 0.0000135,
-                            boundaryMargin: const EdgeInsets.all(300),
+                            interactionEndFrictionCoefficient: 0.000008,
+                            boundaryMargin: const EdgeInsets.all(350),
                             minScale: 0.20,
                             maxScale: 6.0,
                             child: MouseRegion(
                               cursor: SystemMouseCursors.grab,
                               child: GestureDetector(
                                 behavior: HitTestBehavior.opaque,
-                                onTapUp: (details) =>
-                                    _aoTocarNoMapa(details.localPosition),
+                                onTapUp: (details) {
+                                  final agora = DateTime.now();
+                                  if (_ultimoToqueTempo != null &&
+                                      agora.difference(_ultimoToqueTempo!) <
+                                          const Duration(milliseconds: 320) &&
+                                      _ultimoToquePosicao != null &&
+                                      (_ultimoToquePosicao! - details.localPosition)
+                                              .distance <
+                                          70) {
+                                    _ultimoToqueTempo = null;
+                                    _ultimoToquePosicao = null;
+                                    _aoDuploToqueNoMapa(details.localPosition);
+                                  } else {
+                                    _ultimoToqueTempo = agora;
+                                    _ultimoToquePosicao = details.localPosition;
+                                    _aoTocarNoMapa(details.localPosition);
+                                  }
+                                },
                                 child: RepaintBoundary(
                                   child: SizedBox(
                                     width: MapGeometryService.canvasWidth,
@@ -424,9 +467,11 @@ class _MapScreenState extends State<MapScreen>
                                         MapGeometryService.canvasHeight,
                                       ),
                                       painter: PortugalMapPainter(
-                                        geometries: _geometries,
-                                        dadosRisco: dadosRiscoDia,
-                                        dicoSelecionado: _dicoSelecionado,
+                                        allBordersPath: _geometryService.allBordersPath,
+                                        groupedFillPaths: _geometryService
+                                            .obterGroupedPaths(dadosRiscoDia),
+                                        selectedGeometry: concelhoGeoSelecionado,
+                                        riscoSelecionadoRcm: riscoConcelho?.rcm,
                                         isDark: Theme.of(context).brightness ==
                                             Brightness.dark,
                                         altoContraste: accProvider.altoContraste,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/concelho_geometry.dart';
+import '../models/risco_incendio.dart';
 
 /// Serviço que carrega e faz o parsing dos polígonos GeoJSON de Portugal Continental
 class MapGeometryService {
@@ -12,6 +13,38 @@ class MapGeometryService {
   MapGeometryService._internal();
 
   List<ConcelhoGeometry>? _geometries;
+  Path? _allBordersPath;
+  final Map<String, Map<int, Path>> _groupedPathsCache = {};
+
+  /// Caminho unificado de todas as fronteiras concelhias de Portugal continental
+  /// Pré-compilado uma única vez no arranque para eliminar recálculos na GPU.
+  Path get allBordersPath => _allBordersPath ?? Path();
+
+  /// Devolve os caminhos combinados agrupados por nível de RCM (1..5, 0 = sem dados).
+  /// Utiliza memoização por data de previsão e ficheiro para 0ms de cálculo em frames subsequentes.
+  Map<int, Path> obterGroupedPaths(DadosRisco? dados) {
+    final cacheKey = dados != null ? '${dados.dataPrev}_${dados.fileDate}' : '__sem_dados__';
+    final cached = _groupedPathsCache[cacheKey];
+    if (cached != null) {
+      return cached;
+    }
+
+    final map = <int, Path>{};
+    if (_geometries != null) {
+      for (final geo in _geometries!) {
+        final rcm = dados?.getRisco(geo.dico)?.rcm ?? 0;
+        final p = map.putIfAbsent(rcm, () => Path());
+        p.addPath(geo.path, Offset.zero);
+      }
+    }
+    _groupedPathsCache[cacheKey] = map;
+    return map;
+  }
+
+  /// Limpa a cache de agrupamento vetorial
+  void limparCacheCaminhos() {
+    _groupedPathsCache.clear();
+  }
 
   // Dimensões do canvas virtual
   static const double canvasWidth = 1000.0;
@@ -138,6 +171,14 @@ class MapGeometryService {
       }
 
       _geometries = list;
+
+      // Pré-compilar todas as fronteiras numa única estrutura de Path imutável
+      final allBorders = Path();
+      for (final geo in list) {
+        allBorders.addPath(geo.path, Offset.zero);
+      }
+      _allBordersPath = allBorders;
+
       return list;
     } catch (e) {
       debugPrint('Erro ao carregar geometrias dos concelhos: $e');

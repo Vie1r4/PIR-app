@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../models/concelho_geometry.dart';
-import '../models/risco_incendio.dart';
 import '../utils/risco_helpers.dart';
 
 /// Representação de uma opção de dia para seleção no mapa (Hoje, Amanhã, etc.)
@@ -18,12 +17,13 @@ class DiaOpcao {
 }
 
 /// CustomPainter dedicado à renderização vetorial de alta performance de Portugal continental
-/// no Canvas 1000x1600. Utiliza agrupamento de geometrias por cor para reduzir
-/// as draw calls de 556 para apenas 6 por frame, garantindo 60/120fps fluidos no zoom.
+/// no Canvas 1000x1600. Utiliza agrupamento de geometrias por cor e fronteiras pré-compiladas
+/// para reduzir as draw calls a ~8 por frame, garantindo 60/120fps fluidos no zoom e pan.
 class PortugalMapPainter extends CustomPainter {
-  final List<ConcelhoGeometry> geometries;
-  final DadosRisco? dadosRisco;
-  final String? dicoSelecionado;
+  final Path allBordersPath;
+  final Map<int, Path> groupedFillPaths;
+  final ConcelhoGeometry? selectedGeometry;
+  final int? riscoSelecionadoRcm;
   final bool isDark;
   final bool altoContraste;
 
@@ -32,15 +32,11 @@ class PortugalMapPainter extends CustomPainter {
   final Paint _strokePaint = Paint()..style = PaintingStyle.stroke;
   final Paint _selectedStrokePaint = Paint()..style = PaintingStyle.stroke;
 
-  // Agrupamento de paths pré-calculados por nível de RCM (0=sem dados, 1..5)
-  final Map<int, Path> _groupedFillPaths = {};
-  final Path _allBordersPath = Path();
-  ConcelhoGeometry? _selectedGeometry;
-
   PortugalMapPainter({
-    required this.geometries,
-    required this.dadosRisco,
-    required this.dicoSelecionado,
+    required this.allBordersPath,
+    required this.groupedFillPaths,
+    required this.selectedGeometry,
+    required this.riscoSelecionadoRcm,
     required this.isDark,
     this.altoContraste = false,
   }) {
@@ -60,19 +56,6 @@ class PortugalMapPainter extends CustomPainter {
     }
 
     _selectedStrokePaint.color = isDark ? Colors.white : const Color(0xFF002F6C);
-
-    // Agrupar previamente todos os 278 concelhos por nível de risco
-    // Reduz centenas de draw calls a apenas 6 chamadas de GPU ultrarrápidas!
-    for (final geo in geometries) {
-      if (geo.dico == dicoSelecionado) {
-        _selectedGeometry = geo;
-        continue;
-      }
-      final rcm = dadosRisco?.getRisco(geo.dico)?.rcm ?? 0;
-      final pathGroup = _groupedFillPaths.putIfAbsent(rcm, () => Path());
-      pathGroup.addPath(geo.path, Offset.zero);
-      _allBordersPath.addPath(geo.path, Offset.zero);
-    }
   }
 
   @override
@@ -81,31 +64,30 @@ class PortugalMapPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, _oceanPaint);
 
     // 2. Preenchimentos agrupados por nível de risco (apenas 5-6 draw calls!)
-    _groupedFillPaths.forEach((rcm, combinedPath) {
+    groupedFillPaths.forEach((rcm, combinedPath) {
       _fillPaint.color = rcm > 0 ? corDoRiscoMapa(rcm) : const Color(0xFFDCDFE3);
       canvas.drawPath(combinedPath, _fillPaint);
     });
 
-    // 3. Contornos consolidados (1 única chamada para todas as fronteiras de Portugal)
-    if (geometries.isNotEmpty) {
-      canvas.drawPath(_allBordersPath, _strokePaint);
-    }
+    // 3. Contornos consolidados (1 única chamada para todas as fronteiras de Portugal continental)
+    canvas.drawPath(allBordersPath, _strokePaint);
 
     // 4. Concelho selecionado (desenhado com destaque no topo)
-    if (_selectedGeometry != null) {
-      final rcm = dadosRisco?.getRisco(_selectedGeometry!.dico)?.rcm ?? 0;
+    if (selectedGeometry != null) {
+      final rcm = riscoSelecionadoRcm ?? 0;
       _fillPaint.color = rcm > 0 ? corDoRiscoMapa(rcm) : const Color(0xFFDCDFE3);
 
-      canvas.drawPath(_selectedGeometry!.path, _fillPaint);
-      canvas.drawPath(_selectedGeometry!.path, _selectedStrokePaint);
+      canvas.drawPath(selectedGeometry!.path, _fillPaint);
+      canvas.drawPath(selectedGeometry!.path, _selectedStrokePaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant PortugalMapPainter oldDelegate) {
-    return oldDelegate.dadosRisco != dadosRisco ||
-        oldDelegate.dicoSelecionado != dicoSelecionado ||
-        oldDelegate.geometries != geometries ||
+    return oldDelegate.groupedFillPaths != groupedFillPaths ||
+        oldDelegate.allBordersPath != allBordersPath ||
+        oldDelegate.selectedGeometry != selectedGeometry ||
+        oldDelegate.riscoSelecionadoRcm != riscoSelecionadoRcm ||
         oldDelegate.isDark != isDark ||
         oldDelegate.altoContraste != altoContraste;
   }

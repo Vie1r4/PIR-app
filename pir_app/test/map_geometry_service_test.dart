@@ -74,5 +74,28 @@ void main() {
       final fora3 = await service.encontrarPorCoordenadas(35.6762, 139.6503);
       expect(fora3, isNull);
     });
+
+    test('allBordersPath está pré-compilado e contém as fronteiras de Portugal', () async {
+      await service.carregarGeometrias();
+      final borders = service.allBordersPath;
+      expect(borders.getBounds().isEmpty, isFalse);
+      expect(borders.getBounds().width, greaterThan(200));
+      expect(borders.getBounds().height, greaterThan(400));
+    });
+
+    test('obterGroupedPaths memoiza caminhos por carimbo e dados de risco', () async {
+      await service.carregarGeometrias();
+      final paths1 = service.obterGroupedPaths(null);
+      expect(paths1, isNotEmpty);
+      expect(paths1.containsKey(0), isTrue);
+
+      // Chamar uma segunda vez deve devolver a mesma instância em cache
+      final paths2 = service.obterGroupedPaths(null);
+      expect(identical(paths1, paths2), isTrue);
+
+      service.limparCacheCaminhos();
+      final paths3 = service.obterGroupedPaths(null);
+      expect(paths3, isNotEmpty);
+    });
   });
 }
