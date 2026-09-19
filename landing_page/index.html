@@ -3,152 +3,310 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PIR — Perigo de Incêndio Rural</title>
-  <meta name="description" content="Aplicação comunitária para consulta rápida do risco de incêndio rural do IPMA em Portugal Continental. Disponível para Windows e iPhone.">
+  <title>PIR — Perigo de Incêndio Rural | Aplicação Oficial</title>
+  <meta name="description" content="Consulta rápida, precisa e oficial do perigo de incêndio rural do IPMA para o teu concelho. Disponível para Windows Desktop e iPhone.">
   <link rel="icon" type="image/png" href="assets/favicon.png">
-  
-  <!-- Open Graph / Redes Sociais -->
+
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="PIR — Perigo de Incêndio Rural">
-  <meta property="og:description" content="Consulta rápida e oficial do risco de incêndio por concelho. Instala no Windows ou adiciona ao iPhone.">
+  <meta property="og:description" content="Consulta rápida e oficial do risco de incêndio por concelho. Instala no Windows ou iPhone.">
   <meta property="og:image" content="assets/icon.png">
-  <meta name="theme-color" content="#0C0D0F">
+  <meta name="theme-color" content="#0B0E14">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <a href="#" class="brand">
-        <img src="assets/icon.png" alt="PIR Logo" class="brand-icon">
-        <span class="brand-name">PIR</span>
+  <!-- ==========================================
+       1. NAVBAR
+  =========================================== -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#inicio" class="nav-logo">
+        <img src="assets/icon.png" alt="PIR Logo" class="nav-logo-icon">
+        <span class="nav-logo-title">PIR</span>
       </a>
-      <div class="header-links">
-        <a href="https://github.com/Vie1r4/PIR-app" target="_blank" rel="noopener">GitHub ↗</a>
-      </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-pill">
-        <span class="dot"></span>
-        <span>Versão 1.2.0 • Dados Oficiais IPMA</span>
-      </div>
-      <h1>Perigo de Incêndio Rural.</h1>
-      <p class="hero-intro">
-        Uma ferramenta comunitária, leve e sem ruído para acompanhar o risco de incêndio diário e a previsão meteorológica a 9 dias em todos os concelhos de Portugal Continental. Sem anúncios, sem criação de conta e 100% privada.
-      </p>
-    </section>
+      <ul class="nav-links">
+        <li><a href="#inicio">Início</a></li>
+        <li><a href="#funcionalidades">Funcionalidades</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#download">Download</a></li>
+      </ul>
 
-    <!-- Download & Access Section -->
-    <section class="access-grid">
-      <!-- Windows Desktop -->
-      <div class="access-card">
-        <div class="card-top">
-          <div class="platform-tag">
-            <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-            <span>Windows Desktop</span>
+      <a href="#download" class="nav-cta">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Descarregar</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ==========================================
+       2. SECÇÃO HERO (3 COLUNAS)
+  =========================================== -->
+  <main id="inicio" class="hero-section">
+    <div class="hero-grid">
+      
+      <!-- Coluna da Esquerda -->
+      <div class="hero-col-left">
+        <div>
+          <div class="hero-tagline">Proteção & Prevenção Civil</div>
+          <h1 class="hero-title">Risco de Incêndio Rural no <span class="accent">teu Concelho.</span></h1>
+        </div>
+
+        <div class="hero-scroll-indicator">
+          <span class="scroll-line"></span>
+          <span>Scroll to explore</span>
+        </div>
+      </div>
+
+      <!-- Coluna Central: Mockup do Smartphone na Vertical -->
+      <div class="hero-col-center">
+        <div class="phone-mockup">
+          <div class="phone-island"></div>
+          
+          <div class="phone-screen">
+            <!-- Header simulado da app -->
+            <div class="phone-header-bar">
+              <div class="phone-search-bar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Pesquisar concelho...</span>
+              </div>
+            </div>
+
+            <!-- Dias disponíveis -->
+            <div class="phone-day-tabs">
+              <span class="phone-day-pill active">Hoje</span>
+              <span class="phone-day-pill">Amanhã</span>
+              <span class="phone-day-pill">D+2</span>
+              <span class="phone-day-pill">+7 Dias</span>
+            </div>
+
+            <!-- Mapa vetorial de Portugal estilizado -->
+            <div class="phone-map-view">
+              <svg class="map-svg-shape" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Silhueta estilizada de Portugal Continental -->
+                <path d="M28 10 C38 6, 68 8, 75 14 C82 20, 88 35, 84 50 C80 62, 92 78, 86 95 C82 108, 80 120, 72 135 C64 148, 52 158, 40 162 C26 160, 16 148, 22 132 C26 122, 22 110, 24 96 C20 84, 18 70, 24 55 C22 40, 20 22, 28 10 Z" fill="#1C212B" stroke="#2D3545" stroke-width="1.5"/>
+                <!-- Áreas de calor / risco colorido -->
+                <path d="M38 25 C55 22, 70 28, 72 45 C65 55, 48 50, 40 40 Z" fill="#F59E0B" opacity="0.85"/>
+                <path d="M42 55 C65 52, 78 68, 72 88 C55 92, 45 80, 42 65 Z" fill="#EF4444" opacity="0.9"/>
+                <path d="M32 95 C48 90, 68 100, 62 125 C45 130, 32 118, 30 102 Z" fill="#DC2626" opacity="0.95"/>
+                <path d="M35 132 C50 130, 58 140, 52 154 C40 156, 32 148, 32 138 Z" fill="#F97316" opacity="0.85"/>
+                <!-- Pin de localização -->
+                <circle cx="52" cy="74" r="4.5" fill="#FFFFFF" stroke="#DC2626" stroke-width="2"/>
+              </svg>
+            </div>
+
+            <!-- Cartão de Risco do Concelho Selecionado -->
+            <div class="phone-risk-card">
+              <div class="risk-card-top">
+                <span class="risk-concelho-name">Sintra</span>
+                <span class="risk-level-badge">Nível 4 • Muito Elevado</span>
+              </div>
+              <div class="risk-card-meta">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                <span>Proibido realizar queimas e queimadas</span>
+              </div>
+            </div>
+
+            <div class="phone-home-indicator"></div>
           </div>
-          <h2 class="card-title">Instalador Oficial (.exe)</h2>
-          <p class="card-desc">
-            Aplicação nativa otimizada para o teu computador, com renderização vetorial do mapa a 60/120 FPS e suporte a arrasto e zoom com o rato.
-          </p>
         </div>
-        <a href="downloads/PIR_App_v1.2.0_Setup.exe" class="btn-download" download>
-          <span>Descarregar para Windows</span>
-          <span style="opacity: 0.6; font-size: 0.8rem; font-weight: 500;">(11.5 MB)</span>
-        </a>
       </div>
 
-      <!-- iPhone / iOS -->
-      <div class="access-card">
-        <div class="card-top">
-          <div class="platform-tag">
-            <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.2c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.61 1.35-.55.63-.99 1.68-.86 2.7.99.08 2.02-.45 2.55-1.2"/></svg>
-            <span>iPhone (iOS)</span>
+      <!-- Coluna da Direita: Estatísticas, Valor & Download Badges -->
+      <div class="hero-col-right">
+        <!-- Estatísticas / Prova de Dados -->
+        <div class="hero-stats-row">
+          <div class="stat-box">
+            <span class="stat-number">278</span>
+            <span class="stat-label">Concelhos Monitorizados</span>
           </div>
-          <h2 class="card-title">Aplicação no Safari</h2>
-          <p class="card-desc">
-            Instala-se diretamente no iPhone sem passar pela App Store. Fica com o ícone no ecrã e abre em ecrã inteiro nativo.
-          </p>
-        </div>
-
-        <!-- Integrated iOS Instructions -->
-        <div class="ios-guide">
-          <span class="ios-guide-title">Como pôr a dar no iPhone:</span>
-          <div class="step-row">
-            <span class="step-badge">1</span>
-            <span>Abre o link abaixo no <strong>Safari</strong>.</span>
-          </div>
-          <div class="step-row">
-            <span class="step-badge">2</span>
-            <span>Toca no botão <strong>Partilhar</strong> (quadrado com a seta 📤).</span>
-          </div>
-          <div class="step-row">
-            <span class="step-badge">3</span>
-            <span>Escolhe <strong>"Adicionar ao Ecrã Principal"</strong>.</span>
+          <div class="stat-box">
+            <span class="stat-number">9<span class="plus">D</span></span>
+            <span class="stat-label">Previsão Antecipada</span>
           </div>
         </div>
 
-        <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener" class="btn-open">
-          <span>Abrir Aplicação no Safari ↗</span>
-        </a>
+        <!-- Parágrafo de Valor -->
+        <p class="hero-description">
+          Acompanha a evolução do perigo de incêndio rural com dados oficiais e previsão meteorológica calibrada. Desenvolvido para máxima rapidez, sem publicidade e com total privacidade.
+        </p>
+
+        <!-- Bloco Disponível em -->
+        <div id="download" class="badges-section">
+          <span class="badges-caption">Disponível em:</span>
+          
+          <div class="badges-group">
+            <!-- Botão Windows (Destaque Principal) -->
+            <a href="downloads/PIR_App_v1.2.0_Setup.exe" class="badge-btn primary-btn" download>
+              <div class="badge-icon-box">
+                <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+              </div>
+              <div class="badge-text-box">
+                <span class="badge-top-line">Download para PC</span>
+                <span class="badge-main-line">Windows (.exe) • 11.5 MB</span>
+              </div>
+            </a>
+
+            <!-- Botão iPhone (iOS) -->
+            <button class="badge-btn" onclick="openIosModal()">
+              <div class="badge-icon-box">
+                <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.2c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.61 1.35-.55.63-.99 1.68-.86 2.7.99.08 2.02-.45 2.55-1.2"/></svg>
+              </div>
+              <div class="badge-text-box">
+                <span class="badge-top-line">Adicionar ao ecrã</span>
+                <span class="badge-main-line">iPhone (iOS / Safari)</span>
+              </div>
+            </button>
+
+            <!-- Botão Web -->
+            <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener" class="badge-btn">
+              <div class="badge-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <div class="badge-text-box">
+                <span class="badge-top-line">Acesso direto</span>
+                <span class="badge-main-line">Versão Web no Browser</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
       </div>
-    </section>
+    </div>
+  </main>
 
-    <!-- Web Version Fallback -->
-    <p class="web-hint">
-      Também podes usar no computador diretamente no browser: <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener">Abrir Versão Web ↗</a>
-    </p>
+  <!-- ==========================================
+       3. GRELHA DE FUNCIONALIDADES (4 CARTÕES)
+  =========================================== -->
+  <section id="funcionalidades" class="features-section">
+    <div class="features-grid">
+      <!-- Card 1 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3 class="feature-card-title">Previsão a 9 Dias</h3>
+        <p class="feature-card-desc">Motor preditivo meteorológico que antecipa a evolução do risco por concelho em função do vento, calor e humidade.</p>
+      </div>
 
-    <hr class="section-divider">
+      <!-- Card 2: Destaque sutil -->
+      <div class="feature-card highlight">
+        <div class="feature-icon-wrapper">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        </div>
+        <h3 class="feature-card-title">Mapa Vetorial Fluido</h3>
+        <p class="feature-card-desc">Fronteiras pré-compiladas a 60/120 FPS. Navegação suave com arrasto de rato no PC ou toque no ecrã do telemóvel.</p>
+      </div>
 
-    <!-- About Section -->
-    <section class="about-section">
-      <div class="section-label">Sobre o Projeto</div>
-      <h2>Concebida para ser útil, rápida e silenciosa.</h2>
-      <p class="about-text">
-        Em Portugal, a gestão do risco de incêndio rural exige decisões rápidas sobre queimas, trabalhos agrícolas, maquinaria e atividades na natureza. O <strong>PIR</strong> foi criado para eliminar o ruído: sintetiza os boletins complexos do IPMA numa interface imediata, onde podes ver o risco do teu concelho num segundo ou explorar o mapa interativo de todo o país.
-      </p>
+      <!-- Card 3 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="feature-card-title">Regulamentação & Queimas</h3>
+        <p class="feature-card-desc">Consulta rápida das proibições legais de queimas, queimadas e pirotecnia segundo as normas da Proteção Civil e ICNF.</p>
+      </div>
 
-      <div class="principles-list">
-        <div class="principle-item">
-          <div class="principle-title">Privacidade por Desenho</div>
-          <div class="principle-desc">A deteção do teu concelho via GPS é feita 100% no teu aparelho. As tuas coordenadas nunca saem do dispositivo e não existe qualquer telemetria ou conta de utilizador.</div>
+      <!-- Card 4: Fundo contrastante -->
+      <div class="feature-card dark-contrast">
+        <div class="feature-icon-wrapper">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
+        <h3 class="feature-card-title">Resiliência Sem Rede</h3>
+        <p class="feature-card-desc">Armazenamento local persistente em NoSQL (Hive) que mantém os últimos dados disponíveis mesmo em zonas de serra sem sinal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       MODAL GUIA IOS
+  =========================================== -->
+  <div id="ios-modal" class="ios-modal-overlay">
+    <div class="ios-modal-box">
+      <button class="ios-modal-close" onclick="closeIosModal()" aria-label="Fechar">✕</button>
+      <h3 class="ios-modal-title">Instalar no iPhone</h3>
+      <p class="ios-modal-sub">Como adicionar a aplicação ao ecrã inicial do iOS:</p>
+
+      <div class="ios-modal-steps">
+        <div class="ios-step">
+          <span class="ios-step-num">1</span>
+          <div class="ios-step-text">
+            <strong>Abrir no Safari</strong>
+            <p>Toca no botão abaixo para abrir a aplicação web oficial no Safari.</p>
+          </div>
         </div>
 
-        <div class="principle-item">
-          <div class="principle-title">Previsão Alargada a 9 Dias</div>
-          <div class="principle-desc">Inclui um motor preditivo calibrado que projeta antecipadamente a tendência meteorológica de perigo para os 278 concelhos do continente.</div>
+        <div class="ios-step">
+          <span class="ios-step-num">2</span>
+          <div class="ios-step-text">
+            <strong>Tocar em Partilhar</strong>
+            <p>Na barra inferior do Safari, toca no ícone de Partilhar (quadrado com seta 📤).</p>
+          </div>
         </div>
 
-        <div class="principle-item">
-          <div class="principle-title">Resiliência Sem Rede</div>
-          <div class="principle-desc">Se estiveres numa serra ou aldeia sem sinal de telemóvel, a aplicação acede aos últimos dados guardados localmente para não ficares desinformado.</div>
-        </div>
-
-        <div class="principle-item">
-          <div class="principle-title">Software de Utilidade Pública</div>
-          <div class="principle-desc">Projeto independente e aberto, baseado nos dados públicos do IPMA ao abrigo da Lei n.º 68/2021 sobre dados abertos da administração pública.</div>
+        <div class="ios-step">
+          <span class="ios-step-num">3</span>
+          <div class="ios-step-text">
+            <strong>Adicionar ao Ecrã Principal</strong>
+            <p>Escolhe "Adicionar ao Ecrã Principal". A app ficará com o ícone oficial preto e a chama laranja.</p>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- Footer -->
-    <footer>
-      <div class="footer-top">
-        <span>PIR-App v1.2.0</span>
-        <div class="footer-links">
-          <a href="https://github.com/Vie1r4/PIR-app" target="_blank" rel="noopener">Código no GitHub</a>
-          <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener">Versão Web Direta</a>
-          <a href="https://www.ipma.pt" target="_blank" rel="noopener">IPMA</a>
-        </div>
-      </div>
-      <p>Aviso: Esta ferramenta tem fins informativos e não substitui os avisos ou instruções operacionais da ANEPC (Proteção Civil) e dos Corpos de Bombeiros.</p>
-    </footer>
+      <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener" class="ios-modal-btn">
+        <span>Abrir Aplicação no Safari ↗</span>
+      </a>
+    </div>
   </div>
 
+  <!-- ==========================================
+       FOOTER
+  =========================================== -->
+  <footer id="sobre">
+    <div class="footer-container">
+      <div>
+        <strong>PIR — Perigo de Incêndio Rural</strong> • Versão 1.2.0 • Dados Oficiais IPMA
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/Vie1r4/PIR-app" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener">Web App</a>
+        <a href="https://www.ipma.pt" target="_blank" rel="noopener">IPMA</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function openIosModal() {
+      const m = document.getElementById('ios-modal');
+      if (m) {
+        m.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeIosModal() {
+      const m = document.getElementById('ios-modal');
+      if (m) {
+        m.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    document.getElementById('ios-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'ios-modal') closeIosModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeIosModal();
+    });
+  </script>
 </body>
 </html>
