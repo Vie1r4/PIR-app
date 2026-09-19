@@ -1,10 +1,9 @@
 :root {
-  --bg-main: #0D0E11; /* kDarkBg da app */
-  --bg-surface: #16171B; /* kDarkCard da app */
-  --bg-card-inner: #202227; /* kDarkCard2 da app */
-  --accent: #FF6B35; /* kBrand da app */
-  --accent-hover: #FF7A30; /* kBrandDark da app */
-  --accent-glow: rgba(255, 107, 53, 0.35);
+  --bg-main: #0D0E11;
+  --bg-surface: #16171B;
+  --bg-card-inner: #202227;
+  --accent: #10B981; /* Verde esmeralda florestal inspirado na fotografia */
+  --accent-hover: #059669; /* Verde pinheiro profundo */
   --border-subtle: rgba(255, 255, 255, 0.06);
   --border-card: rgba(255, 255, 255, 0.08);
   --text-white: #FFFFFF;
@@ -45,7 +44,7 @@ body {
 
 /* =====================================================================
    1. NAVBAR
-===================================================================== */
+==================================================================== */
 .navbar {
   width: 100%;
   padding: 16px clamp(16px, 4vw, 48px);
@@ -117,14 +116,14 @@ body {
   padding: 9px 20px;
   border-radius: var(--radius-pill);
   text-decoration: none;
-  box-shadow: 0 4px 16px var(--accent-glow);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   transition: all 0.2s ease;
 }
 
 .btn-install-nav:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px var(--accent-glow);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
 }
 
 /* =====================================================================
@@ -161,7 +160,6 @@ body {
   height: 7px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
   flex-shrink: 0;
 }
 
@@ -303,7 +301,7 @@ body {
   background: var(--accent);
   color: #FFFFFF;
   font-weight: 600;
-  box-shadow: 0 2px 10px var(--accent-glow);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Corpo Dinâmico */
@@ -345,8 +343,8 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(255, 107, 53, 0.1);
-  border: 1px solid rgba(255, 107, 53, 0.25);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -375,7 +373,7 @@ body {
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--accent);
-  background: rgba(255, 107, 53, 0.12);
+  background: rgba(16, 185, 129, 0.15);
   padding: 2px 7px;
   border-radius: 5px;
 }
@@ -400,7 +398,7 @@ body {
   text-decoration: none;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 18px var(--accent-glow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   flex-shrink: 0;
 }
@@ -408,7 +406,7 @@ body {
 .btn-download-action:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px var(--accent-glow);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 /* Rodapé do Cartão */
@@ -554,7 +552,12 @@ body {
   padding: 13px;
   border-radius: 12px;
   text-decoration: none;
-  box-shadow: 0 4px 16px var(--accent-glow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: background 0.2s ease;
+}
+
+.ios-modal-btn:hover {
+  background: var(--accent-hover);
 }
 
 /* =====================================================================
