@@ -21,6 +21,11 @@ class IpmaApiService {
     return _fetchRisco(ApiUrls.rcmAmanha);
   }
 
+  /// Fetch day after tomorrow's risk data (D+2)
+  Future<DadosRisco> fetchRiscoDepoisDeAmanha() async {
+    return _fetchRisco(ApiUrls.rcmDepoisDeAmanha);
+  }
+
   /// Internal method to fetch and parse risk data from a URL with web CORS fallback
   Future<DadosRisco> _fetchRisco(String url) async {
     final urlsParaTentar = <String>[];

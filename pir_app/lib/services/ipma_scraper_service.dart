@@ -57,12 +57,14 @@ class IpmaScraperService {
       if (kIsWeb) pageUrl,
     ]);
 
+    final timeout = kIsWeb ? const Duration(seconds: 4) : const Duration(seconds: 12);
+
     for (final url in urlsParaTentar) {
       try {
         final response = await _client.get(
           Uri.parse(url),
           headers: HttpHeadersConfig.scraperHeaders,
-        ).timeout(const Duration(seconds: 12));
+        ).timeout(timeout);
 
         if (response.statusCode == 200 && response.body.isNotEmpty) {
           final resultados = parseHtml(response.body);
@@ -81,11 +83,11 @@ class IpmaScraperService {
       }
     }
 
-    // Se todos os proxies falharem, ativar backoff curto de 1 minuto
+    // Se todos os proxies falharem, ativar arrefecimento curto (60s)
     _falhasConsecutivas++;
-    final segundosEspera = (60 * (1 << (_falhasConsecutivas - 1))).clamp(60, 600);
+    final segundosEspera = (60 * (1 << (_falhasConsecutivas - 1))).clamp(60, 180);
     _proximaTentativaPermitida = DateTime.now().add(Duration(seconds: segundosEspera));
-    debugPrint('IpmaScraperService: Todos os endpoints falharam. Backoff de ${segundosEspera}s.');
+    debugPrint('IpmaScraperService: Todos os endpoints falharam. Arrefecimento de ${segundosEspera}s.');
 
     return [];
   }

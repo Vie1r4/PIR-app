@@ -12,6 +12,7 @@ import '../services/ipma_api_service.dart';
 import '../services/ipma_scraper_service.dart';
 import '../services/localizacao_service.dart';
 import '../services/map_geometry_service.dart';
+import '../services/previsao_calculo_service.dart';
 
 class RiscoProvider extends ChangeNotifier {
   final IpmaApiService _apiService = IpmaApiService();
@@ -195,6 +196,12 @@ class RiscoProvider extends ChangeNotifier {
       if (cacheAlargada != null && cacheAlargada.isNotEmpty) {
         _previsaoAlargada =
             cacheAlargada.map((j) => DadosRisco.fromJson(j)).toList();
+      } else if (_riscoHoje != null) {
+        // Se a previsão alargada não estava em cache, projeta imediatamente para nunca ficar com 2 dias
+        _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
+          d0: _riscoHoje!,
+          d1: _riscoAmanha,
+        );
       }
 
       _ultimaAtualizacao = _cacheService.ultimaAtualizacao('rcm_d0');
@@ -240,10 +247,11 @@ class RiscoProvider extends ChangeNotifier {
     _ultimoPedidoRede = DateTime.now();
 
     try {
-      // 1. Executar API oficial e Scraper em simultâneo com tratamento isolado
+      // 1. Executar API oficial (D0, D1 e D2) e Scraper em paralelo
       final apiFuture = Future.wait([
         _apiService.fetchRiscoHoje(),
         _apiService.fetchRiscoAmanha(),
+        _apiService.fetchRiscoDepoisDeAmanha(),
       ]).then<List<DadosRisco>?>((v) => v).catchError((e) {
         debugPrint('Falha ao obter API oficial do IPMA: $e');
         return null;
@@ -256,24 +264,52 @@ class RiscoProvider extends ChangeNotifier {
       });
 
       final apiResultados = await apiFuture;
+
+      if (apiResultados != null && apiResultados.length >= 2) {
+        _riscoHoje = apiResultados[0];
+        _riscoAmanha = apiResultados[1];
+        final d2 = apiResultados.length > 2 ? apiResultados[2] : null;
+
+        // Se ainda não temos a previsão de 9 dias (ou era vazia),
+        // calcula imediatamente a partir da base oficial (0ms de latência percebida)
+        if (_previsaoAlargada.isEmpty || _previsaoAlargada.length < 9) {
+          _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
+            d0: _riscoHoje!,
+            d1: _riscoAmanha,
+            d2: d2,
+          );
+          _isOnline = true;
+          _ultimaAtualizacao = DateTime.now();
+          notifyListeners();
+        }
+      }
+
       final scraperResultados = await scraperFuture;
 
       final redeSucesso = (apiResultados != null && apiResultados.length >= 2) ||
           scraperResultados.isNotEmpty;
 
-      if (apiResultados != null && apiResultados.length >= 2) {
-        _riscoHoje = apiResultados[0];
-        _riscoAmanha = apiResultados[1];
-      } else if (scraperResultados.isNotEmpty) {
-        // Fallback gracioso: usar os dados do scraper já descarregados sem 2º pedido HTTP
-        _riscoHoje = scraperResultados[0];
+      if (scraperResultados.isNotEmpty) {
+        // Fallback gracioso: usar os dados do scraper já descarregados
+        _riscoHoje ??= scraperResultados[0];
         if (scraperResultados.length > 1) {
-          _riscoAmanha = scraperResultados[1];
+          _riscoAmanha ??= scraperResultados[1];
         }
+        // Se o scraper do site do IPMA obteve os 9 dias, adota esses valores
+        _previsaoAlargada = scraperResultados;
+      } else if (_riscoHoje != null && (_previsaoAlargada.isEmpty || _previsaoAlargada.length < 9)) {
+        // Garantia de 9 dias: cálculo algorítmico robusto a partir da base oficial
+        final d2 = (apiResultados != null && apiResultados.length > 2)
+            ? apiResultados[2]
+            : null;
+        _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
+          d0: _riscoHoje!,
+          d1: _riscoAmanha,
+          d2: d2,
+        );
       }
 
-      if (scraperResultados.isNotEmpty) {
-        _previsaoAlargada = scraperResultados;
+      if (_previsaoAlargada.isNotEmpty) {
         await _cacheService.salvarPrevisaoAlargada(
           _previsaoAlargada.map((d) => d.toJson()).toList(),
         );
@@ -285,6 +321,9 @@ class RiscoProvider extends ChangeNotifier {
         _ultimaAtualizacao = DateTime.now();
         await _cacheService.salvarDadosRisco('rcm_d0', _riscoHoje!.toJson());
         await _cacheService.salvarDadosRisco('rcm_d1', _riscoAmanha!.toJson());
+        if (apiResultados != null && apiResultados.length > 2) {
+          await _cacheService.salvarDadosRisco('rcm_d2', apiResultados[2].toJson());
+        }
         await _cacheService.salvarUltimaAtualizacao('rcm_d0');
         _erro = null;
       } else {

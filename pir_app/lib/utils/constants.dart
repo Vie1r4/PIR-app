@@ -6,6 +6,8 @@ class ApiUrls {
       'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-d0.json';
   static const String rcmAmanha =
       'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-d1.json';
+  static const String rcmDepoisDeAmanha =
+      'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-d2.json';
 
   ApiUrls._();
 }
@@ -76,6 +78,7 @@ class CacheKeys {
   static const String boxName = 'pir_cache';
   static const String rcmD0 = 'rcm_d0';
   static const String rcmD1 = 'rcm_d1';
+  static const String rcmD2 = 'rcm_d2';
   static const String favoritos = 'favoritos';
   static const String concelhoPrincipal = 'concelho_principal';
   static const String autoLocalizacao = 'auto_localizacao';
