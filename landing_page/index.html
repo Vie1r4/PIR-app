@@ -26,215 +26,224 @@
   <!-- ==========================================
        1. NAVBAR
   =========================================== -->
-  <nav class="navbar">
+  <header class="navbar">
     <div class="nav-container">
-      <a href="#inicio" class="nav-logo">
-        <img src="assets/icon.png" alt="PIR Logo" class="nav-logo-icon">
-        <span class="nav-logo-title">PIR</span>
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 23c-4.97 0-9-4.03-9-9 0-3.32 1.8-6.22 4.48-7.76.32-.18.73-.08.93.23.2.31.11.72-.2.93C6.01 8.68 4.5 11.18 4.5 14c0 4.14 3.36 7.5 7.5 7.5s7.5-3.36 7.5-7.5c0-2.82-1.51-5.32-3.71-6.6-.31-.21-.4-.62-.2-.93.2-.31.61-.41.93-.23C19.2 7.78 21 10.68 21 14c0 4.97-4.03 9-9 9z"/>
+            <path d="M12 18c-2.21 0-4-1.79-4-4 0-1.63.98-3.03 2.39-3.66.33-.15.72 0 .87.33.15.33 0 .72-.33.87-.95.42-1.6 1.36-1.6 2.46 0 1.47 1.19 2.67 2.67 2.67s2.67-1.19 2.67-2.67c0-1.1-.65-2.04-1.6-2.46-.33-.15-.48-.54-.33-.87.15-.33.54-.48.87-.33 1.41.63 2.39 2.03 2.39 3.66 0 2.21-1.79 4-4 4z"/>
+          </svg>
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-title">PIR</span>
+          <span class="nav-country">PORTUGAL</span>
+        </div>
       </a>
 
-      <ul class="nav-links">
-        <li><a href="#inicio">Início</a></li>
-        <li><a href="#funcionalidades">Funcionalidades</a></li>
-        <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#download">Download</a></li>
-      </ul>
+      <div class="nav-actions">
+        <a href="#download-card" class="btn-install-nav">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Instalar Agora</span>
+        </a>
 
-      <a href="#download" class="nav-cta">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span>Descarregar</span>
-      </a>
+        <a href="https://github.com/Vie1r4/PIR-app" target="_blank" rel="noopener" class="nav-user-btn" aria-label="Perfil do GitHub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+        </a>
+      </div>
     </div>
-  </nav>
+  </header>
 
   <!-- ==========================================
-       2. SECÇÃO HERO (3 COLUNAS)
+       2. HERO SECTION
   =========================================== -->
-  <main id="inicio" class="hero-wrapper">
-    <div class="hero-grid">
+  <main class="hero-container">
+    
+    <!-- Tagline / Badge Oficial -->
+    <div class="official-badge">
+      <span class="badge-dot"></span>
+      <span class="badge-text">PROTEÇÃO & PREVENÇÃO CIVIL • DADOS OFICIAIS IPMA</span>
+    </div>
+
+    <!-- Título Principal -->
+    <h1 class="main-headline">
+      Risco de Incêndio Rural no<br>
+      <span class="highlight-concelho">teu Concelho.</span>
+    </h1>
+
+    <!-- Subtítulo Explicativo -->
+    <p class="hero-subtitle">
+      Acompanha a evolução do perigo de fogo em tempo real com dados meteorológicos calibrados. Disponível nativamente no teu computador e no teu telemóvel.
+    </p>
+
+    <!-- Barra de Métricas (Pill Strip) -->
+    <div class="metrics-pill-bar">
+      <div class="metric-item">
+        <span class="metric-icon">📍</span>
+        <span><strong>278 Concelhos</strong> Monitorizados</span>
+      </div>
+      <span class="metric-separator">•</span>
+      <div class="metric-item">
+        <span class="metric-icon">📅</span>
+        <span><strong>9 Dias</strong> Previsão Antecipada</span>
+      </div>
+      <span class="metric-separator">•</span>
+      <div class="metric-item">
+        <span class="metric-icon">🛡️</span>
+        <span><strong>100% Gratuito</strong> & Sem Publicidade</span>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         3. CARTÃO DE DOWNLOAD MULTIPLATAFORMA
+    =========================================== -->
+    <div id="download-card" class="platform-card">
       
-      <!-- Coluna da Esquerda -->
-      <div class="hero-col-left">
-        <div>
-          <div class="hero-tagline">Proteção & Prevenção Civil</div>
-          <h1 class="hero-title">Risco de Incêndio Rural no <span class="accent">teu Concelho.</span></h1>
+      <!-- Cabeçalho do Cartão -->
+      <div class="platform-card-header">
+        <div class="platform-header-text">
+          <span class="platform-category">DISTRIBUIÇÃO MULTIPLATAFORMA</span>
+          <h2 class="platform-title">Instalação Direta e Sem Complicações</h2>
         </div>
 
-        <div class="hero-scroll-indicator">
-          <span class="scroll-line"></span>
-          <span>Scroll to explore</span>
+        <!-- Seletor de Plataforma (Segmented Control) -->
+        <div class="platform-tabs" role="tablist">
+          <button class="tab-btn active" id="tab-windows" onclick="selectPlatform('windows')" role="tab" aria-selected="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+            <span>Windows</span>
+          </button>
+          
+          <button class="tab-btn" id="tab-ios" onclick="selectPlatform('ios')" role="tab" aria-selected="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.2c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.61 1.35-.55.63-.99 1.68-.86 2.7.99.08 2.02-.45 2.55-1.2"/></svg>
+            <span>iPhone (iOS)</span>
+          </button>
+
+          <button class="tab-btn" id="tab-web" onclick="selectPlatform('web')" role="tab" aria-selected="false">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Web App</span>
+          </button>
         </div>
       </div>
 
-      <!-- Coluna Central: Mockup do Smartphone na Vertical -->
-      <div class="hero-col-center">
-        <div class="phone-mockup">
-          <div class="phone-island"></div>
-          
-          <div class="phone-screen">
-            <!-- Header simulado da app -->
-            <div class="phone-header-bar">
-              <div class="phone-search-bar">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <span>Pesquisar concelho...</span>
-              </div>
-            </div>
-
-            <!-- Dias disponíveis -->
-            <div class="phone-day-tabs">
-              <span class="phone-day-pill active">Hoje</span>
-              <span class="phone-day-pill">Amanhã</span>
-              <span class="phone-day-pill">D+2</span>
-              <span class="phone-day-pill">+7 Dias</span>
-            </div>
-
-            <!-- Mapa vetorial de Portugal estilizado -->
-            <div class="phone-map-view">
-              <svg class="map-svg-shape" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Silhueta estilizada de Portugal Continental -->
-                <path d="M28 10 C38 6, 68 8, 75 14 C82 20, 88 35, 84 50 C80 62, 92 78, 86 95 C82 108, 80 120, 72 135 C64 148, 52 158, 40 162 C26 160, 16 148, 22 132 C26 122, 22 110, 24 96 C20 84, 18 70, 24 55 C22 40, 20 22, 28 10 Z" fill="#1C212B" stroke="#2D3545" stroke-width="1.5"/>
-                <!-- Áreas de calor / risco colorido -->
-                <path d="M38 25 C55 22, 70 28, 72 45 C65 55, 48 50, 40 40 Z" fill="#F59E0B" opacity="0.85"/>
-                <path d="M42 55 C65 52, 78 68, 72 88 C55 92, 45 80, 42 65 Z" fill="#EF4444" opacity="0.9"/>
-                <path d="M32 95 C48 90, 68 100, 62 125 C45 130, 32 118, 30 102 Z" fill="#DC2626" opacity="0.95"/>
-                <path d="M35 132 C50 130, 58 140, 52 154 C40 156, 32 148, 32 138 Z" fill="#F97316" opacity="0.85"/>
-                <!-- Pin de localização -->
-                <circle cx="52" cy="74" r="4.5" fill="#FFFFFF" stroke="#DC2626" stroke-width="2"/>
+      <!-- Corpo Dinâmico da Plataforma Selecionada -->
+      <div class="platform-body">
+        
+        <!-- Conteúdo 1: Windows (Padrão) -->
+        <div id="panel-windows" class="platform-panel active">
+          <div class="panel-info">
+            <div class="panel-icon-squircle">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
               </svg>
             </div>
-
-            <!-- Cartão de Risco do Concelho Selecionado -->
-            <div class="phone-risk-card">
-              <div class="risk-card-top">
-                <span class="risk-concelho-name">Sintra</span>
-                <span class="risk-level-badge">Nível 4 • Muito Elevado</span>
+            <div class="panel-text">
+              <div class="panel-title-row">
+                <h3 class="panel-title">PIR para Windows</h3>
+                <span class="version-tag">v1.2.0</span>
               </div>
-              <div class="risk-card-meta">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                <span>Proibido realizar queimas e queimadas</span>
-              </div>
+              <p class="panel-desc">
+                Instalador nativo x64 (.exe) • Tamanho leve de 11.5 MB • Arranque ultrarrápido
+              </p>
             </div>
-
-            <div class="phone-home-indicator"></div>
           </div>
+
+          <a href="downloads/PIR_App_v1.2.0_Setup.exe" class="btn-download-action" download>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Descarregar para Windows (.exe)</span>
+          </a>
         </div>
+
+        <!-- Conteúdo 2: iPhone (iOS) -->
+        <div id="panel-ios" class="platform-panel">
+          <div class="panel-info">
+            <div class="panel-icon-squircle">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="3" ry="3"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+            </div>
+            <div class="panel-text">
+              <div class="panel-title-row">
+                <h3 class="panel-title">PIR para iPhone</h3>
+                <span class="version-tag">iOS 15+</span>
+              </div>
+              <p class="panel-desc">
+                PWA nativa offline • Adicionar ao Ecrã Principal pelo Safari num instante
+              </p>
+            </div>
+          </div>
+
+          <button class="btn-download-action" onclick="openIosModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>Instalar no iPhone (Guia)</span>
+          </button>
+        </div>
+
+        <!-- Conteúdo 3: Web App -->
+        <div id="panel-web" class="platform-panel">
+          <div class="panel-info">
+            <div class="panel-icon-squircle">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <div class="panel-text">
+              <div class="panel-title-row">
+                <h3 class="panel-title">PIR Versão Web</h3>
+                <span class="version-tag">Online</span>
+              </div>
+              <p class="panel-desc">
+                Sem instalação necessária • Acesso direto em qualquer navegador moderno
+              </p>
+            </div>
+          </div>
+
+          <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener" class="btn-download-action">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            <span>Aceder à Web App ↗</span>
+          </a>
+        </div>
+
       </div>
 
-      <!-- Coluna da Direita: Estatísticas, Valor & Download Badges -->
-      <div class="hero-col-right">
-        <!-- Estatísticas / Prova de Dados -->
-        <div class="hero-stats-row">
-          <div class="stat-box">
-            <span class="stat-number">278</span>
-            <span class="stat-label">Concelhos Monitorizados</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-number">9<span class="plus">D</span></span>
-            <span class="stat-label">Previsão Antecipada</span>
-          </div>
-        </div>
-
-        <!-- Parágrafo de Valor -->
-        <p class="hero-description">
-          Acompanha a evolução do perigo de incêndio rural com dados oficiais e previsão meteorológica calibrada. Desenvolvido para máxima rapidez, sem publicidade e com total privacidade.
-        </p>
-
-        <!-- Bloco Disponível em -->
-        <div id="download" class="badges-section">
-          <span class="badges-caption">Disponível em:</span>
-          
-          <div class="badges-group">
-            <!-- Botão Windows (Destaque Principal) -->
-            <a href="downloads/PIR_App_v1.2.0_Setup.exe" class="badge-btn primary-btn" download>
-              <div class="badge-icon-box">
-                <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-              </div>
-              <div class="badge-text-box">
-                <span class="badge-top-line">Download para PC</span>
-                <span class="badge-main-line">Windows (.exe) • 11.5 MB</span>
-              </div>
-            </a>
-
-            <!-- Botão iPhone (iOS) -->
-            <button class="badge-btn" onclick="openIosModal()">
-              <div class="badge-icon-box">
-                <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.2c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.61 1.35-.55.63-.99 1.68-.86 2.7.99.08 2.02-.45 2.55-1.2"/></svg>
-              </div>
-              <div class="badge-text-box">
-                <span class="badge-top-line">Adicionar ao ecrã</span>
-                <span class="badge-main-line">iPhone (iOS / Safari)</span>
-              </div>
-            </button>
-
-            <!-- Botão Web -->
-            <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener" class="badge-btn">
-              <div class="badge-icon-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              </div>
-              <div class="badge-text-box">
-                <span class="badge-top-line">Acesso direto</span>
-                <span class="badge-main-line">Versão Web no Browser</span>
-              </div>
-            </a>
-          </div>
-        </div>
-
+      <!-- Rodapé do Cartão -->
+      <div class="platform-card-footer">
+        <span class="compat-info">• Compatível com Windows 10/11, iPhone iOS 15+ e todos os navegadores modernos.</span>
+        <span class="security-info">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          SHA-256 Validado
+        </span>
       </div>
+
     </div>
+
   </main>
 
-  <section id="funcionalidades" class="features-dock">
-    <div class="features-dock-container">
-      <div class="features-dock-grid">
-        <!-- Card 1 -->
-        <div class="dock-card">
-          <div class="dock-card-header">
-            <div class="dock-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <h3 class="dock-card-title">Previsão a 9 Dias</h3>
-          </div>
-          <p class="dock-card-desc">Motor preditivo meteorológico que antecipa a evolução do risco por concelho em função do vento, calor e humidade.</p>
-        </div>
-
-        <!-- Card 2: Destaque sutil -->
-        <div class="dock-card highlight">
-          <div class="dock-card-header">
-            <div class="dock-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-            </div>
-            <h3 class="dock-card-title">Mapa Vetorial Fluido</h3>
-          </div>
-          <p class="dock-card-desc">Fronteiras pré-compiladas a 60/120 FPS. Navegação suave com arrasto de rato no PC ou toque no ecrã do telemóvel.</p>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="dock-card">
-          <div class="dock-card-header">
-            <div class="dock-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <h3 class="dock-card-title">Regulamentação & Queimas</h3>
-          </div>
-          <p class="dock-card-desc">Consulta rápida das proibições legais de queimas, queimadas e pirotecnia segundo as normas da Proteção Civil e ICNF.</p>
-        </div>
-
-        <!-- Card 4: Fundo contrastante -->
-        <div class="dock-card contrast">
-          <div class="dock-card-header">
-            <div class="dock-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-            </div>
-            <h3 class="dock-card-title">Resiliência Sem Rede</h3>
-          </div>
-          <p class="dock-card-desc">Armazenamento local persistente em NoSQL (Hive) que mantém os últimos dados disponíveis mesmo em zonas de serra sem sinal.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ==========================================
-       MODAL GUIA IOS
+       MODAL GUIA IOS (SAFARI)
   =========================================== -->
   <div id="ios-modal" class="ios-modal-overlay">
     <div class="ios-modal-box">
@@ -274,23 +283,29 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       FOOTER
-  =========================================== -->
-  <footer id="sobre">
-    <div class="footer-container">
-      <div>
-        <strong>PIR — Perigo de Incêndio Rural</strong> • Versão 1.2.0 • Dados Oficiais IPMA
-      </div>
-      <div class="footer-links">
-        <a href="https://github.com/Vie1r4/PIR-app" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://vie1r4.github.io/PIR-app/" target="_blank" rel="noopener">Web App</a>
-        <a href="https://www.ipma.pt" target="_blank" rel="noopener">IPMA</a>
-      </div>
-    </div>
-  </footer>
-
   <script>
+    function selectPlatform(platform) {
+      // Toggle active tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      const activeBtn = document.getElementById('tab-' + platform);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.setAttribute('aria-selected', 'true');
+      }
+
+      // Toggle active panels
+      document.querySelectorAll('.platform-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      const activePanel = document.getElementById('panel-' + platform);
+      if (activePanel) {
+        activePanel.classList.add('active');
+      }
+    }
+
     function openIosModal() {
       const m = document.getElementById('ios-modal');
       if (m) {
