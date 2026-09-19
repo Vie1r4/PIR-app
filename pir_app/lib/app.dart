@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +42,15 @@ class PirApp extends StatelessWidget {
     return MaterialApp(
       title: 'PIR - Perigo de Incendio Rural',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.trackpad,
+          PointerDeviceKind.unknown,
+        },
+      ),
       themeMode: temaProvider.themeMode,
       theme: lightTheme,
       darkTheme: darkTheme,

@@ -49,6 +49,7 @@ class _MapScreenState extends State<MapScreen>
   bool _hasInitialFit = false;
   DateTime? _ultimoToqueTempo;
   Offset? _ultimoToquePosicao;
+  bool _estaArrastando = false;
 
   // Controlos de Pesquisa Integrada
   final TextEditingController _searchController = TextEditingController();
@@ -427,11 +428,23 @@ class _MapScreenState extends State<MapScreen>
                             clipBehavior: Clip.none,
                             trackpadScrollCausesScale: true,
                             interactionEndFrictionCoefficient: 0.000008,
-                            boundaryMargin: const EdgeInsets.all(350),
+                            boundaryMargin: const EdgeInsets.all(double.infinity),
                             minScale: 0.20,
                             maxScale: 6.0,
+                            onInteractionStart: (_) {
+                              if (mounted && !_estaArrastando) {
+                                setState(() => _estaArrastando = true);
+                              }
+                            },
+                            onInteractionEnd: (_) {
+                              if (mounted && _estaArrastando) {
+                                setState(() => _estaArrastando = false);
+                              }
+                            },
                             child: MouseRegion(
-                              cursor: SystemMouseCursors.grab,
+                              cursor: _estaArrastando
+                                  ? SystemMouseCursors.grabbing
+                                  : SystemMouseCursors.grab,
                               child: GestureDetector(
                                 behavior: HitTestBehavior.opaque,
                                 onTapUp: (details) {
