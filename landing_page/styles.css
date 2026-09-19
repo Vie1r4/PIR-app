@@ -1,15 +1,15 @@
 :root {
-  --bg-main: #090C11;
-  --bg-surface: #131722;
-  --bg-card-inner: #0A0D13;
-  --accent: #FF5C28;
-  --accent-hover: #FF6E3D;
-  --accent-glow: rgba(255, 92, 40, 0.35);
+  --bg-main: #0D0E11; /* kDarkBg da app */
+  --bg-surface: #16171B; /* kDarkCard da app */
+  --bg-card-inner: #202227; /* kDarkCard2 da app */
+  --accent: #FF6B35; /* kBrand da app */
+  --accent-hover: #FF7A30; /* kBrandDark da app */
+  --accent-glow: rgba(255, 107, 53, 0.35);
   --border-subtle: rgba(255, 255, 255, 0.06);
   --border-card: rgba(255, 255, 255, 0.08);
   --text-white: #FFFFFF;
-  --text-dim: #8E98A8;
-  --text-muted: #5D6878;
+  --text-dim: #94A3B8;
+  --text-muted: #64748B;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --radius-pill: 9999px;
   --radius-card: 20px;
@@ -29,7 +29,7 @@ html, body {
 body {
   font-family: var(--font);
   background-color: var(--bg-main);
-  background-image: radial-gradient(ellipse 70% 55% at 50% -5%, rgba(255, 92, 40, 0.18) 0%, rgba(9, 12, 17, 0.98) 75%);
+  background-image: radial-gradient(ellipse 70% 55% at 50% -5%, rgba(255, 107, 53, 0.18) 0%, rgba(13, 14, 17, 0.98) 75%);
   background-repeat: no-repeat;
   color: var(--text-white);
   line-height: 1.5;
@@ -64,17 +64,13 @@ body {
   color: inherit;
 }
 
-.nav-logo-box {
+.nav-logo-img {
   width: 38px;
   height: 38px;
   border-radius: 11px;
-  background: #161B26;
-  border: 1px solid rgba(255, 92, 40, 0.28);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .nav-brand-text {
@@ -101,7 +97,6 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
 .btn-install-nav {
@@ -123,26 +118,6 @@ body {
   background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px var(--accent-glow);
-}
-
-.nav-user-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #141824;
-  border: 1px solid var(--border-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-dim);
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.nav-user-btn:hover {
-  background: #1C2232;
-  color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.16);
 }
 
 /* =====================================================================
@@ -178,8 +153,8 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #FF4D2D;
-  box-shadow: 0 0 10px #FF4D2D;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
   flex-shrink: 0;
 }
 
@@ -257,7 +232,7 @@ body {
   border: 1px solid var(--border-card);
   border-radius: var(--radius-card);
   padding: clamp(20px, 3vw, 28px);
-  box-shadow: 0 25px 65px -15px rgba(0, 0, 0, 0.85), 0 0 35px rgba(255, 92, 40, 0.05);
+  box-shadow: 0 25px 65px -15px rgba(0, 0, 0, 0.85), 0 0 35px var(--accent-glow);
   text-align: left;
 }
 
@@ -319,7 +294,7 @@ body {
   background: var(--accent);
   color: #FFFFFF;
   font-weight: 600;
-  box-shadow: 0 2px 10px rgba(255, 92, 40, 0.35);
+  box-shadow: 0 2px 10px var(--accent-glow);
 }
 
 /* Corpo Dinâmico */
@@ -361,8 +336,8 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(255, 92, 40, 0.1);
-  border: 1px solid rgba(255, 92, 40, 0.25);
+  background: rgba(255, 107, 53, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -391,7 +366,7 @@ body {
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--accent);
-  background: rgba(255, 92, 40, 0.12);
+  background: rgba(255, 107, 53, 0.12);
   padding: 2px 7px;
   border-radius: 5px;
 }
@@ -471,7 +446,7 @@ body {
 }
 
 .ios-modal-box {
-  background: #141722;
+  background: var(--bg-surface);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-card);
   max-width: 440px;
