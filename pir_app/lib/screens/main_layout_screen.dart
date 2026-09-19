@@ -254,6 +254,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
     final activeColor = isDark ? kBrandDark : kBrand;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: false,
         child: accProvider.reduzirAnimacoes

@@ -56,7 +56,6 @@ class _MapScreenState extends State<MapScreen>
   String _searchQuery = '';
   int? _filtroNivelRisco; // null = todos, 1 a 5 = filtrar por nível de risco
   bool _mostrandoDropdownPesquisa = false;
-  bool _pesquisaExpandida = false;
   bool _diasExpandido = false;
 
   @override
@@ -66,8 +65,8 @@ class _MapScreenState extends State<MapScreen>
     _searchFocusNode.addListener(() {
       if (_searchFocusNode.hasFocus) {
         setState(() {
-          _pesquisaExpandida = true;
           _mostrandoDropdownPesquisa = true;
+          _diasExpandido = false;
         });
       }
     });
@@ -247,11 +246,10 @@ class _MapScreenState extends State<MapScreen>
   }
 
   void _aoTocarNoMapa(Offset scenePoint) {
-    // Se o dropdown de pesquisa ou barra de pesquisa estiverem abertos, tocar fora fecha-os
-    if (_mostrandoDropdownPesquisa || _pesquisaExpandida) {
+    // Se o dropdown de pesquisa estiver aberto, tocar fora fecha-o
+    if (_mostrandoDropdownPesquisa) {
       setState(() {
         _mostrandoDropdownPesquisa = false;
-        _pesquisaExpandida = false;
       });
       _searchFocusNode.unfocus();
     }
@@ -337,15 +335,14 @@ class _MapScreenState extends State<MapScreen>
       const SingleActivator(LogicalKeyboardKey.keyF, control: true): () {
         _searchFocusNode.requestFocus();
         setState(() {
-          _pesquisaExpandida = true;
           _mostrandoDropdownPesquisa = true;
+          _diasExpandido = false;
         });
       },
       const SingleActivator(LogicalKeyboardKey.escape): () {
-        if (_mostrandoDropdownPesquisa || _pesquisaExpandida) {
+        if (_mostrandoDropdownPesquisa) {
           setState(() {
             _mostrandoDropdownPesquisa = false;
-            _pesquisaExpandida = false;
           });
           _searchFocusNode.unfocus();
         } else if (_diasExpandido) {
@@ -363,6 +360,7 @@ class _MapScreenState extends State<MapScreen>
     };
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: widget.showAppBar
           ? AppBar(
               title: const Text('Mapa & Pesquisa'),
@@ -410,10 +408,9 @@ class _MapScreenState extends State<MapScreen>
                       ? const Center(child: CircularProgressIndicator())
                       : Listener(
                           onPointerDown: (_) {
-                            if (_mostrandoDropdownPesquisa || _pesquisaExpandida) {
+                            if (_mostrandoDropdownPesquisa) {
                               setState(() {
                                 _mostrandoDropdownPesquisa = false;
-                                _pesquisaExpandida = false;
                               });
                               _searchFocusNode.unfocus();
                             }
@@ -486,16 +483,18 @@ class _MapScreenState extends State<MapScreen>
                 ),
               ),
 
-              // 2. Barra de Pesquisa Flutuante no Topo Esquerdo (Minimizável / Expansível)
+              // 2. Barra de Pesquisa Flutuante no Topo Esquerdo (Largura estável, sem esticar/deformar)
               Positioned(
                 left: 14,
                 top: effectiveTop,
-                right: (isNarrow && _pesquisaExpandida) ? 14 : null,
+                right: isNarrow
+                    ? (diasDisponiveis.isNotEmpty ? 132 : 14)
+                    : null,
                 child: _buildSearchBar(isNarrow, accProvider.elementosGrandes),
               ),
 
               // 3. Dropdown Flutuante de Resultados de Pesquisa (quando ativo)
-              if (_mostrandoDropdownPesquisa && _pesquisaExpandida)
+              if (_mostrandoDropdownPesquisa)
                 Positioned(
                   left: 14,
                   right: isNarrow ? 14 : null,
@@ -508,8 +507,8 @@ class _MapScreenState extends State<MapScreen>
                   ),
                 ),
 
-              // 4. Seletor de Dias Flutuante no Topo Direito (Com modo recolhido/expandido)
-              if (diasDisponiveis.isNotEmpty && !(isNarrow && _pesquisaExpandida))
+              // 4. Seletor de Dias Flutuante no Topo Direito (Sempre visível e estável)
+              if (diasDisponiveis.isNotEmpty)
                 Positioned(
                   right: 14,
                   top: effectiveTop,
@@ -554,67 +553,11 @@ class _MapScreenState extends State<MapScreen>
 );
 }
 
-  /// Barra de pesquisa flutuante elegante com suporte a minimizar e fechar
+  /// Barra de pesquisa flutuante elegante com largura estável e sem saltos de layout
   Widget _buildSearchBar(bool isNarrow, [bool isGrandes = false]) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Se estiver em ecrã estreito e não estiver expandida
-    if (isNarrow && !_pesquisaExpandida && _searchQuery.isEmpty && !_searchFocusNode.hasFocus) {
-      return Container(
-        height: isGrandes ? 44 : 38,
-        decoration: BoxDecoration(
-          color: cs.surface.withValues(alpha: isDark ? 0.92 : 0.97),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isDark ? const Color(0x28FFFFFF) : const Color(0x18000000),
-            width: 0.8,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () {
-              HapticFeedback.selectionClick();
-              setState(() {
-                _pesquisaExpandida = true;
-                _mostrandoDropdownPesquisa = true;
-                _diasExpandido = false; // Recolhe a aba de dias ao pesquisar
-              });
-              _searchFocusNode.requestFocus();
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(CupertinoIcons.search, size: 16, color: cs.primary),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Pesquisar...',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: cs.outline,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Barra de pesquisa aberta / expandida
     return Container(
       width: isNarrow ? null : 310,
       height: isGrandes ? 48 : 42,
@@ -646,7 +589,7 @@ class _MapScreenState extends State<MapScreen>
                   filled: false,
                   fillColor: Colors.transparent,
                   hintText: isNarrow
-                      ? 'Pesquisar concelho ou distrito...'
+                      ? 'Pesquisar concelho...'
                       : 'Pesquisar concelho ou distrito... (Ctrl+F)',
                   hintStyle: TextStyle(
                     fontSize: 12,
@@ -657,9 +600,14 @@ class _MapScreenState extends State<MapScreen>
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
                           icon: const Icon(CupertinoIcons.xmark_circle_fill, size: 16),
+                          tooltip: 'Limpar pesquisa',
                           onPressed: () {
                             _searchController.clear();
-                            setState(() => _searchQuery = '');
+                            _searchFocusNode.unfocus();
+                            setState(() {
+                              _searchQuery = '';
+                              _mostrandoDropdownPesquisa = false;
+                            });
                           },
                         )
                       : null,
@@ -668,33 +616,20 @@ class _MapScreenState extends State<MapScreen>
                   focusedBorder: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 ),
+                onTap: () {
+                  setState(() {
+                    _mostrandoDropdownPesquisa = true;
+                    _diasExpandido = false;
+                  });
+                },
                 onChanged: (val) {
                   setState(() {
                     _searchQuery = val;
                     _mostrandoDropdownPesquisa = true;
-                    _pesquisaExpandida = true;
+                    _diasExpandido = false;
                   });
                 },
               ),
-            ),
-            // Botão explícito de minimizar/fechar pesquisa
-            IconButton(
-              tooltip: 'Fechar pesquisa',
-              icon: Icon(
-                CupertinoIcons.chevron_up,
-                size: 17,
-                color: cs.outline,
-              ),
-              onPressed: () {
-                HapticFeedback.selectionClick();
-                _searchController.clear();
-                _searchFocusNode.unfocus();
-                setState(() {
-                  _searchQuery = '';
-                  _mostrandoDropdownPesquisa = false;
-                  _pesquisaExpandida = false;
-                });
-              },
             ),
           ],
         ),
@@ -726,12 +661,12 @@ class _MapScreenState extends State<MapScreen>
       final rcm = dicoRef != null ? dadosDoDia?.getRisco(dicoRef)?.rcm : null;
 
       return Container(
-        height: 38,
+        height: 42,
         decoration: BoxDecoration(
           color: cs.surface.withValues(alpha: isDark ? 0.92 : 0.97),
-          borderRadius: BorderRadius.circular(19),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? const Color(0x22FFFFFF) : const Color(0x16000000),
+            color: isDark ? const Color(0x28FFFFFF) : const Color(0x18000000),
             width: 0.8,
           ),
           boxShadow: [
@@ -745,12 +680,11 @@ class _MapScreenState extends State<MapScreen>
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(19),
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
               HapticFeedback.selectionClick();
               setState(() {
                 _diasExpandido = true;
-                _pesquisaExpandida = false;
                 _mostrandoDropdownPesquisa = false;
               });
               _searchFocusNode.unfocus();
