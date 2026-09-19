@@ -202,7 +202,7 @@ class StatusConexaoBadge extends StatelessWidget {
                         ? null
                         : () async {
                             Navigator.pop(context);
-                            await provider.carregarDados();
+                            await provider.carregarDados(forcar: true);
                           },
                     icon: const Icon(CupertinoIcons.arrow_clockwise, size: 18),
                     label: Text(

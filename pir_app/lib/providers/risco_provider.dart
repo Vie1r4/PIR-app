@@ -126,8 +126,8 @@ class RiscoProvider extends ChangeNotifier {
       });
     }
 
-    // Carrega dados respeitando o TTL do cache local
-    await carregarDados();
+    // Carrega dados da rede (se falhar, mantém _isOnline = false e preserva o cache)
+    await carregarDados(silencioso: true, forcar: true);
     _iniciarAutoSync();
   }
 
@@ -211,31 +211,9 @@ class RiscoProvider extends ChangeNotifier {
   }
 
   /// Fetch fresh data from the IPMA API and Scraper.
-  /// Se [forcar] for false e o cache local for válido (< 2 horas), evita pedidos de rede desnecessários.
   Future<void> carregarDados({bool silencioso = false, bool forcar = false}) async {
-    // 1. Se o cache for válido (< 2h) e não for um pedido forçado, usa os dados locais
-    if (!forcar && isCacheValido) {
-      debugPrint('RiscoProvider: Cache local válido (< 2h). Pedido HTTP ao IPMA poupado.');
-      _isOnline = true;
-      _isLoading = false;
-      _erro = null;
-      notifyListeners();
-      return;
-    }
-
-    // 2. Proteção Anti-Metralhadora: Cooldown de 30s para pull-to-refresh
-    if (forcar && isCooldownForcarAtivo) {
-      debugPrint('RiscoProvider: Cooldown de pull-to-refresh ativo (< 30s). A responder via cache local.');
-      if (!silencioso) {
-        _isLoading = true;
-        notifyListeners();
-        // Pequena animação suave de 300ms para feedback tátil antes de retornar
-        await Future.delayed(const Duration(milliseconds: 300));
-        _isLoading = false;
-        notifyListeners();
-      }
-      return;
-    }
+    // Evita chamadas concorrentes se já estiver um pedido em curso
+    if (_isLoading) return;
 
     if (!silencioso) {
       _isLoading = true;
@@ -243,7 +221,6 @@ class RiscoProvider extends ChangeNotifier {
       notifyListeners();
     }
 
-    // Registar timestamp da tentativa de rede
     _ultimoPedidoRede = DateTime.now();
 
     try {
@@ -264,61 +241,45 @@ class RiscoProvider extends ChangeNotifier {
       });
 
       final apiResultados = await apiFuture;
-
-      if (apiResultados != null && apiResultados.length >= 2) {
-        _riscoHoje = apiResultados[0];
-        _riscoAmanha = apiResultados[1];
-        final d2 = apiResultados.length > 2 ? apiResultados[2] : null;
-
-        // Se ainda não temos a previsão de 9 dias (ou era vazia),
-        // calcula imediatamente a partir da base oficial (0ms de latência percebida)
-        if (_previsaoAlargada.isEmpty || _previsaoAlargada.length < 9) {
-          _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
-            d0: _riscoHoje!,
-            d1: _riscoAmanha,
-            d2: d2,
-          );
-          _isOnline = true;
-          _ultimaAtualizacao = DateTime.now();
-          notifyListeners();
-        }
-      }
-
       final scraperResultados = await scraperFuture;
 
       final redeSucesso = (apiResultados != null && apiResultados.length >= 2) ||
           scraperResultados.isNotEmpty;
 
-      if (scraperResultados.isNotEmpty) {
-        // Fallback gracioso: usar os dados do scraper já descarregados
-        _riscoHoje ??= scraperResultados[0];
-        if (scraperResultados.length > 1) {
-          _riscoAmanha ??= scraperResultados[1];
-        }
-        // Se o scraper do site do IPMA obteve os 9 dias, adota esses valores
-        _previsaoAlargada = scraperResultados;
-      } else if (_riscoHoje != null && (_previsaoAlargada.isEmpty || _previsaoAlargada.length < 9)) {
-        // Garantia de 9 dias: cálculo algorítmico robusto a partir da base oficial
-        final d2 = (apiResultados != null && apiResultados.length > 2)
-            ? apiResultados[2]
-            : null;
-        _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
-          d0: _riscoHoje!,
-          d1: _riscoAmanha,
-          d2: d2,
-        );
-      }
-
-      if (_previsaoAlargada.isNotEmpty) {
-        await _cacheService.salvarPrevisaoAlargada(
-          _previsaoAlargada.map((d) => d.toJson()).toList(),
-        );
-      }
-
-      // Se obtivemos dados novos com sucesso
-      if (redeSucesso && _riscoHoje != null && _riscoAmanha != null) {
+      if (redeSucesso) {
+        // Pedido de rede efetuado com sucesso -> Estado estritamente Online
         _isOnline = true;
         _ultimaAtualizacao = DateTime.now();
+
+        if (apiResultados != null && apiResultados.length >= 2) {
+          _riscoHoje = apiResultados[0];
+          _riscoAmanha = apiResultados[1];
+        } else if (scraperResultados.isNotEmpty) {
+          _riscoHoje = scraperResultados[0];
+          if (scraperResultados.length > 1) {
+            _riscoAmanha = scraperResultados[1];
+          }
+        }
+
+        if (scraperResultados.isNotEmpty) {
+          _previsaoAlargada = scraperResultados;
+        } else if (_riscoHoje != null) {
+          final d2 = (apiResultados != null && apiResultados.length > 2)
+              ? apiResultados[2]
+              : null;
+          _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
+            d0: _riscoHoje!,
+            d1: _riscoAmanha,
+            d2: d2,
+          );
+        }
+
+        if (_previsaoAlargada.isNotEmpty) {
+          await _cacheService.salvarPrevisaoAlargada(
+            _previsaoAlargada.map((d) => d.toJson()).toList(),
+          );
+        }
+
         await _cacheService.salvarDadosRisco('rcm_d0', _riscoHoje!.toJson());
         await _cacheService.salvarDadosRisco('rcm_d1', _riscoAmanha!.toJson());
         if (apiResultados != null && apiResultados.length > 2) {
@@ -327,17 +288,17 @@ class RiscoProvider extends ChangeNotifier {
         await _cacheService.salvarUltimaAtualizacao('rcm_d0');
         _erro = null;
       } else {
-        // Stale-While-Revalidate: preserva dados em cache anteriores intactos
+        // Rede falhou (sem internet / offline):
         _isOnline = false;
         _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
         if (!silencioso && _riscoHoje == null) {
           _erro = 'Sem ligação à internet. Não existem dados em cache.';
         } else {
-          _erro = null; // Mantém os dados visíveis com aviso de idade no badge
+          _erro = null;
         }
       }
     } catch (e) {
-      // Stale-While-Revalidate: falha de socket/rede não apaga cache
+      // Exceção de rede (sem net):
       _isOnline = false;
       _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
       debugPrint('Erro ao carregar dados: $e');

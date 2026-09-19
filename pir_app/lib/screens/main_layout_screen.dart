@@ -65,9 +65,9 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
     final shortcuts = <ShortcutActivator, VoidCallback>{
       const SingleActivator(LogicalKeyboardKey.keyF, control: true): () => _mudarAba(1),
       const SingleActivator(LogicalKeyboardKey.keyF, meta: true): () => _mudarAba(1),
-      const SingleActivator(LogicalKeyboardKey.keyR, control: true): () => provider.carregarDados(),
-      const SingleActivator(LogicalKeyboardKey.keyR, meta: true): () => provider.carregarDados(),
-      const SingleActivator(LogicalKeyboardKey.f5): () => provider.carregarDados(),
+      const SingleActivator(LogicalKeyboardKey.keyR, control: true): () => provider.carregarDados(forcar: true),
+      const SingleActivator(LogicalKeyboardKey.keyR, meta: true): () => provider.carregarDados(forcar: true),
+      const SingleActivator(LogicalKeyboardKey.f5): () => provider.carregarDados(forcar: true),
       const SingleActivator(LogicalKeyboardKey.digit1, alt: true): () => _mudarAba(0),
       const SingleActivator(LogicalKeyboardKey.digit2, alt: true): () => _mudarAba(1),
       const SingleActivator(LogicalKeyboardKey.digit3, alt: true): () => _mudarAba(2),

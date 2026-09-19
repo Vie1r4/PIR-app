@@ -43,6 +43,7 @@ class IpmaApiService {
     }
 
     Exception? ultimoErro;
+    final timeout = kIsWeb ? const Duration(seconds: 4) : const Duration(seconds: 6);
 
     for (final targetUrl in urlsParaTentar) {
       try {
@@ -51,7 +52,7 @@ class IpmaApiService {
               Uri.parse(targetUrl),
               headers: HttpHeadersConfig.defaultHeaders,
             )
-            .timeout(const Duration(seconds: 12));
+            .timeout(timeout);
 
         if (response.statusCode == 200 && response.body.isNotEmpty) {
           final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -64,6 +65,16 @@ class IpmaApiService {
       } catch (e) {
         ultimoErro = Exception('Falha na comunicação com o IPMA em $targetUrl: $e');
         debugPrint('IpmaApiService: Falha na URL $targetUrl: $e');
+
+        // Se for erro de ausência de rede no dispositivo, não insiste em proxies
+        final errStr = e.toString().toLowerCase();
+        if (errStr.contains('xmlhttprequest') ||
+            errStr.contains('socketexception') ||
+            errStr.contains('failed to fetch') ||
+            errStr.contains('networkerror') ||
+            errStr.contains('clientexception')) {
+          break;
+        }
         continue;
       }
     }
