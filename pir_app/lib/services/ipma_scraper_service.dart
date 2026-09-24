@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 
 import '../models/risco_incendio.dart';
 import '../utils/constants.dart';
 
 /// Serviço isolado responsável por extrair a previsão alargada de 9 dias
-/// a partir da página HTML do IPMA (web scraping).
+/// a partir da página HTML do IPMA (web scraping) ou asset estático pré-sincronizado.
 ///
 /// Mantido completamente separado da API oficial para fácil manutenção
 /// e garantia de fallback seguro caso o site mude.
@@ -33,9 +34,8 @@ class IpmaScraperService {
   Duration get tempoRestanteBackoff =>
       emBackoff ? _proximaTentativaPermitida!.difference(DateTime.now()) : Duration.zero;
 
-  /// Descarrega a página do IPMA e extrai a lista de previsões (até 9 dias).
-  /// Na Web, utiliza proxies CORS transparentes de fallback para contornar
-  /// a ausência de cabeçalhos CORS no servidor do IPMA.
+  /// Descarrega a página do IPMA ou o ficheiro de dados pré-sincronizado e extrai a lista de previsões (até 9 dias).
+  /// Na Web, utiliza assets empacotados, raw GitHub (com CORS) ou proxies de fallback.
   Future<List<DadosRisco>> fetchPrevisao9Dias() async {
     // 1. Verificar Circuit Breaker / Backoff
     if (emBackoff) {
@@ -43,6 +43,27 @@ class IpmaScraperService {
         'IpmaScraperService: Circuit Breaker ativo (faltam ${tempoRestanteBackoff.inSeconds}s). A poupar pedidos HTML.',
       );
       return [];
+    }
+
+    // 2. Tentar primeiro o asset empacotado pré-sincronizado (mesmo domínio no Web PWA ou nativo)
+    try {
+      final staticJson = await rootBundle.loadString('assets/data/rcm-9dias.json');
+      if (staticJson.isNotEmpty) {
+        final resultados = parsePayload(staticJson);
+        if (resultados.isNotEmpty) {
+          final dataPrimeiro = resultados.first.dataPrev;
+          final dtPrimeiro = DateTime.tryParse(dataPrimeiro);
+          if (dtPrimeiro != null &&
+              dtPrimeiro.isAfter(DateTime.now().subtract(const Duration(days: 2)))) {
+            debugPrint(
+              'IpmaScraperService: 9 dias carregados com sucesso a partir de asset estático ($dataPrimeiro).',
+            );
+            return resultados;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('IpmaScraperService: Asset estático indisponível ou em carregamento: $e');
     }
 
     final urlsParaTentar = <String>[];
@@ -53,15 +74,16 @@ class IpmaScraperService {
       urlsParaTentar.add(legacyPageUrl);
     }
 
-    // Proxies CORS para Web e fallback resiliente
+    // Fallbacks para Web (Raw GitHub CORS limpo, proxies)
     urlsParaTentar.addAll([
+      'https://raw.githubusercontent.com/Vie1r4/PIR-app/main/pir_app/assets/data/rcm-9dias.json',
       'https://cors.eu.org/$pageUrl',
       'https://api.codetabs.com/v1/proxy?quest=${Uri.encodeComponent(pageUrl)}',
       'https://api.allorigins.win/raw?url=${Uri.encodeComponent(pageUrl)}',
       if (kIsWeb) pageUrl,
     ]);
 
-    final timeout = kIsWeb ? const Duration(seconds: 10) : const Duration(seconds: 12);
+    final timeout = kIsWeb ? const Duration(seconds: 8) : const Duration(seconds: 12);
 
     for (final url in urlsParaTentar) {
       try {
@@ -71,9 +93,8 @@ class IpmaScraperService {
         ).timeout(timeout);
 
         if (response.statusCode == 200 && response.body.isNotEmpty) {
-          final resultados = parseHtml(response.body);
+          final resultados = parsePayload(response.body);
           if (resultados.isNotEmpty) {
-            // Sucesso: repor contadores de backoff
             _falhasConsecutivas = 0;
             _proximaTentativaPermitida = null;
             return resultados;
@@ -87,13 +108,33 @@ class IpmaScraperService {
       }
     }
 
-    // Se todos os proxies falharem, ativar arrefecimento curto (60s)
     _falhasConsecutivas++;
     final segundosEspera = (60 * (1 << (_falhasConsecutivas - 1))).clamp(60, 180);
     _proximaTentativaPermitida = DateTime.now().add(Duration(seconds: segundosEspera));
     debugPrint('IpmaScraperService: Todos os endpoints falharam. Arrefecimento de ${segundosEspera}s.');
 
     return [];
+  }
+
+  /// Processa o conteúdo (seja um JSON estático ou o HTML da página do IPMA)
+  List<DadosRisco> parsePayload(String content) {
+    if (content.trim().startsWith('[')) {
+      try {
+        final decoded = jsonDecode(content);
+        if (decoded is List) {
+          final resultados = <DadosRisco>[];
+          for (final item in decoded) {
+            if (item is Map<String, dynamic>) {
+              resultados.add(DadosRisco.fromJson(item));
+            }
+          }
+          if (resultados.isNotEmpty) return resultados;
+        }
+      } catch (e) {
+        debugPrint('IpmaScraperService: Falha ao fazer parse de JSON simples: $e');
+      }
+    }
+    return parseHtml(content);
   }
 
   /// Extrai os blocos de dados `rcmF[0]` ... `rcmF[8]` a partir do código HTML.

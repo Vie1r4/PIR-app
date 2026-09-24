@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - feat/ios-dev
+  schedule:
+    # Sincroniza automaticamente 3 vezes por dia (07:00, 12:00, 17:00 UTC)
+    - cron: '0 7,12,17 * * *'
   workflow_dispatch:
 
 permissions:
@@ -39,6 +42,11 @@ jobs:
         run: |
           cd pir_app
           flutter pub get
+
+      - name: Sync IPMA 9-Day Data
+        run: |
+          cd pir_app
+          dart tool/sync_ipma.dart
 
       - name: Build Web
         run: |

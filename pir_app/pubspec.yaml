@@ -49,3 +49,4 @@ flutter:
     - assets/concelhos.json
     - assets/logopirapp.png
     - assets/concelhos_geo.json
+    - assets/data/rcm-9dias.json
