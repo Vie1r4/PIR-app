@@ -28,10 +28,18 @@ void main() {
       expect(RiscoProvider.cooldownForcar, equals(const Duration(seconds: 30)));
     });
 
-    test('IpmaScraperService inicia com circuit breaker inativo', () {
+    test('IpmaScraperService inicia com circuit breaker inativo e aponta para endpoint direto HTTPS', () {
       final scraper = IpmaScraperService();
       expect(scraper.emBackoff, isFalse);
       expect(scraper.tempoRestanteBackoff, equals(Duration.zero));
+      expect(IpmaScraperService.pageUrl, equals('https://www.ipma.pt/pt/riscoincendio/rcm.pt/index.jsp'));
+      expect(IpmaScraperService.pageUrl, startsWith('https://'));
+    });
+
+    test('Accept-Encoding nao contem Brotli (br) para compatibilidade nativa com iOS HttpClient', () {
+      expect(HttpHeadersConfig.defaultHeaders['Accept-Encoding'], isNot(contains('br')));
+      expect(HttpHeadersConfig.scraperHeaders['Accept-Encoding'], isNot(contains('br')));
+      expect(HttpHeadersConfig.scraperHeaders['Accept-Encoding'], equals('gzip, deflate'));
     });
 
     test('DadosRisco.dataAtualizacaoOficial faz parse correto do carimbo do IPMA', () {

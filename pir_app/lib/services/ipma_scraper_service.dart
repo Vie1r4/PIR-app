@@ -11,7 +11,10 @@ import '../utils/constants.dart';
 /// Mantido completamente separado da API oficial para fácil manutenção
 /// e garantia de fallback seguro caso o site mude.
 class IpmaScraperService {
-  static const String pageUrl = 'https://www.ipma.pt/pt/ambiente/risco.incendio/';
+  /// Endpoint direto JSP que responde em HTTPS 200 OK sem redirecionamentos HTTP 302.
+  /// Previne bloqueio por App Transport Security (ATS) no iOS.
+  static const String pageUrl = 'https://www.ipma.pt/pt/riscoincendio/rcm.pt/index.jsp';
+  static const String legacyPageUrl = 'https://www.ipma.pt/pt/ambiente/risco.incendio/';
 
   final http.Client _client;
 
@@ -47,6 +50,7 @@ class IpmaScraperService {
     // No nativo (iOS/Android/Desktop), tentar sempre o IPMA diretamente primeiro
     if (!kIsWeb) {
       urlsParaTentar.add(pageUrl);
+      urlsParaTentar.add(legacyPageUrl);
     }
 
     // Proxies CORS para Web e fallback resiliente
@@ -57,7 +61,7 @@ class IpmaScraperService {
       if (kIsWeb) pageUrl,
     ]);
 
-    final timeout = kIsWeb ? const Duration(seconds: 4) : const Duration(seconds: 12);
+    final timeout = kIsWeb ? const Duration(seconds: 10) : const Duration(seconds: 12);
 
     for (final url in urlsParaTentar) {
       try {

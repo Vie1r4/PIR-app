@@ -29,7 +29,7 @@ class HttpHeadersConfig {
     return const {
       'User-Agent': userAgent,
       'Accept': 'application/json, text/plain, */*',
-      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Encoding': 'gzip, deflate',
     };
   }
 
@@ -45,7 +45,7 @@ class HttpHeadersConfig {
       'User-Agent': userAgent,
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
-      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Encoding': 'gzip, deflate',
     };
   }
 
