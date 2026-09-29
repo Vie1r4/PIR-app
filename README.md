@@ -63,9 +63,14 @@ Os dados são recolhidos diretamente das fontes abertas e oficiais do IPMA:
 
 ## 🚀 Como Usar
 
-### No iPhone / iPad / Android (Web PWA):
-1. Acede a **[https://vie1r4.github.io/PIR-app/](https://vie1r4.github.io/PIR-app/)** no Safari (iOS) ou Chrome (Android).
-2. No iOS (Safari), toca no botão de **Partilhar** (`Compartilhar`) e seleciona **"Ecrã Principal"** (*Add to Home Screen*).
+### No Android (App Nativa APK):
+1. Descarrega o instalador direto **`.apk`** através da landing page oficial.
+2. Abre o ficheiro e, se solicitado, autoriza a instalação de fontes desconhecidas no navegador (ex: Chrome).
+3. A aplicação fica imediatamente disponível na tua gaveta de aplicações com suporte nativo 100% offline, GPS de alta precisão e arranque instantâneo.
+
+### No iPhone / iPad (Web PWA):
+1. Acede a **[https://vie1r4.github.io/PIR-app/](https://vie1r4.github.io/PIR-app/)** no Safari.
+2. Toca no botão de **Partilhar** e seleciona **"Ecrã Principal"** (*Add to Home Screen*).
 3. A aplicação abre instantaneamente em modo nativo de ecrã inteiro (Standalone), com suporte offline, ícone de alta resolução e transições táteis fluidas.
 
 ### No Computador (Windows Desktop):
@@ -200,6 +205,7 @@ O Flutter encontra-se instalado em `C:\Users\Utilizador\flutter\bin`.
 ```powershell
 flutter run -d chrome     # Web / PWA
 flutter run -d windows    # Windows Desktop
+flutter run -d android    # Android (com emulador ou dispositivo USB)
 ```
 
 ### Executar Testes Automatizados:
@@ -219,4 +225,7 @@ flutter build web --release --base-href /PIR-app/
 
 # Windows Desktop
 flutter build windows --release
+
+# Android (APK Nativo Direto)
+flutter build apk --release
 ```

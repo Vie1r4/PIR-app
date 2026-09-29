@@ -385,6 +385,19 @@ body {
   line-height: 1.4;
 }
 
+.panel-link-guide {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.panel-link-guide:hover {
+  color: var(--accent-hover);
+}
+
 .btn-download-action {
   display: inline-flex;
   align-items: center;
@@ -574,13 +587,19 @@ body {
   }
   .platform-tabs {
     width: 100%;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    padding: 3px;
   }
   .tab-btn {
-    flex: 1;
     justify-content: center;
-    padding: 7px 8px;
-    font-size: 0.78rem;
+    padding: 7px 4px;
+    font-size: 0.74rem;
+    gap: 5px;
+  }
+  .tab-btn svg {
+    flex-shrink: 0;
   }
   .platform-panel {
     flex-direction: column;

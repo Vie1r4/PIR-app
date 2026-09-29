@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página não encontrada | PIR</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0B0E14;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .error-code {
+      font-size: 6rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #FF6B35;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.25rem;
+    }
+
+    .error-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #fff;
+    }
+
+    .error-subtitle {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.45);
+      max-width: 360px;
+      line-height: 1.65;
+      margin-bottom: 2.25rem;
+    }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FF6B35;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn-home:hover { opacity: 0.82; }
+
+    .brand-footer {
+      margin-top: 3.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.2);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="error-code">404</p>
+  <h1 class="error-title">Página não encontrada</h1>
+  <p class="error-subtitle">
+    O endereço que tentaste aceder não existe.<br>
+    Volta à página principal para descarregar a aplicação PIR.
+  </p>
+
+  <a href="/" class="btn-home">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Voltar ao início
+  </a>
+
+  <p class="brand-footer">PIR — Perigo de Incêndio Rural</p>
+
+</body>
+</html>

@@ -98,9 +98,17 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> with WidgetsBinding
         ? _buildDesktopLayout(paginas, accProvider)
         : _buildMobileLayout(paginas, numFavoritos, accProvider);
 
-    return CallbackShortcuts(
-      bindings: shortcuts,
-      child: Focus(autofocus: true, child: layoutContent),
+    return PopScope(
+      canPop: _indiceSelecionado == 0,
+      onPopInvokedWithResult: (didPop, dynamic result) {
+        if (!didPop && _indiceSelecionado != 0) {
+          _mudarAba(0);
+        }
+      },
+      child: CallbackShortcuts(
+        bindings: shortcuts,
+        child: Focus(autofocus: true, child: layoutContent),
+      ),
     );
   }
 

@@ -1,0 +1,29 @@
+# PIR — Perigo de Incêndio Rural
+
+> Aplicação gratuita, sem publicidade e sem recolha de dados pessoais para consultar o perigo de incêndio rural em Portugal Continental, com dados oficiais do IPMA.
+
+## O que é a PIR?
+
+PIR é uma aplicação multiplataforma que permite consultar o nível de perigo de incêndio rural por concelho em Portugal Continental, com base nos dados meteorológicos calibrados do IPMA (Instituto Português do Mar e da Atmosfera).
+
+## Funcionalidades
+
+- Monitorização de 278 concelhos de Portugal Continental
+- Previsão antecipada de 9 dias
+- Dados oficiais do IPMA, atualizados automaticamente 3 vezes por dia
+- 100% gratuito, sem publicidade e sem subscrições
+- Sem recolha de dados pessoais
+
+## Plataformas disponíveis
+
+- **Windows 10/11**: instalador nativo x64 (.exe), 11.5 MB, arranque ultrarrápido
+- **Android (Android 5.0+)**: instalador nativo direto (.apk), 100% offline e GPS
+- **iPhone (iOS 15+)**: PWA instalável diretamente pelo Safari, sem App Store
+- **Web**: acesso direto em qualquer navegador moderno, sem instalação
+
+## Links
+
+- Landing page oficial: https://pir-app.vercel.app/
+- Download Windows (.exe): https://pir-app.vercel.app/downloads/PIR_App_v1.2.0_Setup.exe
+- Download Android (.apk): https://pir-app.vercel.app/downloads/PIR_App_v1.2.0.apk
+- Web App / PWA: https://vie1r4.github.io/PIR-app/
