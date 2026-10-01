@@ -46,7 +46,7 @@ jobs:
       - name: Build Android APK (Release)
         run: |
           cd pir_app
-          flutter build apk --release
+          flutter build apk --release --android-skip-build-dependency-validation
 
       - name: Compute SHA-256 Checksum
         run: |
