@@ -186,21 +186,79 @@ const mesesAbrev = [
   'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
 ];
 
-/// Formata o rótulo de um dia (Hoje, Amanhã ou 'Seg, 5 Set' / 'Seg, 5')
-String formatarRotuloDia(String dataPrev, int diaIndex, {bool incluirMes = true}) {
+/// Devolve a data e hora corrente calibrada para o fuso horário de Portugal Continental (Europe/Lisbon).
+/// Trata automaticamente a alternância entre Horário de Verão (WEST = UTC+1) e Inverno (WET = UTC+0)
+/// de forma consistente e determinística em qualquer sistema operativo ou browser.
+DateTime agoraPortugal([DateTime? baseUtc]) {
+  final utc = baseUtc ?? DateTime.now().toUtc();
+  final ano = utc.year;
+
+  // Início DST UE (último domingo de março às 01:00 UTC)
+  final ultimoDiaMarco = DateTime.utc(ano, 3, 31);
+  final ultimoDomingoMarco =
+      ultimoDiaMarco.subtract(Duration(days: ultimoDiaMarco.weekday % 7));
+  final inicioDst = DateTime.utc(ano, 3, ultimoDomingoMarco.day, 1, 0);
+
+  // Fim DST UE (último domingo de outubro às 01:00 UTC)
+  final ultimoDiaOutubro = DateTime.utc(ano, 10, 31);
+  final ultimoDomingoOutubro =
+      ultimoDiaOutubro.subtract(Duration(days: ultimoDiaOutubro.weekday % 7));
+  final fimDst = DateTime.utc(ano, 10, ultimoDomingoOutubro.day, 1, 0);
+
+  final isDst = (utc.isAfter(inicioDst) || utc.isAtSameMomentAs(inicioDst)) &&
+      utc.isBefore(fimDst);
+  return utc.add(Duration(hours: isDst ? 1 : 0));
+}
+
+/// Formata o rótulo de um dia validando semanticamente contra o dia civil de Portugal Continental.
+/// Impede que boletins da cache referentes a dias passados (ex: ontem) sejam falsamente rotulados como "Hoje".
+String formatarRotuloDia(
+  String dataPrev,
+  int diaIndex, {
+  bool incluirMes = true,
+  DateTime? agoraReferencia,
+}) {
+  DateTime? dtPrev;
+  try {
+    final partes = dataPrev.trim().split('-');
+    if (partes.length == 3) {
+      dtPrev = DateTime(
+        int.parse(partes[0]),
+        int.parse(partes[1]),
+        int.parse(partes[2]),
+      );
+    } else {
+      dtPrev = DateTime.tryParse(dataPrev);
+    }
+  } catch (_) {}
+
+  if (dtPrev != null) {
+    final ref = agoraReferencia ?? agoraPortugal();
+    final hojeCivil = DateTime(ref.year, ref.month, ref.day);
+    final dataCivil = DateTime(dtPrev.year, dtPrev.month, dtPrev.day);
+    final diffDias = dataCivil.difference(hojeCivil).inDays;
+
+    if (diffDias == 0) return 'Hoje';
+    if (diffDias == 1) return 'Amanhã';
+    if (diffDias == -1) return 'Ontem (Desatualizado)';
+    if (diffDias < -1) {
+      final mes = mesesAbrev[dtPrev.month - 1];
+      return '${dtPrev.day} $mes (Desatualizado)';
+    }
+
+    // Dias futuros (D+2 em diante)
+    final diaSemana = diasDaSemanaAbrev[dtPrev.weekday - 1];
+    if (incluirMes) {
+      final mes = mesesAbrev[dtPrev.month - 1];
+      return '$diaSemana, ${dtPrev.day} $mes';
+    }
+    return '$diaSemana, ${dtPrev.day}';
+  }
+
+  // Fallback seguro caso a dataPrev seja inválida ou vazia
   if (diaIndex == 0) return 'Hoje';
   if (diaIndex == 1) return 'Amanhã';
-  try {
-    final dt = DateTime.parse(dataPrev);
-    final diaSemana = diasDaSemanaAbrev[dt.weekday - 1];
-    if (incluirMes) {
-      final mes = mesesAbrev[dt.month - 1];
-      return '$diaSemana, ${dt.day} $mes';
-    }
-    return '$diaSemana, ${dt.day}';
-  } catch (_) {
-    return dataPrev;
-  }
+  return dataPrev;
 }
 
 /// Condicionantes e restrições legais associadas ao nível de risco (ICNF / DL 82/2021)

@@ -9,3 +9,6 @@ update_icon*.ps1
 **/build/
 **/.dart_tool/
 **/dist/
+
+# Multi-agent teamwork artifacts
+.agents/

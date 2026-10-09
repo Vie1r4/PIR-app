@@ -9,13 +9,18 @@ class ApiUrls {
   static const String rcmDepoisDeAmanha =
       'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-d2.json';
 
+  /// Endpoint unificado v1 na Vercel (Edge CDN Cache com CORS universal).
+  /// Fonte única de verdade oficial para Web, Desktop, iOS e Android.
+  static const String rcm9DiasVercel =
+      'https://pir-app.vercel.app/api/v1/rcm-9dias';
+
   ApiUrls._();
 }
 
 /// Configuração de cabeçalhos HTTP com User-Agent responsável
 class HttpHeadersConfig {
   static const String userAgent =
-      'PIR-App/1.1.0 (+https://github.com/Vie1r4/PIR-app; shovieira@gmail.com)';
+      'PIR-App/1.2.0 (+https://github.com/Vie1r4/PIR-app; shovieira@gmail.com)';
 
   /// Cabeçalhos para a API oficial do IPMA.
   /// Na Web (browsers), User-Agent e Accept-Encoding são geridos pelo browser e proibidos em fetch/XHR.
@@ -79,6 +84,7 @@ class CacheKeys {
   static const String rcmD0 = 'rcm_d0';
   static const String rcmD1 = 'rcm_d1';
   static const String rcmD2 = 'rcm_d2';
+  static const String snapshotDiario = 'snapshot_diario';
   static const String favoritos = 'favoritos';
   static const String concelhoPrincipal = 'concelho_principal';
   static const String autoLocalizacao = 'auto_localizacao';

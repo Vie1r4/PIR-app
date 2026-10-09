@@ -7,18 +7,23 @@ import 'package:flutter/services.dart';
 import '../models/concelho.dart';
 import '../models/concelho_geometry.dart';
 import '../models/risco_incendio.dart';
+import '../repositories/risco_repository.dart';
 import '../services/cache_service.dart';
-import '../services/ipma_api_service.dart';
-import '../services/ipma_scraper_service.dart';
 import '../services/localizacao_service.dart';
 import '../services/map_geometry_service.dart';
-import '../services/previsao_calculo_service.dart';
 
 class RiscoProvider extends ChangeNotifier {
-  final IpmaApiService _apiService = IpmaApiService();
-  final IpmaScraperService _scraperService = IpmaScraperService();
-  final CacheService _cacheService = CacheService();
-  final LocalizacaoService _localizacaoService = LocalizacaoService();
+  final RiscoRepository _repository;
+  final CacheService _cacheService;
+  final LocalizacaoService _localizacaoService;
+
+  RiscoProvider({
+    RiscoRepository? repository,
+    CacheService? cacheService,
+    LocalizacaoService? localizacaoService,
+  })  : _repository = repository ?? RiscoRepository(),
+        _cacheService = cacheService ?? CacheService(),
+        _localizacaoService = localizacaoService ?? LocalizacaoService();
 
   List<Concelho> _concelhos = [];
   DadosRisco? _riscoHoje;
@@ -28,6 +33,7 @@ class RiscoProvider extends ChangeNotifier {
   Set<String> _favoritoDicos = {};
   bool _isLoading = false;
   bool _isOnline = false;
+  OrigemDados _origem = OrigemDados.cacheHive;
   String? _erro;
   DateTime? _ultimaAtualizacao;
   Timer? _autoSyncTimer;
@@ -51,6 +57,7 @@ class RiscoProvider extends ChangeNotifier {
   Set<String> get favoritoDicos => _favoritoDicos;
   bool get isLoading => _isLoading;
   bool get isOnline => _isOnline;
+  OrigemDados get origem => _origem;
   String? get erro => _erro;
   DateTime? get ultimaAtualizacao => _ultimaAtualizacao;
 
@@ -178,41 +185,21 @@ class RiscoProvider extends ChangeNotifier {
     }
   }
 
-  /// Load cached risk data (for offline use)
+  /// Carrega os dados persistidos em cache via repositório para arranque imediato
   Future<void> _carregarDadosDoCache() async {
     _isOnline = false;
-    try {
-      final cacheHoje = _cacheService.carregarDadosRisco('rcm_d0');
-      if (cacheHoje != null) {
-        _riscoHoje = DadosRisco.fromJson(cacheHoje);
-      }
-
-      final cacheAmanha = _cacheService.carregarDadosRisco('rcm_d1');
-      if (cacheAmanha != null) {
-        _riscoAmanha = DadosRisco.fromJson(cacheAmanha);
-      }
-
-      final cacheAlargada = _cacheService.carregarPrevisaoAlargada();
-      if (cacheAlargada != null && cacheAlargada.isNotEmpty) {
-        _previsaoAlargada =
-            cacheAlargada.map((j) => DadosRisco.fromJson(j)).toList();
-      } else if (_riscoHoje != null) {
-        // Se a previsão alargada não estava em cache, projeta imediatamente para nunca ficar com 2 dias
-        _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
-          d0: _riscoHoje!,
-          d1: _riscoAmanha,
-        );
-      }
-
-      _ultimaAtualizacao = _cacheService.ultimaAtualizacao('rcm_d0');
-    } catch (e) {
-      debugPrint('Erro ao carregar cache: $e');
-    }
+    final res = _repository.carregarDadosLocais();
+    _riscoHoje = res.riscoHoje;
+    _riscoAmanha = res.riscoAmanha;
+    _previsaoAlargada = res.previsaoAlargada;
+    _origem = res.origem;
+    _isOnline = res.isOnline;
+    _ultimaAtualizacao = res.ultimaAtualizacao;
+    _erro = res.erro;
   }
 
-  /// Fetch fresh data from the IPMA API and Scraper.
+  /// Sincroniza dados da rede via repositório mantendo o estado reativo da interface
   Future<void> carregarDados({bool silencioso = false, bool forcar = false}) async {
-    // Evita chamadas concorrentes se já estiver um pedido em curso
     if (_isLoading) return;
 
     if (!silencioso) {
@@ -224,88 +211,34 @@ class RiscoProvider extends ChangeNotifier {
     _ultimoPedidoRede = DateTime.now();
 
     try {
-      // 1. Executar API oficial (D0, D1 e D2) e Scraper em paralelo
-      final apiFuture = Future.wait([
-        _apiService.fetchRiscoHoje(),
-        _apiService.fetchRiscoAmanha(),
-        _apiService.fetchRiscoDepoisDeAmanha(),
-      ]).then<List<DadosRisco>?>((v) => v).catchError((e) {
-        debugPrint('Falha ao obter API oficial do IPMA: $e');
-        return null;
-      });
+      final estadoAtual = ResultadoPrevisao(
+        riscoHoje: _riscoHoje,
+        riscoAmanha: _riscoAmanha,
+        previsaoAlargada: _previsaoAlargada,
+        origem: _origem,
+        isOnline: _isOnline,
+        ultimaAtualizacao: _ultimaAtualizacao,
+      );
 
-      final scraperFuture =
-          _scraperService.fetchPrevisao9Dias().catchError((e) {
-        debugPrint('Falha ao obter Scraper de 9 dias do IPMA: $e');
-        return <DadosRisco>[];
-      });
+      final res = await _repository.sincronizarRede(estadoAtual: estadoAtual);
 
-      final apiResultados = await apiFuture;
-      final scraperResultados = await scraperFuture;
+      _riscoHoje = res.riscoHoje;
+      _riscoAmanha = res.riscoAmanha;
+      _previsaoAlargada = res.previsaoAlargada;
+      _origem = res.origem;
+      _isOnline = res.isOnline;
+      _ultimaAtualizacao = res.ultimaAtualizacao;
 
-      final redeSucesso = (apiResultados != null && apiResultados.length >= 2) ||
-          scraperResultados.isNotEmpty;
-
-      if (redeSucesso) {
-        // Pedido de rede efetuado com sucesso -> Estado estritamente Online
-        _isOnline = true;
-        _ultimaAtualizacao = DateTime.now();
-
-        if (apiResultados != null && apiResultados.length >= 2) {
-          _riscoHoje = apiResultados[0];
-          _riscoAmanha = apiResultados[1];
-        } else if (scraperResultados.isNotEmpty) {
-          _riscoHoje = scraperResultados[0];
-          if (scraperResultados.length > 1) {
-            _riscoAmanha = scraperResultados[1];
-          }
-        }
-
-        if (scraperResultados.isNotEmpty) {
-          _previsaoAlargada = scraperResultados;
-        } else if (_riscoHoje != null) {
-          final d2 = (apiResultados != null && apiResultados.length > 2)
-              ? apiResultados[2]
-              : null;
-          _previsaoAlargada = PrevisaoCalculoService.calcularPrevisao9Dias(
-            d0: _riscoHoje!,
-            d1: _riscoAmanha,
-            d2: d2,
-          );
-        }
-
-        if (_previsaoAlargada.isNotEmpty) {
-          await _cacheService.salvarPrevisaoAlargada(
-            _previsaoAlargada.map((d) => d.toJson()).toList(),
-          );
-        }
-
-        await _cacheService.salvarDadosRisco('rcm_d0', _riscoHoje!.toJson());
-        await _cacheService.salvarDadosRisco('rcm_d1', _riscoAmanha!.toJson());
-        if (apiResultados != null && apiResultados.length > 2) {
-          await _cacheService.salvarDadosRisco('rcm_d2', apiResultados[2].toJson());
-        }
-        await _cacheService.salvarUltimaAtualizacao('rcm_d0');
-        _erro = null;
+      if (!silencioso && _riscoHoje == null) {
+        _erro = res.erro;
       } else {
-        // Rede falhou (sem internet / offline):
-        _isOnline = false;
-        _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
-        if (!silencioso && _riscoHoje == null) {
-          _erro = 'Sem ligação à internet. Não existem dados em cache.';
-        } else {
-          _erro = null;
-        }
+        _erro = null;
       }
     } catch (e) {
-      // Exceção de rede (sem net):
+      debugPrint('RiscoProvider: Erro ao carregar dados: $e');
       _isOnline = false;
-      _ultimaAtualizacao ??= _cacheService.ultimaAtualizacao('rcm_d0');
-      debugPrint('Erro ao carregar dados: $e');
       if (!silencioso && _riscoHoje == null) {
         _erro = 'Sem ligação à internet. A aguardar reconexão.';
-      } else {
-        _erro = null;
       }
     } finally {
       _isLoading = false;
@@ -316,6 +249,7 @@ class RiscoProvider extends ChangeNotifier {
   @override
   void dispose() {
     _autoSyncTimer?.cancel();
+    _repository.dispose();
     super.dispose();
   }
 

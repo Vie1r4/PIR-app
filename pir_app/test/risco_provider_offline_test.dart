@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pir_app/models/risco_incendio.dart';
 import 'package:pir_app/providers/risco_provider.dart';
+import 'package:pir_app/repositories/risco_repository.dart';
 
 void main() {
   group('RiscoProvider Connectivity Status Tests', () {
@@ -34,6 +35,13 @@ void main() {
       final reconstruido = RiscoLocal.fromJson('0307', json);
       expect(reconstruido.rcm, equals(4));
       expect(reconstruido.nivel, equals(NivelRisco.muitoElevado));
+    });
+    test('RiscoProvider suporta injeção de dependências para isolamento de testes', () {
+      final repositoryCustomizado = RiscoRepository();
+      final provider = RiscoProvider(repository: repositoryCustomizado);
+
+      expect(provider, isNotNull);
+      expect(provider.isLoading, isFalse);
     });
   });
 }

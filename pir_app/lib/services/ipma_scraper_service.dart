@@ -50,16 +50,11 @@ class IpmaScraperService {
       final staticJson = await rootBundle.loadString('assets/data/rcm-9dias.json');
       if (staticJson.isNotEmpty) {
         final resultados = parsePayload(staticJson);
-        if (resultados.isNotEmpty) {
-          final dataPrimeiro = resultados.first.dataPrev;
-          final dtPrimeiro = DateTime.tryParse(dataPrimeiro);
-          if (dtPrimeiro != null &&
-              dtPrimeiro.isAfter(DateTime.now().subtract(const Duration(days: 2)))) {
-            debugPrint(
-              'IpmaScraperService: 9 dias carregados com sucesso a partir de asset estático ($dataPrimeiro).',
-            );
-            return resultados;
-          }
+        if (resultados.isNotEmpty && _validarFrescura(resultados)) {
+          debugPrint(
+            'IpmaScraperService: 9 dias carregados com sucesso a partir de asset estático (${resultados.first.dataPrev}).',
+          );
+          return resultados;
         }
       }
     } catch (e) {
@@ -68,20 +63,15 @@ class IpmaScraperService {
 
     final urlsParaTentar = <String>[];
 
-    // No nativo (iOS/Android/Desktop), tentar sempre o IPMA diretamente primeiro
+    // 1ª Opção (Universal): API Serverless Central do PIR-App na Vercel
+    // Edge Cache de 1h + CORS universal. Garante consistência idêntica em Web, Desktop, iOS e Android.
+    urlsParaTentar.add(ApiUrls.rcm9DiasVercel);
+
+    // 2ª Opção (Nativo - Windows/Android): Fallback direto ao IPMA em caso de indisponibilidade da Vercel
     if (!kIsWeb) {
       urlsParaTentar.add(pageUrl);
       urlsParaTentar.add(legacyPageUrl);
     }
-
-    // Fallbacks para Web (Raw GitHub CORS limpo, proxies)
-    urlsParaTentar.addAll([
-      'https://raw.githubusercontent.com/Vie1r4/PIR-app/main/pir_app/assets/data/rcm-9dias.json',
-      'https://cors.eu.org/$pageUrl',
-      'https://api.codetabs.com/v1/proxy?quest=${Uri.encodeComponent(pageUrl)}',
-      'https://api.allorigins.win/raw?url=${Uri.encodeComponent(pageUrl)}',
-      if (kIsWeb) pageUrl,
-    ]);
 
     final timeout = kIsWeb ? const Duration(seconds: 8) : const Duration(seconds: 12);
 
@@ -94,10 +84,17 @@ class IpmaScraperService {
 
         if (response.statusCode == 200 && response.body.isNotEmpty) {
           final resultados = parsePayload(response.body);
-          if (resultados.isNotEmpty) {
+          if (resultados.isNotEmpty && _validarFrescura(resultados)) {
             _falhasConsecutivas = 0;
             _proximaTentativaPermitida = null;
+            debugPrint(
+              'IpmaScraperService: 9 dias obtidos com sucesso de $url (${resultados.first.dataPrev}).',
+            );
             return resultados;
+          } else if (resultados.isNotEmpty) {
+            debugPrint(
+              'IpmaScraperService: Dados de $url descartados por obsolescência (${resultados.first.dataPrev}). A tentar próximo...',
+            );
           }
         } else {
           debugPrint('IpmaScraperService: Código ${response.statusCode} em $url. A tentar próximo fallback...');
@@ -114,6 +111,16 @@ class IpmaScraperService {
     debugPrint('IpmaScraperService: Todos os endpoints falharam. Arrefecimento de ${segundosEspera}s.');
 
     return [];
+  }
+
+  /// Valida se os dados meteorológicos são atuais (rejeita dados com mais de 2 dias de atraso).
+  bool _validarFrescura(List<DadosRisco> resultados) {
+    if (resultados.isEmpty) return false;
+    final dataPrimeiro = resultados.first.dataPrev;
+    final dtPrimeiro = DateTime.tryParse(dataPrimeiro);
+    if (dtPrimeiro == null) return false;
+    final limite = DateTime.now().subtract(const Duration(days: 2));
+    return dtPrimeiro.isAfter(limite);
   }
 
   /// Processa o conteúdo (seja um JSON estático ou o HTML da página do IPMA)

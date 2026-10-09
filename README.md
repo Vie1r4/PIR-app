@@ -110,6 +110,7 @@ O projeto adota o formato *Architecture Decision Records* (ADR) para documentar 
 | [**0003**](pir_app/docs/adr/0003-projecao-cartografica-vetorial-canvas.md) | Projeção Cartográfica Vetorial Offline em CustomPainter | Aceite | Renderização de 278 concelhos a 60/120 FPS sem WebViews nem dependências de tiles pesadas |
 | [**0004**](pir_app/docs/adr/0004-geolocalizacao-hibrida-e-mapeamento-poligonal.md) | Geolocalização Híbrida e Mapeamento Poligonal Offline | Aceite | Deteção resiliente GPS+IP e identificação geométrica local de concelhos com privacidade |
 | [**0005**](pir_app/docs/adr/0005-motor-preditivo-multidias-e-otimizacao-vetorial.md) | Motor Preditivo Multi-Dias e Memoização Vetorial Cartográfica | Aceite | Continuidade de 9 dias via D0/D1/D2 e 60/120 FPS no mapa com duplo toque inteligente |
+| [**0006**](pir_app/docs/adr/0006-api-unificada-edge-cache-vercel.md) | API Unificada Serverless Vercel com Edge CDN Cache e CORS Universal | Aceite | Consistência de dados 100% idêntica entre Web, iOS e Desktop a custo zero |
 
 Os registos detalhados encontram-se disponíveis no diretório [`pir_app/docs/adr/`](pir_app/docs/adr/).
 

@@ -30,17 +30,8 @@ class IpmaApiService {
   Future<DadosRisco> _fetchRisco(String url) async {
     final urlsParaTentar = <String>[];
 
-    // No nativo e como 1ª tentativa na web
+    // No nativo e na Web (a Web usa prioritariamente a Edge API via ScraperService ou chamada direta sem intermediários instáveis)
     urlsParaTentar.add(url);
-
-    // Na Web, adicionar proxies transparentes de fallback caso o browser bloqueie por CORS
-    if (kIsWeb) {
-      urlsParaTentar.addAll([
-        'https://cors.eu.org/$url',
-        'https://api.codetabs.com/v1/proxy?quest=${Uri.encodeComponent(url)}',
-        'https://api.allorigins.win/raw?url=${Uri.encodeComponent(url)}',
-      ]);
-    }
 
     Exception? ultimoErro;
     final timeout = kIsWeb ? const Duration(seconds: 4) : const Duration(seconds: 6);

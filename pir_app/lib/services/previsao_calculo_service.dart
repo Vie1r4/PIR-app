@@ -70,7 +70,8 @@ class PrevisaoCalculoService {
     required String dataRun,
     required String fileDate,
   }) {
-    final targetDate = dataBase.add(Duration(days: offsetDias));
+    // Cálculo puramente baseado em calendário civil (imune a mudanças de hora de 23h/25h no DST)
+    final targetDate = DateTime(dataBase.year, dataBase.month, dataBase.day + offsetDias);
     final targetDateStr =
         '${targetDate.year.toString().padLeft(4, '0')}-${targetDate.month.toString().padLeft(2, '0')}-${targetDate.day.toString().padLeft(2, '0')}';
 

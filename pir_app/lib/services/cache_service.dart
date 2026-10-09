@@ -12,6 +12,48 @@ class CacheService {
     _box = await Hive.openBox(CacheKeys.boxName);
   }
 
+  /// Salva atomicamente todo o snapshot de previsão meteorológica numa única operação transacional
+  Future<void> salvarSnapshotDiario({
+    required Map<String, dynamic> d0,
+    Map<String, dynamic>? d1,
+    Map<String, dynamic>? d2,
+    List<Map<String, dynamic>> previsaoAlargada = const [],
+    required DateTime timestamp,
+  }) async {
+    final payload = {
+      'versao': 1,
+      'timestamp': timestamp.toIso8601String(),
+      'rcm_d0': d0,
+      if (d1 != null) 'rcm_d1': d1,
+      if (d2 != null) 'rcm_d2': d2,
+      'rcm_previsao_alargada': previsaoAlargada,
+    };
+    await _box?.put(CacheKeys.snapshotDiario, jsonEncode(payload));
+
+    // Mantém chaves individuais para compatibilidade e testes legados
+    await _box?.put(CacheKeys.rcmD0, jsonEncode(d0));
+    if (d1 != null) await _box?.put(CacheKeys.rcmD1, jsonEncode(d1));
+    if (d2 != null) await _box?.put(CacheKeys.rcmD2, jsonEncode(d2));
+    if (previsaoAlargada.isNotEmpty) {
+      await _box?.put('rcm_previsao_alargada', jsonEncode(previsaoAlargada));
+    }
+    await _box?.put(
+      '${CacheKeys.ultimaAtualizacaoPrefix}${CacheKeys.rcmD0}',
+      timestamp.toIso8601String(),
+    );
+  }
+
+  /// Carrega o snapshot atómico se disponível
+  Map<String, dynamic>? carregarSnapshotDiario() {
+    final data = _box?.get(CacheKeys.snapshotDiario) as String?;
+    if (data == null) return null;
+    try {
+      return jsonDecode(data) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Save risk data JSON to cache
   Future<void> salvarDadosRisco(String key, Map<String, dynamic> json) async {
     await _box?.put(key, jsonEncode(json));

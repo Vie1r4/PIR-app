@@ -8,6 +8,7 @@ import '../providers/acessibilidade_provider.dart';
 import '../providers/risco_provider.dart';
 import '../models/risco_incendio.dart';
 import '../widgets/alerta_governo_card.dart';
+import '../widgets/contingencia_offline_card.dart';
 import '../widgets/modal_niveis_risco.dart';
 import '../widgets/modal_seletor_concelhos.dart';
 import '../widgets/previsao_alargada_card.dart';
@@ -418,7 +419,7 @@ class HomeScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cs = Theme.of(context).colorScheme;
     final riscoHoje = provider.getRiscoHoje(concelho.dico);
-    final rcmHoje = riscoHoje?.rcm ?? 1;
+    final rcmHoje = riscoHoje?.nivelValido?.valor;
 
     return Container(
       decoration: BoxDecoration(
@@ -533,6 +534,12 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+
+        // Card de Contingência se o serviço estiver inacessível e não houver dados em cache
+        if (provider.riscoHoje == null && provider.erro != null) ...[
+          ContingenciaOfflineCard(provider: provider),
+          const SizedBox(height: 18),
+        ],
 
         // Barra de pesquisa rápida em destaque estilo cápsula Apple
         Container(

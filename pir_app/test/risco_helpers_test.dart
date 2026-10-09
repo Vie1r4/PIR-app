@@ -3,19 +3,30 @@ import 'package:pir_app/utils/risco_helpers.dart';
 
 void main() {
   group('formatarRotuloDia', () {
-    test('Dia 0 é Hoje e Dia 1 é Amanhã', () {
-      expect(formatarRotuloDia('2026-09-05', 0), equals('Hoje'));
-      expect(formatarRotuloDia('2026-09-06', 1), equals('Amanhã'));
+    test('Dia 0 é Hoje e Dia 1 é Amanhã quando alinhados com o dia civil', () {
+      final ref = DateTime(2026, 9, 5);
+      expect(formatarRotuloDia('2026-09-05', 0, agoraReferencia: ref), equals('Hoje'));
+      expect(formatarRotuloDia('2026-09-06', 1, agoraReferencia: ref), equals('Amanhã'));
+    });
+
+    test('Boletim do dia anterior é explicitamente rotulado como Ontem (Desatualizado)', () {
+      final ref = DateTime(2026, 9, 5);
+      // Ficheiro na cache é de ontem (2026-09-04), mesmo que venha no índice 0
+      expect(
+        formatarRotuloDia('2026-09-04', 0, agoraReferencia: ref),
+        equals('Ontem (Desatualizado)'),
+      );
     });
 
     test('Dias subsequentes formatam semana e dia/mês', () {
       // 2026-09-07 é Segunda-feira
-      final rotuloCompleto = formatarRotuloDia('2026-09-07', 2, incluirMes: true);
+      final ref = DateTime(2026, 9, 5);
+      final rotuloCompleto = formatarRotuloDia('2026-09-07', 2, incluirMes: true, agoraReferencia: ref);
       expect(rotuloCompleto, contains('Seg'));
       expect(rotuloCompleto, contains('7'));
       expect(rotuloCompleto, contains('Set'));
 
-      final rotuloCurto = formatarRotuloDia('2026-09-07', 2, incluirMes: false);
+      final rotuloCurto = formatarRotuloDia('2026-09-07', 2, incluirMes: false, agoraReferencia: ref);
       expect(rotuloCurto, equals('Seg, 7'));
     });
   });

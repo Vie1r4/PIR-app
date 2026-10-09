@@ -13,11 +13,21 @@ enum NivelRisco {
 
   const NivelRisco(this.valor, this.label);
 
+  static NivelRisco? tryFromRcm(int? rcm) {
+    if (rcm == null || rcm < 1 || rcm > 5) return null;
+    return NivelRisco.values.firstWhere((n) => n.valor == rcm);
+  }
+
+  static NivelRisco fromRcmStrict(int rcm) {
+    if (rcm < 1 || rcm > 5) {
+      throw FormatException('Código RCM fora dos limites físicos oficiais (1..5): $rcm');
+    }
+    return NivelRisco.values.firstWhere((n) => n.valor == rcm);
+  }
+
+  /// Converte código RCM oficial (1..5) de forma estrita. Lança [FormatException] se fora dos limites.
   static NivelRisco fromRcm(int rcm) {
-    return NivelRisco.values.firstWhere(
-      (n) => n.valor == rcm,
-      orElse: () => NivelRisco.reduzido,
-    );
+    return fromRcmStrict(rcm);
   }
 }
 
@@ -45,7 +55,21 @@ class RiscoLocal {
     this.rrId,
   });
 
-  NivelRisco get nivel => NivelRisco.fromRcm(rcm);
+  NivelRisco? get nivelValido => NivelRisco.tryFromRcm(rcm);
+
+  /// Retorna o [NivelRisco] apenas se o valor físico for válido.
+  /// Lança [StateError] se acedido num registo com código RCM anómalo ou corrompido,
+  /// impedindo categoricamente qualquer falsa segurança operacional.
+  NivelRisco get nivel {
+    final n = nivelValido;
+    if (n == null) {
+      throw StateError(
+        'Tentativa de aceder a nível de risco inválido (RCM=$rcm) no concelho DICO=$dico. '
+        'Consulte [nivelValido] para verificação segura.',
+      );
+    }
+    return n;
+  }
 
   factory RiscoLocal.fromJson(String dico, Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>;

@@ -7,14 +7,14 @@ import 'risco_badge.dart';
 /// Modal estilo Apple BottomSheet com a explicacao detalhada de cada um dos 5 niveis de risco
 /// e as regras legais aplicaveis segundo o ICNF / Dec.-Lei n.º 82/2021.
 class ModalNiveisRisco extends StatefulWidget {
-  final int nivelInicial;
+  final int? nivelInicial;
 
   const ModalNiveisRisco({
     super.key,
-    this.nivelInicial = 1,
+    this.nivelInicial,
   });
 
-  static Future<void> exibir(BuildContext context, {int nivelInicial = 1}) {
+  static Future<void> exibir(BuildContext context, {int? nivelInicial}) {
     return showDialog(
       context: context,
       barrierDismissible: true,
@@ -36,7 +36,10 @@ class _ModalNiveisRiscoState extends State<ModalNiveisRisco> {
   @override
   void initState() {
     super.initState();
-    _nivelSelecionado = widget.nivelInicial.clamp(1, 5);
+    // Se não houver nível inicial oficial fornecido, inicia a navegação pelo nível 1 em modo catálogo geral
+    _nivelSelecionado = widget.nivelInicial != null
+        ? widget.nivelInicial!.clamp(1, 5)
+        : 1;
   }
 
   @override
